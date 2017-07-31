@@ -1,0 +1,6 @@
+{
+  "name": "@mapbox/dispatch-incoming",
+  "version": "1.0.0",
+  "description": "Alarm routing engine",
+  "dependencies": {}
+}
