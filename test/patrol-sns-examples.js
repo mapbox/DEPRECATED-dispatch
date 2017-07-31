@@ -1,5 +1,5 @@
 module.exports.examples = {
-  mfaDisabled = {
+  mfaDisabled: {
     'timestamp' : '2017-07-31T00:54:06.655Z',
     'title': 'User feanor has disabled 2FA on their Github account',
     'priority': 'self_service',
@@ -18,7 +18,7 @@ module.exports.examples = {
       }
     }
   },
-  madePublic = {
+  madePublic: {
     'timestamp' : '2017-07-31T00:54:06.655Z',
     'title': 'Prvate repository silmarils made public by feanor',
     'priority': 'self_service',
