@@ -1,8 +1,29 @@
 {
-  "name": "@mapbox/dispatch-incoming",
+  "name": "@mapbox/dispatch",
   "version": "1.0.0",
-  "description": "Alarm routing engine",
+  "description": "Security monitoring tool",
+  "main": "index.js",
+  "engines": {
+    "node": "4.3.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mapbox/dispatch.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/dispatch/issues"
+  },
+  "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
+    "@mapbox/pagerduty": "^1.0.0",
+    "decrypt-kms-env": "^3.0.0",
+    "github": "^9.2.0",
+    "lambda-cfn": "^1.0.0",
     "@mapbox/cloudfriend": "^1.8.2",
     "@slack/client": "3.10.0"
   },

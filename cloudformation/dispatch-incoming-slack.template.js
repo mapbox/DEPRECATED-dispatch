@@ -1,6 +1,11 @@
 var cf = require('cloudfriend');
+var lambdaCfn = require('lambda-cfn');
 
-module.exports = {
+module.exports = lambdaCfn(
+  [
+    'rules/dispatch-triage.js'
+  ], {
+
   AWSTemplateFormatVersion: '2010-09-09',
   Description: 'Test of dispatch-incoming lambda Slack functionality',
   Parameters: {
@@ -70,4 +75,4 @@ module.exports = {
   Outputs: {
     DispatchIncomingSlack: { Value: cf.ref('DispatchIncomingSlackTopic') }
   }
-};
+});
