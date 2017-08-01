@@ -24,9 +24,13 @@ module.exports.config = {
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
     },
-    GithubRepoOwner: {
+    GithubOwner: {
       Type: 'String',
-      Description: 'Github repository where dispatch issues are created. In org/repo form'
+      Description: 'Owner of Github repo'
+    },
+    GithubRepo: {
+      Type: 'String',
+      Description: 'Github repository'
     }
   },
   statements: [
@@ -53,9 +57,8 @@ module.exports.fn = function(event, context, callback) {
     const PDApiKey = process.env.dispatchTriagePagerDutyApiKey;
     const PDServiceId = process.env.dispatchTriagePagerDutyServiceId;
     const PDFromAddress = process.env.dispatchTriagePagerDutyFromAddress;
-    const GithubRepoOwner = process.env.dispatchTriageGithubRepoOwner;
-    const GithubRepo = GithubRepoOwner.split('/')[0];
-    const GithubOwner = GithubRepoOwner.split('/')[1];
+    const GithubOwner = process.env.dispatchTriageGithubOwner;
+    const GithubRepo = process.env.dispatchTriageGithubRepo;
 
     if (event.response == 'ok') {
       var github = require('../lib/github.js');
