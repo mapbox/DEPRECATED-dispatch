@@ -7,14 +7,18 @@ module.exports.examples = {
       'github': 'feanor'
     },
     'message': {
-      'github': {
-        'issue': 'Two factor authentication has been disabled...',
-        'directions': 'Ensure you re-enable 2FA on your Github account...'
-      },
-      'slack': {
-        'prompt': 'Did you turn off two-factor authentication...',
-        'response': ['Yes', 'No'],
-        'condition': 'Responding `Yes` will... Respoding `No` will...'
+      'issue': 'Two factor authentication has been disabled...',
+      'directions': 'Ensure you re-enable 2FA on your Github account...'
+      'prompt': {
+        'message': 'Did you turn off two-factor authentication on your GitHub account? ...',
+        'actions': {
+          {
+            'value': 'Yes'
+          },
+          {
+            'value': 'No'
+          }
+        }
       }
     }
   },
@@ -26,14 +30,18 @@ module.exports.examples = {
       'github': 'feanor'
     },
     'message': {
-      'github': {
-        'issue': 'A private Mapbox repository has been made public...',
-        'directions': 'Please review the contents of this repository and...'
-      },
-      'slack': {
-        'prompt': 'Did you make this private repository public...',
-        'response': ['Yes', 'No'],
-        'condition': 'Responding `Yes` will... Respoding `No` will...'
+      'issue': 'A private Mapbox repository has been made public...',
+      'directions': 'Please review the contents of this repository and...'
+      'prompt': {
+        'message': 'Did you make this private repository public? ...',
+        'actions': {
+          {
+            'value': 'Yes'
+          },
+          {
+            'value': 'No'
+          }
+        }
       }
     }
   }

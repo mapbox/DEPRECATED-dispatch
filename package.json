@@ -2,5 +2,9 @@
   "name": "@mapbox/dispatch-incoming",
   "version": "1.0.0",
   "description": "Alarm routing engine",
-  "dependencies": {}
+  "dependencies": {
+    "@mapbox/cloudfriend": "^1.8.2",
+    "@slack/client": "3.10.0"
+  },
+  "devDependencies": {}
 }
