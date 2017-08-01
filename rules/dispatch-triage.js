@@ -72,7 +72,8 @@ module.exports.fn = function(event, context, callback) {
 
       githubIssue
         .then(value => {
-          console.log(value);
+          // TODO what if the issue is not found? that is unexpected
+          // unless the person closed it directly on GH.
           callback(null, 'got gh issue');
         })
         .catch(error => { callback(error, 'error handled'); });
