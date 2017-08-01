@@ -23,6 +23,10 @@ module.exports.config = {
     GithubToken: {
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
+    },
+    DispatchGithubRepo: {
+      Type: 'String',
+      Description: 'Github repository where dispatch issues are created. In form of org/repo'
     }
   },
   statements: [
@@ -49,10 +53,24 @@ module.exports.fn = function(event, context, callback) {
     const PDApiKey = process.env.dispatchTriagePagerDutyApiKey;
     const PDServiceId = process.env.dispatchTriagePagerDutyServiceId;
     const PDFromAddress = process.env.dispatchTriagePagerDutyFromAddress;
-    console.log(event);
-    // TODO find the GH issue and close it
+    const GithubRepoOwner = process.env.dispatchTriageGithubRepoOwner;
+    const GithubRepo = GithubRepoOwner.split('/')[0];
+    const GithubOwner = GithubRepoOwner.split('/')[1];
+
     if (event.response == 'ok') {
-      callback(null, 'ok');
+      var github = require('../lib/github.js');
+      var githubIssue = github.issueExists({
+        title: event.title,
+        owner: GithubOwner,
+        repo: GithubRepo
+      });
+
+      githubIssue
+        .then(value => {
+          console.log(value);
+          callback(null, 'got gh issue');
+        })
+        .catch(error => { callback(error, 'error handled'); });
     }
     // create PD incident
     else if (event.response == 'not ok') {
