@@ -1,4 +1,4 @@
-var cf = require('cloudfriend');
+var cf = require('@mapbox/cloudfriend');
 var lambdaCfn = require('lambda-cfn');
 
 module.exports = lambdaCfn(
