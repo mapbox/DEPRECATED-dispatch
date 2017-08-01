@@ -57,12 +57,14 @@ module.exports.fn = function(event, context, callback) {
     const PDApiKey = process.env.dispatchTriagePagerDutyApiKey;
     const PDServiceId = process.env.dispatchTriagePagerDutyServiceId;
     const PDFromAddress = process.env.dispatchTriagePagerDutyFromAddress;
+    const GithubToken = process.env.dispatchTriageGithubToken;
     const GithubOwner = process.env.dispatchTriageGithubOwner;
     const GithubRepo = process.env.dispatchTriageGithubRepo;
 
     if (event.response == 'ok') {
       var github = require('../lib/github.js');
       var githubIssue = github.issueExists({
+        token: GithubToken,
         title: event.title,
         owner: GithubOwner,
         repo: GithubRepo
