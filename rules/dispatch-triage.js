@@ -24,7 +24,7 @@ module.exports.config = {
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
     },
-    DispatchGithubRepoOwner: {
+    GithubRepoOwner: {
       Type: 'String',
       Description: 'Github repository where dispatch issues are created. In org/repo form'
     }
