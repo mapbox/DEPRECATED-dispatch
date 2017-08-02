@@ -72,11 +72,10 @@ module.exports.fn = function(event, context, callback) {
 
       closeIssue
         .then(value => {
-          console.log('debug');
-          console.log(value);
           callback(null, 'closed issue');
         })
         .catch(error => {
+          console.log(error);
           callback(error, 'error handled');
         });
     }
