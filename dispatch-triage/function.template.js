@@ -4,7 +4,7 @@ var cf = require('@mapbox/cloudfriend');
 module.exports = lambdaCfn.build({
   name: 'dispatchTriage',
   runtime: 'nodejs4.3',
-  sourcePath: 'functions/dispatch-triage/dispatch-triage.js',
+  sourcePath: 'functions/dispatch-triage/function.js',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',
