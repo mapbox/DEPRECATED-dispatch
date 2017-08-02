@@ -63,29 +63,30 @@ module.exports.fn = function(event, context, callback) {
 
     if (event.response == 'ok') {
       var github = require('../lib/github.js');
-      var githubIssue = github.issueExists({
+      var closeIssue = github.closeIssue({
         token: GithubToken,
-        title: event.title,
+        githubIssueNumber: event.githubIssueNumber, // TODO get the number from slack payload
         owner: GithubOwner,
         repo: GithubRepo
       });
 
-      githubIssue
+      closeIssue
         .then(value => {
-          // TODO what if the issue is not found? that is unexpected
-          // unless the person closed it directly on GH.
-          callback(null, 'got gh issue');
+          callback(null, 'closed issue');
         })
-        .catch(error => { callback(error, 'error handled'); });
+        .catch(error => {
+          console.log(error);
+          callback(null, 'error handled'); // TODO fix this error handling.  When error is passed as first arg, there's an error
+        });
     }
     // create PD incident
     else if (event.response == 'not ok') {
       var pd = require('../lib/pagerduty.js');
       var options = {
         accessToken: PDApiKey,
-        title: 'the server is on fire', // TODO get the title from webhook event
+        title: 'the server is on fire', // TODO get the title from slack payload
         serviceId: PDServiceId,
-        incidentKey: 'testing', // TODO get the incident key from webhook event
+        incidentKey: 'testing', // TODO get the incident key from slack payload
         from: PDFromAddress
       };
       var incident = pd(options);
