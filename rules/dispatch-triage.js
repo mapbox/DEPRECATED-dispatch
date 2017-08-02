@@ -76,7 +76,7 @@ module.exports.fn = function(event, context, callback) {
         })
         .catch(error => {
           console.log(error);
-          callback(error, 'error handled');
+          callback(null, 'error handled');
         });
     }
     // create PD incident
