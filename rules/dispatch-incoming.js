@@ -1,3 +1,4 @@
+'use strict'
 var message = require('lambda-cfn').message;
 var dke = require('decrypt-kms-env');
 var splitOnComma = require('lambda-cfn').splitOnComma;
@@ -60,7 +61,6 @@ module.exports.fn = function(event, context, callback) {
 
     var priority = JSON.parse(event.Records[0].Sns.Message).priority
 
-    console.log(priority);
     if (priority != 'self-service') {
       // create PD incident
       var pd = require('../lib/pagerduty.js');
@@ -82,9 +82,10 @@ module.exports.fn = function(event, context, callback) {
       var options = {
         owner: GithubOwner,
         repo: GithubRepo,
-        title: 'bee-boop', // TODO get from SNS,
-        body: 'more bee-booping', // TODO get from SNS
-        assignees: ['oliikit'] // TODO get from SNS
+        token: GithubToken,
+        user: 'oliikit', // TODO get from SNS
+        title: 'there is a fire',
+        body: 'hurry hurry'
       }
       gh.createIssue(options).catch(err => callback(err, 'error handled'));
     } else {
