@@ -63,18 +63,17 @@ module.exports.fn = function(event, context, callback) {
 
     if (event.response == 'ok') {
       var github = require('../lib/github.js');
-      var githubIssue = github.issueExists({
+      var closeIssue = github.closeIssue({
         token: GithubToken,
         title: event.title,
         owner: GithubOwner,
         repo: GithubRepo
       });
 
-      githubIssue
+      closeIssue
         .then(value => {
-          // TODO what if the issue is not found? that is unexpected
-          // unless the person closed it directly on GH.
-          callback(null, 'got gh issue');
+          console.log(value);
+          callback(null, 'closed issue');
         })
         .catch(error => { callback(error, 'error handled'); });
     }
