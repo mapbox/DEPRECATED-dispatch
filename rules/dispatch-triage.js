@@ -81,7 +81,7 @@ module.exports.fn = function(event, context, callback) {
     }
     // create PD incident
     else if (event.response == 'not ok') {
-      var pd = require('../lib/pagerduty.js');
+      var createIncident = require('../lib/pagerduty.js').createIncident;
       var options = {
         accessToken: PDApiKey,
         title: 'the server is on fire', // TODO get the title from slack payload
@@ -89,7 +89,7 @@ module.exports.fn = function(event, context, callback) {
         incidentKey: 'testing', // TODO get the incident key from slack payload
         from: PDFromAddress
       };
-      var incident = pd(options);
+      var incident = createIncident(options);
       incident
         .then(value => { callback(null, 'incident triggered'); })
         .catch(error => { callback(error, 'error handled'); });
