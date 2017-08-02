@@ -76,7 +76,7 @@ module.exports.fn = function(event, context, callback) {
         })
         .catch(error => {
           console.log(error);
-          callback(null, 'error handled');
+          callback(null, 'error handled'); // TODO fix this error handling.  When error is passed as first arg, there's an error
         });
     }
     // create PD incident
