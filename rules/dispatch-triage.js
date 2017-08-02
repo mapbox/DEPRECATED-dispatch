@@ -76,7 +76,9 @@ module.exports.fn = function(event, context, callback) {
           console.log(value);
           callback(null, 'closed issue');
         })
-        .catch(error => { callback(error, 'error handled'); });
+        .catch(error => {
+          callback(error, 'error handled');
+        });
     }
     // create PD incident
     else if (event.response == 'not ok') {
