@@ -2,9 +2,9 @@ var lambdaCfn = require('lambda-cfn');
 var cf = require('@mapbox/cloudfriend');
 
 module.exports = lambdaCfn.build({
-  name: 'dispatchTriage',
+  name: 'dispatchIncoming',
   runtime: 'nodejs4.3',
-  sourcePath: 'functions/dispatch-triage/function.js',
+  sourcePath: 'functions/dispatch-incoming/function.js',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',
@@ -18,17 +18,17 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: 'PagerDuty From address'
     },
-    GithubToken: {
-      Type: 'String',
-      Description: '[secure] GitHub OAuth Token'
-    },
     GithubOwner: {
       Type: 'String',
-      Description: 'Owner of Github repo'
+      Description: 'Owner of the Github repo'
     },
     GithubRepo: {
       Type: 'String',
-      Description: 'Github repository'
+      Description: 'Github repo'
+    },
+    GithubToken: {
+      Type: 'String',
+      Description: '[secure] GitHub OAuth Token'
     }
   },
   statements: [
@@ -43,18 +43,6 @@ module.exports = lambdaCfn.build({
     }
   ],
   eventSources: {
-    webhook: {
-      method: 'POST',
-      apiKey: false,
-      integration: {
-        PassthroughBehavior: 'WHEN_NO_TEMPLATES',
-        RequestTemplates: {
-          'application/x-www-form-urlencoded': '{ "postBody" : $input.json("$")}'
-        }
-      }
-    },
-  },
-  destinations: {
-    webhook: {}
+    sns: {}
   }
 });
