@@ -10,7 +10,7 @@ module.exports.fn = function(event, context, callback) {
     const GithubToken = process.env.GithubToken;
     const GithubOwner = process.env.GithubOwner;
     const GithubRepo = process.env.GithubRepo;
-
+console.log(event);
     try {
       var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
