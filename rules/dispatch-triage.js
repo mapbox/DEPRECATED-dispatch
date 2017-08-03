@@ -51,6 +51,7 @@ module.exports.config = {
 };
 
 module.exports.fn = function(event, context, callback) {
+console.log(event);
   // decrypt the environment
   dke(process.env, function(err, scrubbed) {
     if (err) throw err;
