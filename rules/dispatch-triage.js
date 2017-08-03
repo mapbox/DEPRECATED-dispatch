@@ -2,6 +2,7 @@ var message = require('lambda-cfn').message;
 var dke = require('decrypt-kms-env');
 var splitOnComma = require('lambda-cfn').splitOnComma;
 var getEnv = require('lambda-cfn').getEnv;
+var qs = require('qs');
 
 module.exports.config = {
   name: 'dispatchTriage',
@@ -64,8 +65,7 @@ module.exports.fn = function(event, context, callback) {
 console.log(event);
 
     try {
-      var payload = JSON.parse(decodeURIComponent(event.postBody));
-      var payload2 = JSON.parse(decodeURIComponent(event));
+      var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
       callback(null, 'payload parse error');
     }
