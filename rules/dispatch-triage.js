@@ -62,15 +62,11 @@ module.exports.fn = function(event, context, callback) {
     const GithubOwner = process.env.dispatchTriageGithubOwner;
     const GithubRepo = process.env.dispatchTriageGithubRepo;
 
-console.log(event);
-
     try {
       var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
       callback(null, 'payload parse error');
     }
-
-console.log(payload);
 
     // assume there was just one action
     // TODO proper format/error handling
