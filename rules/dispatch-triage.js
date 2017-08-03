@@ -61,6 +61,8 @@ module.exports.fn = function(event, context, callback) {
     const GithubOwner = process.env.dispatchTriageGithubOwner;
     const GithubRepo = process.env.dispatchTriageGithubRepo;
 
+console.log(event);
+
     try {
       var payload = JSON.parse(decodeURIComponent(event.postBody));
     } catch (err) {
