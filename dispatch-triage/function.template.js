@@ -53,8 +53,5 @@ module.exports = lambdaCfn.build({
         }
       }
     },
-  },
-  destinations: {
-    webhook: {}
   }
 });
