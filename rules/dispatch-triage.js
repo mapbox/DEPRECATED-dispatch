@@ -67,6 +67,8 @@ module.exports.fn = function(event, context, callback) {
       callback(null, 'payload parse error');
     }
 
+console.log(payload);
+
     // assume there was just one action
     // TODO proper format/error handling
     var response = payload.actions[0].name;
