@@ -65,6 +65,7 @@ console.log(event);
 
     try {
       var payload = JSON.parse(decodeURIComponent(event.postBody));
+      var payload2 = JSON.parse(decodeURIComponent(event));
     } catch (err) {
       callback(null, 'payload parse error');
     }
