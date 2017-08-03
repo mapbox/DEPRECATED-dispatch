@@ -2,7 +2,7 @@ var message = require('lambda-cfn').message;
 var dke = require('decrypt-kms-env');
 var splitOnComma = require('lambda-cfn').splitOnComma;
 var getEnv = require('lambda-cfn').getEnv;
-var qs = require('qs');
+var qs = require('querystring');
 
 module.exports.config = {
   name: 'dispatchTriage',
