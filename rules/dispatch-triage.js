@@ -51,7 +51,6 @@ module.exports.config = {
 };
 
 module.exports.fn = function(event, context, callback) {
-console.log(event);
   // decrypt the environment
   dke(process.env, function(err, scrubbed) {
     if (err) throw err;
@@ -61,6 +60,9 @@ console.log(event);
     const GithubToken = process.env.dispatchTriageGithubToken;
     const GithubOwner = process.env.dispatchTriageGithubOwner;
     const GithubRepo = process.env.dispatchTriageGithubRepo;
+
+console.log(event);
+console.log(context);
 
     if (event.response == 'ok') {
       var github = require('../lib/github.js');
