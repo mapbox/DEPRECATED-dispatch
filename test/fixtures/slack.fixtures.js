@@ -2,58 +2,107 @@
 
 module.exports.sns = {
   mfaDisabled: {
-    "timestamp" : "2017-07-31T00:54:06.655Z",
-    "title": "User kara has disabled 2FA on their Github account",
-    "priority": "self_service",
-    "username": "kara",
-    "message": {
-      "issue": "Two factor authentication has been disabled...",
-      "directions": "Ensure you re-enable 2FA on your Github account...",
-      "prompt": {
-        "message": "Did you turn off two-factor authentication on your GitHub account? ...",
-        "actions": [
+    'timestamp' : '2017-07-31T00:54:06.655Z',
+    'title': 'User kara has disabled 2FA on their Github account',
+    'priority': 'self_service',
+    'username': 'kara',
+    'message': {
+      'issue': 'Two factor authentication has been disabled...',
+      'directions': 'Ensure you re-enable 2FA on your Github account...',
+      'prompt': {
+        'message': 'Did you turn off two-factor authentication on your GitHub account? ...',
+        'actions': [
           {
-            "value": "Yes"
+            'value': 'Yes'
           },
           {
-            "value": "No"
+            'value': 'No'
           }
         ]
       }
     }
   },
   madePublic: {
-    "timestamp" : "2017-07-31T00:54:06.655Z",
-    "title": "Prvate repository totally-not-sensitive-data made public by kara",
-    "priority": "self_service",
-    "username": "kara",
-    "message": {
-      "issue": "A private Mapbox repository has been made public...",
-      "directions": "Please review the contents of this repository and...",
-      "prompt": {
-        "message": "Did you make this private repository public? ...",
-        "actions": [
+    'timestamp' : '2017-07-31T00:54:06.655Z',
+    'title': 'Prvate repository totally-not-sensitive-data made public by kara',
+    'priority': 'self_service',
+    'username': 'kara',
+    'message': {
+      'issue': 'A private Mapbox repository has been made public...',
+      'directions': 'Please review the contents of this repository and...',
+      'prompt': {
+        'message': 'Did you make this private repository public? ...',
+        'actions': [
           {
-            "value": "Yes"
+            'value': 'Yes'
           },
           {
-            "value": "No"
+            'value': 'No'
           }
         ]
       }
+    }
+  },
+  nullUsername: {
+    'timestamp' : '2017-07-31T00:54:06.655Z',
+    'title': 'User kara has disabled 2FA on their Github account',
+    'priority': 'self_service',
+    'username': null,
+    'message': {
+      'issue': 'Two factor authentication has been disabled...',
+      'directions': 'Ensure you re-enable 2FA on your Github account...',
+      'prompt': {
+        'message': 'Did you turn off two-factor authentication on your GitHub account? ...',
+        'actions': [
+          {
+            'value': 'Yes'
+          },
+          {
+            'value': 'No'
+          }
+        ]
+      }
+    }
+  },
+  malformed: {
+    'timestamp' : '2017-07-31T00:54:06.655Z',
+    'title': 'User kara has disabled 2FA on their Github account',
+    'priority': 'self_service',
+    'username': 'kara',
+    'message': {
+      'issue': 'Two factor authentication has been disabled...',
+      'directions': 'Ensure you re-enable 2FA on your Github account...'
     }
   }
 };
 
 module.exports.slack = {
+  username: '@kara',
   message: {
     text: 'Two factor authentication has been disabled...',
-    attachments: [ {
-      text: 'Did you turn off two-factor authentication on your GitHub account? ...',
-      fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-      callback_id: 'dispatch_callback',
-      attachment_type: 'default',
-      actions: [Object] } ]
+    attachments: [
+      {
+        text: 'Did you turn off two-factor authentication on your GitHub account? ...',
+        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        callback_id: 'dispatch_callback',
+        attachment_type: 'default',
+        actions: [
+          {
+            name: 'yes',
+            text: 'Yes',
+            type: 'button',
+            value: 'Yes'
+          },
+          {
+            name: 'no',
+            text: 'No',
+            type: 'button',
+            value: 'No',
+            style: 'danger'
+          }
+        ]
+      }
+    ]
   },
   postMessage: {
     ok: true,
