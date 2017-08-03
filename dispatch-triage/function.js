@@ -11,11 +11,21 @@ module.exports.fn = function(event, context, callback) {
     const GithubOwner = process.env.GithubOwner;
     const GithubRepo = process.env.GithubRepo;
 
-    if (event.response == 'ok') {
+    try {
+      var payload = JSON.parse(qs.parse(event.postBody).payload);
+    } catch (err) {
+      callback(null, 'payload parse error');
+    }
+
+    // assume there was just one action
+    // TODO proper format/error handling
+    var response = payload.actions[0].name;
+
+    if (response == 'yes') {
       var github = require('../lib/github.js');
       var closeIssue = github.closeIssue({
         token: GithubToken,
-        githubIssueNumber: event.githubIssueNumber, // TODO get the number from slack payload
+        githubIssueNumber: 1, // TODO get the number from slack payload
         owner: GithubOwner,
         repo: GithubRepo
       });
@@ -30,8 +40,8 @@ module.exports.fn = function(event, context, callback) {
         });
     }
     // create PD incident
-    else if (event.response == 'not ok') {
-      var pd = require('../lib/pagerduty.js');
+    else if (response == 'no') {
+      var createIncident = require('../lib/pagerduty.js').createIncident;
       var options = {
         accessToken: PDApiKey,
         title: 'the server is on fire', // TODO get the title from slack payload
@@ -39,7 +49,7 @@ module.exports.fn = function(event, context, callback) {
         incidentKey: 'testing', // TODO get the incident key from slack payload
         from: PDFromAddress
       };
-      var incident = pd(options);
+      var incident = createIncident(options);
       incident
         .then(value => { callback(null, 'incident triggered'); })
         .catch(error => { callback(error, 'error handled'); });
