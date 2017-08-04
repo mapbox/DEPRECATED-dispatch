@@ -4,6 +4,7 @@ const file = require('../lib/slack.js');
 const fixtures = require('../test/fixtures/slack.fixtures.js');
 const sinon = require('sinon');
 const test = require('tape');
+const webClient = require('@slack/client').WebClient;
 
 process.env.SlackBotToken = 'test-slack-bot-token';
 
@@ -23,7 +24,7 @@ test('[slack] [ingestSNS] missing username', (t) => {
 
 test('[slack] [ingestSNS] uncaught parsing error', (t) => {
   file.ingestSNS(fixtures.sns.malformed, (err) => {
-    t.equal(err, 'ERR: Unhandled SNS message parsing error','-- should pass through error message');
+    t.equal(err, 'ERR: sns message parsing error','-- should pass through error message');
     t.end();
   });
 });
