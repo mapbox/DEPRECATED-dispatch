@@ -1,7 +1,7 @@
 var qs = require('querystring');
 var dke = require('decrypt-kms-env');
 
-module.exports.fn = function(event, context, callback) {
+module.exports = function(event, context, callback) {
   // decrypt the environment
   dke(process.env, function(err, scrubbed) {
     if (err) throw err;
@@ -11,7 +11,7 @@ module.exports.fn = function(event, context, callback) {
     const GithubToken = process.env.GithubToken;
     const GithubOwner = process.env.GithubOwner;
     const GithubRepo = process.env.GithubRepo;
-console.log(event);
+    console.log(event);
     try {
       var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
