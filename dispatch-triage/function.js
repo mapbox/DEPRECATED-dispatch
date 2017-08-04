@@ -1,3 +1,4 @@
+var qs = require('querystring');
 var dke = require('decrypt-kms-env');
 
 module.exports.fn = function(event, context, callback) {
