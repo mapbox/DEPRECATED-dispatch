@@ -1,8 +1,7 @@
 const tape = require('tape');
 const nock = require('nock');
 const githubRequests = require('../../lib/github.js');
-const issue1 = require('../fixtures/github.js').issue1;
-const manyIssues = require('../fixtures/github.js').manyIssues;
+const issuesFixtures = require('../fixtures/github.js');
 
 tape('Receive auth object from request', function(assert) {
   let auth = {
@@ -17,7 +16,7 @@ tape('Receive auth object from request', function(assert) {
 });
 
 tape('Finds requested issue', function(assert) {
-  let issue = issue1();
+  let issue = [ issuesFixtures.issue1()] ;
 
   let optionsExists = {
     token: 'FakeApiToken',
@@ -41,7 +40,7 @@ tape('Finds requested issue', function(assert) {
 });
 
 tape('Does not find a match to the request issue', function(assert) {
-  let issue = issue1();
+  let issue = issuesFixtures.issue1();
 
   let optionsDoesntExist = {
     token: 'FakeApiToken',
@@ -65,7 +64,7 @@ tape('Does not find a match to the request issue', function(assert) {
 });
 
 tape('Pagination works', function(assert) {
-  let issues = manyIssues(); // contains 150 issues
+  let issues = issuesFixtures.manyIssues(); // contains 150 issues
 
   let optionsExist = {
     token: 'FakeApiToken',
@@ -89,7 +88,7 @@ tape('Pagination works', function(assert) {
 });
 
 tape('Does not create issue because one exists', function(assert) {
-  let issue = issue1();
+  let issue = issuesFixtures.issue1();
 
   let optionsExists = {
     token: 'FakeApiToken',
@@ -114,10 +113,8 @@ tape('Does not create issue because one exists', function(assert) {
 });
 
 tape('Creates issue', function(assert) {
-  // Not a dub? Make an issue
-  // Assigned to user
   let noIssue = []
-  let issue = issue1();
+  let issue = issuesFixtures.issue1();
 
   let options = {
     token: 'FakeApiToken',
@@ -140,11 +137,32 @@ tape('Creates issue', function(assert) {
 
   githubRequests.createIssue(options)
   .then(res => {
-    console.log(res);
-    // assert.deepEqual(res, issue, 'Issue created')
+    assert.deepEqual(res.githubIssue, issue.number, 'Issue created');
+    assert.equal(res.user, issue.assignee.login, 'Issue is assigned');
     assert.end();
   })
   .catch(err => { console.log(err); });
 });
 
-// Close issue
+tape('Closes issue', function(assert) {
+  let closedIssue = issuesFixtures.closedIssue();
+
+  let options = {
+    token: 'FakeApiToken',
+    owner: 'null',
+    repo: 'island',
+    githubIssueNumber: '1'
+  };
+
+  nock('https://api.github.com:443', {"encodedQueryParams":true})
+    .patch('/repos/null/island/issues/1', {"state":"closed"})
+    .query({"access_token":"FakeApiToken"})
+    .reply(200, closedIssue)
+
+  githubRequests.closeIssue(options)
+  .then(res => {
+    assert.deepEqual(res.data, closedIssue, 'Issue is closed');
+    assert.end();
+  })
+  .catch(err => { console.log(err); });
+});
