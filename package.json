@@ -26,7 +26,7 @@
     "decrypt-kms-env": "^3.0.0",
     "github": "^9.2.0",
     "lambda-cfn": "^1.0.0",
-    "@mapbox/cloudfriend": "^1.8.2",
+    "@mapbox/cloudfriend": "^1.8.2"
   },
   "devDependencies": {
     "nock": "^9.0.14",
