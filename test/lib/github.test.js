@@ -1,3 +1,4 @@
+'use strict'
 const tape = require('tape');
 const nock = require('nock');
 const githubRequests = require('../../lib/github.js');
