@@ -1,7 +1,7 @@
 const pd = require('../../lib/pagerduty.js');
 const tape = require('tape');
 const nock = require('nock');
-const incident = require('../fixtures/pagerduty.js')
+const incident = require('../fixtures/pagerduty').incident;
 
 tape('Creates incident', function(assert) {
   let options = {
@@ -25,9 +25,8 @@ tape('Creates incident', function(assert) {
 
   pd.createIncident(options)
   .then(res => {
-    console.log(res);
-    // assert.deepEqual(res, incident, 'Incident was created.');
-    assert.end;
+    assert.deepEqual(res.body, incident, 'Incident was created.');
+    assert.end();
   })
   .catch(err => { console.log(err);})
 })

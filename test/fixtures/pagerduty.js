@@ -1,7 +1,4 @@
-module.exports.incident = incident;
-
-function incident() {
-  let incident = {
+module.exports.incident = {
     "incident": {
       "incident_number": 123512,
       "title": "this is a test",
@@ -77,7 +74,4 @@ function incident() {
       "self": "https://api.pagerduty.com/incidents/XXXXXXX",
       "html_url": "https://mapbox.pagerduty.com/incidents/XXXXXXX"
     }
-  }
-
-  return incident;
 }
