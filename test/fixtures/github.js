@@ -71,7 +71,7 @@ function closedIssue() {
 function manyIssues() {
   let issues = []
 
-  for (var i = 0; i <= 150; i++) {
+  for (i = 0; i <= 150; i++) {
     issues.push(dataDump);
   }
 
