@@ -25,7 +25,7 @@ tape('Creates incident', function(assert) {
 
   pd.createIncident(options)
   .then(res => {
-    // console.log(res);
+    console.log(res);
     // assert.deepEqual(res, incident, 'Incident was created.');
     assert.end;
   })
