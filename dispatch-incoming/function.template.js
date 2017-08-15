@@ -4,7 +4,6 @@ var cf = require('@mapbox/cloudfriend');
 module.exports = lambdaCfn.build({
   name: 'dispatchIncoming',
   runtime: 'nodejs4.3',
-  sourcePath: 'functions/dispatch-incoming/function.js',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',
