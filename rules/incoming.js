@@ -1,8 +1,9 @@
 'use strict'
-var message = require('lambda-cfn').message;
-var dke = require('decrypt-kms-env');
-var splitOnComma = require('lambda-cfn').splitOnComma;
-var getEnv = require('lambda-cfn').getEnv;
+const message = require('lambda-cfn').message;
+const dke = require('decrypt-kms-env');
+const splitOnComma = require('lambda-cfn').splitOnComma;
+const getEnv = require('lambda-cfn').getEnv;
+const decrypt = require('../lib/utils.js')
 
 module.exports.config = {
   name: 'dispatchIncoming',
@@ -50,7 +51,7 @@ module.exports.config = {
 
 module.exports.fn = function(event, context, callback) {
   // decrypt the environment
-  dke(process.env, function(err, scrubbed) {
+  decrypt(process.env, function(err, scrubbed) {
     if (err) throw err;
     const PDApiKey = process.env.dispatchIncomingPagerDutyApiKey;
     const PDServiceId = process.env.dispatchIncomingPagerDutyServiceId;
