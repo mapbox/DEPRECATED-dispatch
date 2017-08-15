@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "lambda-cfn": "mapbox/lambda-cfn#1r1s-cmd",
-    "@mapbox/cloudfriend": "^1.8.2"
+    "@mapbox/cloudfriend": "^1.8.2",
     "nock": "^9.0.14",
     "tape": "^4.8.0"
   }
