@@ -63,18 +63,18 @@ module.exports.fn = function(event, context, callback) {
 
     if (priority != 'self-service') {
       // create PD incident
-      var pd = require('../lib/pagerduty.js');
+      var pd = require('../lib/pagerduty.js').createIncident;
       var options = {
         accessToken: PDApiKey,
-        title: 'the server is on fire', // TODO get the title from webhook event
+        title: 'this is a test', // TODO get the title from webhook event
         serviceId: PDServiceId,
         incidentKey: 'testing', // TODO get the incident key from webhook event
         from: PDFromAddress
       };
       var incident = pd(options);
       incident
-      .then(value => { callback(null, 'incident triggered'); })
-      .catch(error => { callback(error, 'error handled'); });
+      .then(value => callback(null, 'pagerduty incident triggered'))
+      .catch(error => callback(error, 'error handled'));
     }
     // create GH issue
     else if (priority == 'self-service') {
@@ -87,7 +87,9 @@ module.exports.fn = function(event, context, callback) {
         title: 'there is a fire',
         body: 'hurry hurry'
       }
-      gh.createIssue(options).catch(err => callback(err, 'error handled'));
+      gh.createIssue(options)
+      .then(value => callback(null, 'github incident triggered'))
+      .catch(err => callback(err, 'error handled'));
     } else {
       callback(null, 'unhandled response');
     }
