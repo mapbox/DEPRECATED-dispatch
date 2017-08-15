@@ -26,7 +26,7 @@
     "aws-sdk": "^2.94.0",
     "decrypt-kms-env": "^3.0.0",
     "github": "^9.2.0",
-    "lambda-cfn": "mapbox/lambda-cfn#1r1s",
+    "lambda-cfn": "mapbox/lambda-cfn#1r1s-cmd",
     "@mapbox/cloudfriend": "^1.8.2",
     "@slack/client": "^3.10.0"
   },
