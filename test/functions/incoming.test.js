@@ -16,7 +16,8 @@ const highPriorityEvent = {
   [{ EventSource: 'aws:sns',
     Sns: {
       Message: JSON.stringify({
-        priority: 'high'
+        priority: 'high',
+        title: 'this is a test'
       }),
     }
   }]
@@ -27,7 +28,9 @@ const selfServiceEvent = {
   [{ EventSource: 'aws:sns',
     Sns: {
       Message: JSON.stringify({
-        priority: 'self-service'
+        priority: 'self-service',
+        title: 'foobar',
+        body: 'hurry hurry'
       }),
     }
   }]
@@ -36,6 +39,11 @@ const selfServiceEvent = {
 tape('Creates a GH issue from self-service priority', function(assert) {
   let noIssue = [];
   let ghIssue = require('../fixtures/github.js').issue1;
+  let actualResult = {
+    priority: 'self-service',
+    title: 'foobar',
+    body: 'hurry hurry',
+    githubIssue: 1 }
 
   nock('https://api.github.com')
     .get('/repos/null/island/issues')
@@ -48,7 +56,7 @@ tape('Creates a GH issue from self-service priority', function(assert) {
     .reply(201, ghIssue);
 
   incoming(selfServiceEvent, {}, function(err, res) {
-    assert.deepEqual(res, 1, 'Github issue created');
+    assert.deepEqual(res, actualResult, 'Github issue created');
     assert.end();
   });
 });
@@ -72,3 +80,12 @@ tape('Creates a PD incident from high priority', function(assert) {
     assert.end();
   });
 });
+
+tape('Throws error if there is more than 1 record', function(assert) {
+  let badRecord = { Records: [ 'record1', 'record2'] }
+
+  incoming(badRecord, {}, function(err, res) {
+    assert.deepEqual(err, 'SNS contains more than one record.', 'Function returned error.')
+    assert.end();
+  })
+})
