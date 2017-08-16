@@ -28,7 +28,7 @@
     "@slack/client": "^3.10.0"
   },
   "devDependencies": {
-    "lambda-cfn": "mapbox/lambda-cfn#1r1s-cmd",
+    "lambda-cfn": "mapbox/lambda-cfn#master",
     "@mapbox/cloudfriend": "^1.8.2",
     "nock": "^9.0.14",
     "tape": "^4.8.0"
