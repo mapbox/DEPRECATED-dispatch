@@ -1,11 +1,6 @@
 'use strict';
 
-const lambdaCfn = require('lambda-cfn');
-const message = require('lambda-cfn').message;
 const decrypt = require('../lib/utils.js').decrypt;
-const splitOnComma = require('lambda-cfn').splitOnComma;
-const getEnv = require('lambda-cfn').getEnv;
-
 
 module.exports.fn = function(event, context, callback) {
   // decrypt the environment
