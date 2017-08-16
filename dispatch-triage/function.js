@@ -1,9 +1,9 @@
 var qs = require('querystring');
-var dke = require('decrypt-kms-env');
+var decrypt = require('../lib/utils').decrypt;
 
-module.exports = function(event, context, callback) {
+module.exports.fn = function(event, context, callback) {
   // decrypt the environment
-  dke(process.env, function(err, scrubbed) {
+  decrypt(process.env, function(err, scrubbed) {
     if (err) throw err;
     const PDApiKey = process.env.PagerDutyApiKey;
     const PDServiceId = process.env.PagerDutyServiceId;
@@ -11,7 +11,6 @@ module.exports = function(event, context, callback) {
     const GithubToken = process.env.GithubToken;
     const GithubOwner = process.env.GithubOwner;
     const GithubRepo = process.env.GithubRepo;
-    console.log(event);
     try {
       var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
@@ -45,7 +44,7 @@ module.exports = function(event, context, callback) {
       var createIncident = require('../lib/pagerduty.js').createIncident;
       var options = {
         accessToken: PDApiKey,
-        title: 'the server is on fire', // TODO get the title from slack payload
+        title: 'everything is not ok', // TODO get the title from slack payload
         serviceId: PDServiceId,
         incidentKey: 'testing', // TODO get the incident key from slack payload
         from: PDFromAddress
