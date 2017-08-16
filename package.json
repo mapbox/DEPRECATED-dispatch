@@ -21,16 +21,16 @@
   "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
     "@mapbox/cloudfriend": "^1.8.2",
+    "@mapbox/lambda-cfn": "^2.0.0",
     "@mapbox/pagerduty": "^1.0.0",
     "@slack/client": "^3.10.0",
+    "aws-sdk": "^2.94.0",
     "decrypt-kms-env": "^3.0.0",
-    "github": "^9.2.0",
-    "@slack/client": "^3.10.0",
-    "@mapbox/lambda-cfn": "^2.0.0"
+    "github": "^9.2.0"
   },
   "devDependencies": {
-    "@mapbox/cloudfriend": "^1.8.2",
     "nock": "^9.0.14",
+    "sinon": "^2.1.0",
     "tape": "^4.8.0"
   }
 }
