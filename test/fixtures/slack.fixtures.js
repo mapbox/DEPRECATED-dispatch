@@ -43,6 +43,7 @@ module.exports.sns = {
       }
     }
   },
+  nullSNSError: 'ERR: null sns message',
   nullUsername: {
     'timestamp' : '2017-07-31T00:54:06.655Z',
     'title': 'User kara has disabled 2FA on their Github account',
@@ -64,6 +65,7 @@ module.exports.sns = {
       }
     }
   },
+  nullUsernameError: 'ERR: null username in sns message',
   malformed: {
     'timestamp' : '2017-07-31T00:54:06.655Z',
     'title': 'User kara has disabled 2FA on their Github account',
@@ -73,7 +75,8 @@ module.exports.sns = {
       'issue': 'Two factor authentication has been disabled...',
       'directions': 'Ensure you re-enable 2FA on your Github account...'
     }
-  }
+  },
+  malformedError: 'ERR: sns message parsing error'
 };
 
 module.exports.slack = {
@@ -116,6 +119,12 @@ module.exports.slack = {
       attachments: [ [Object] ],
       ts: '1501777340.256863'
     },
+    scopes: [ 'identify', 'bot:basic' ],
+    acceptedScopes: [ 'chat:write:user', 'client' ]
+  },
+  error: {
+    ok: false,
+    error: 'no_text',
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   }
