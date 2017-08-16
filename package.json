@@ -25,10 +25,11 @@
     "@slack/client": "^3.10.0",
     "decrypt-kms-env": "^3.0.0",
     "github": "^9.2.0",
-    "lambda-cfn": "^1.0.0",
-    "@mapbox/cloudfriend": "^1.8.2"
+    "@slack/client": "^3.10.0"
   },
   "devDependencies": {
+    "lambda-cfn": "mapbox/lambda-cfn#1r1s-cmd",
+    "@mapbox/cloudfriend": "^1.8.2",
     "nock": "^9.0.14",
     "tape": "^4.8.0"
   }

@@ -1,15 +1,15 @@
 'use strict';
+
 const tape = require('tape');
 const nock = require('nock');
 const incoming = require('../../rules/incoming.js').fn;
+
 process.env.dispatchIncomingPagerDutyApiKey = 'FakeApiToken';
 process.env.dispatchIncomingPagerDutyServiceId = 'XXXXXXX';
 process.env.dispatchIncomingPagerDutyFromAddress = 'null@foo.bar';
 process.env.dispatchIncomingGithubRepo = 'island';
 process.env.dispatchIncomingGithubOwner = 'null';
 process.env.dispatchIncomingGithubToken = 'FakeApiToken';
-
-process.env.NODE_ENV = 'test'
 
 const highPriorityEvent = {
   Records:

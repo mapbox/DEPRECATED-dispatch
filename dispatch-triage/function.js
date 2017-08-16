@@ -1,67 +1,17 @@
-var message = require('lambda-cfn').message;
-var dke = require('decrypt-kms-env');
-var splitOnComma = require('lambda-cfn').splitOnComma;
-var getEnv = require('lambda-cfn').getEnv;
 var qs = require('querystring');
+var dke = require('decrypt-kms-env');
 
-module.exports.config = {
-  name: 'dispatchTriage',
-  runtime: 'nodejs4.3',
-  sourcePath: 'rules/dispatch-triage.js',
-  parameters: {
-    PagerDutyApiKey: {
-      Type: 'String',
-      Description: '[secure] PagerDuty API key'
-    },
-    PagerDutyServiceId: {
-      Type: 'String',
-      Description: 'PagerDuty service Id'
-    },
-    PagerDutyFromAddress: {
-      Type: 'String',
-      Description: 'PagerDuty From address'
-    },
-    GithubToken: {
-      Type: 'String',
-      Description: '[secure] GitHub OAuth Token'
-    },
-    GithubOwner: {
-      Type: 'String',
-      Description: 'Owner of Github repo'
-    },
-    GithubRepo: {
-      Type: 'String',
-      Description: 'Github repository'
-    }
-  },
-  statements: [
-    {
-      Effect: 'Allow',
-      Action: [
-        'kms:Decrypt'
-      ],
-      Resource: {
-        "Fn::ImportValue":"cloudformation-kms-production"
-      }
-    }
-  ],
-  gatewayRule: {
-    method: 'POST',
-    apiKey: false
-  }
-};
-
-module.exports.fn = function(event, context, callback) {
+module.exports = function(event, context, callback) {
   // decrypt the environment
   dke(process.env, function(err, scrubbed) {
     if (err) throw err;
-    const PDApiKey = process.env.dispatchTriagePagerDutyApiKey;
-    const PDServiceId = process.env.dispatchTriagePagerDutyServiceId;
-    const PDFromAddress = process.env.dispatchTriagePagerDutyFromAddress;
-    const GithubToken = process.env.dispatchTriageGithubToken;
-    const GithubOwner = process.env.dispatchTriageGithubOwner;
-    const GithubRepo = process.env.dispatchTriageGithubRepo;
-
+    const PDApiKey = process.env.PagerDutyApiKey;
+    const PDServiceId = process.env.PagerDutyServiceId;
+    const PDFromAddress = process.env.PagerDutyFromAddress;
+    const GithubToken = process.env.GithubToken;
+    const GithubOwner = process.env.GithubOwner;
+    const GithubRepo = process.env.GithubRepo;
+    console.log(event);
     try {
       var payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {

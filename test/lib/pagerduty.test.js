@@ -1,4 +1,5 @@
 'use strict';
+
 const pd = require('../../lib/pagerduty.js');
 const tape = require('tape');
 const nock = require('nock');
