@@ -14,7 +14,7 @@ process.env.GithubToken = 'FakeApiToken';
 var okResponseEvent = require('../../test/fixtures/triage/ok');
 var notOkResponseEvent = require('../../test/fixtures/triage/notok');
 
-tape('Closes Github issue if ok', function(t) {
+tape('[triage] Closes Github issue if ok', function(t) {
 
   nock('https://api.github.com:443', {"encodedQueryParams":true})
     .patch('/repos/null/island/issues/1', {"state":"closed"})
@@ -28,8 +28,8 @@ tape('Closes Github issue if ok', function(t) {
 
 });
 
-tape('Escalates to PagerDuty if not ok', function(t) {
-  let pdIncident = require('../fixtures/pagerduty.js').incident;
+tape('[triage] Escalates to PagerDuty if not ok', function(t) {
+  let pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
     .post('/incidents', {"incident": {

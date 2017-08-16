@@ -1,86 +1,71 @@
 'use strict';
 
 module.exports.sns = {
-  mfaDisabled: {
-    'timestamp' : '2017-07-31T00:54:06.655Z',
-    'title': 'User kara has disabled 2FA on their Github account',
-    'priority': 'self_service',
-    'username': 'kara',
-    'message': {
-      'issue': 'Two factor authentication has been disabled...',
-      'directions': 'Ensure you re-enable 2FA on your Github account...',
-      'prompt': {
-        'message': 'Did you turn off two-factor authentication on your GitHub account? ...',
-        'actions': [
-          {
-            'value': 'Yes'
-          },
-          {
-            'value': 'No'
-          }
-        ]
-      }
+  malformed: {
+    timestamp: '2017-07-31T00:54:06.655Z',
+    title: 'User kara has disabled 2FA on their Github account',
+    priority: 'self_service',
+    username: 'kara',
+    body: {
+      issue: 'Two factor authentication has been disabled...',
+      directions: 'Ensure you re-enable 2FA on your Github account...'
     }
   },
-  madePublic: {
-    'timestamp' : '2017-07-31T00:54:06.655Z',
-    'title': 'Prvate repository totally-not-sensitive-data made public by kara',
-    'priority': 'self_service',
-    'username': 'kara',
-    'message': {
-      'issue': 'A private Mapbox repository has been made public...',
-      'directions': 'Please review the contents of this repository and...',
-      'prompt': {
-        'message': 'Did you make this private repository public? ...',
-        'actions': [
-          {
-            'value': 'Yes'
-          },
-          {
-            'value': 'No'
-          }
-        ]
-      }
-    }
-  },
+  malformedError: 'ERR: sns message parsing error',
   nullSNSError: 'ERR: null sns message',
   nullUsername: {
-    'timestamp' : '2017-07-31T00:54:06.655Z',
-    'title': 'User kara has disabled 2FA on their Github account',
-    'priority': 'self_service',
-    'username': null,
-    'message': {
-      'issue': 'Two factor authentication has been disabled...',
-      'directions': 'Ensure you re-enable 2FA on your Github account...',
-      'prompt': {
-        'message': 'Did you turn off two-factor authentication on your GitHub account? ...',
-        'actions': [
+    timestamp: '2017-07-31T00:54:06.655Z',
+    title: 'User kara has disabled 2FA on their Github account',
+    priority: 'self_service',
+    username: null,
+    body: {
+      issue: 'Two factor authentication has been disabled...',
+      directions: 'Ensure you re-enable 2FA on your Github account...',
+      prompt: {
+        message: 'Did you turn off two-factor authentication on your GitHub account? ...',
+        actions: [
           {
-            'value': 'Yes'
+            value: 'Yes'
           },
           {
-            'value': 'No'
+            value: 'No'
           }
         ]
       }
     }
   },
-  nullUsernameError: 'ERR: null username in sns message',
-  malformed: {
-    'timestamp' : '2017-07-31T00:54:06.655Z',
-    'title': 'User kara has disabled 2FA on their Github account',
-    'priority': 'self_service',
-    'username': 'kara',
-    'message': {
-      'issue': 'Two factor authentication has been disabled...',
-      'directions': 'Ensure you re-enable 2FA on your Github account...'
+  success: {
+    timestamp: '2017-07-31T00:54:06.655Z',
+    title: 'User kara has disabled 2FA on their Github account',
+    priority: 'self_service',
+    username: 'kara',
+    issue: '7',
+    body: {
+      issue: 'Two factor authentication has been disabled...',
+      directions: 'Ensure you re-enable 2FA on your Github account...',
+      prompt: {
+        message: 'Did you turn off two-factor authentication on your GitHub account? ...',
+        actions: [
+          {
+            value: 'Yes'
+          },
+          {
+            value: 'No'
+          }
+        ]
+      }
     }
-  },
-  malformedError: 'ERR: sns message parsing error'
+  }
 };
 
 module.exports.slack = {
-  username: '@kara',
+  channel: '#test-channel',
+  error: {
+    ok: false,
+    error: 'no_text',
+    scopes: [ 'identify', 'bot:basic' ],
+    acceptedScopes: [ 'chat:write:user', 'client' ]
+  },
   message: {
     text: 'Two factor authentication has been disabled...',
     attachments: [
@@ -107,25 +92,100 @@ module.exports.slack = {
       }
     ]
   },
-  postMessage: {
+  missingMessageError: 'ERR: missing message body',
+  noChannel: {
+    ok: false,
+    error: 'channel_not_found',
+    scopes: [ 'identify', 'bot:basic' ],
+    acceptedScopes: [ 'chat:write:bot', 'post' ]
+  },
+  status: {
+    user: '@kara',
+    id: 'U6GHXJQ1Z',
+    bot: 'B6G0UU6HW',
+    res: true,
+    timestamp: '1501777340.256863',
+    issue: '7'
+  },
+  statusFinal: {
+    user: '@kara',
+    id: 'U6GHXJQ1Z',
+    issue: 'https://api.github.com/repos/null/island/issues/7',
+    bot: 'B6G0UU6HW',
+    res: true,
+    timestamp: '1501777340.256863'
+  },
+  success: {
     ok: true,
     channel: 'D6G0UU7MW',
     ts: '1501777340.256863',
-    message: {
-      type: 'message',
-      user: 'U6GHXJQ1Z',
-      text: 'Two factor authentication has been disabled...',
-      bot_id: 'B6G0UU6HW',
-      attachments: [ [Object] ],
-      ts: '1501777340.256863'
-    },
+    message:
+     { type: 'message',
+       user: 'U6GHXJQ1Z',
+       text: 'Two factor authentication has been disabled...',
+       bot_id: 'B6G0UU6HW',
+       attachments: [ [Object] ],
+       ts: '1501777340.256863' },
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
+  username: '@kara'
+};
+
+module.exports.clients = {
+  empty: {
+    _token:'test-token',
+    slackAPIUrl:'test-url'
+  },
   error: {
-    ok: false,
-    error: 'no_text',
-    scopes: [ 'identify', 'bot:basic' ],
-    acceptedScopes: [ 'chat:write:user', 'client' ]
+    _token:'test-token',
+    slackAPIUrl:'test-url',
+    chat: {
+      postMessage: function(username, message, options, callback) {
+        return callback('error', {
+          ok: false,
+          error: 'no_text',
+          scopes: [ 'identify', 'bot:basic' ],
+          acceptedScopes: [ 'chat:write:user', 'client' ]
+        });
+      }
+    }
+  },
+  noChannel: {
+    _token:'test-token',
+    slackAPIUrl:'test-url',
+    chat: {
+      postMessage: function(username, message, options, callback) {
+        return callback('error', {
+          ok: false,
+          error: 'channel_not_found',
+          scopes: [ 'identify', 'bot:basic' ],
+          acceptedScopes: [ 'chat:write:bot', 'post' ]
+        });
+      }
+    }
+  },
+  success: {
+    _token:'test-token',
+    slackAPIUrl:'test-url',
+    chat: {
+      postMessage: function(username, message, options, callback) {
+        return callback(null, {
+          ok: true,
+          channel: 'D6G0UU7MW',
+          ts: '1501777340.256863',
+          message: {
+            type: 'message',
+            user: 'U6GHXJQ1Z',
+            text: 'Two factor authentication has been disabled...',
+            bot_id: 'B6G0UU6HW',
+            attachments: [ [Object] ],
+            ts: '1501777340.256863'
+          },
+          scopes: [ 'identify', 'bot:basic' ],
+          acceptedScopes: [ 'chat:write:user', 'client' ]
+        });
+      }
+    }
   }
 };
