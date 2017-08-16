@@ -3,9 +3,9 @@
 const pd = require('../../lib/pagerduty.js');
 const tape = require('tape');
 const nock = require('nock');
-const incident = require('../fixtures/pagerduty').incident;
+const incident = require('../fixtures/pagerduty.fixtures.js').incident;
 
-tape('Creates incident', function(assert) {
+tape('[pagerduty] Creates incident', function(assert) {
   let options = {
     accessToken: 'FakeApiToken',
     title: 'this is a test',

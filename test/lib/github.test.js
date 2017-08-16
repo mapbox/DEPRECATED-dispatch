@@ -2,9 +2,9 @@
 const tape = require('tape');
 const nock = require('nock');
 const githubRequests = require('../../lib/github.js');
-const issuesFixtures = require('../fixtures/github.js');
+const issuesFixtures = require('../fixtures/github.fixtures.js');
 
-tape('Receive auth object from request', function(assert) {
+tape('[github] Receive auth object from request', function(assert) {
   let auth = {
     type: 'oauth',
     token: 'FakeApiToken'
@@ -16,7 +16,7 @@ tape('Receive auth object from request', function(assert) {
   assert.end();
 });
 
-tape('Finds requested issue', function(assert) {
+tape('[github] Finds requested issue', function(assert) {
   let issue = [ issuesFixtures.issue1()] ;
 
   let optionsExists = {
@@ -40,7 +40,7 @@ tape('Finds requested issue', function(assert) {
   .catch(err => { console.log(err)} );
 });
 
-tape('Does not find a match to the request issue', function(assert) {
+tape('[github] Does not find a match to the request issue', function(assert) {
   let issue = issuesFixtures.issue1();
 
   let optionsDoesntExist = {
@@ -64,7 +64,7 @@ tape('Does not find a match to the request issue', function(assert) {
   .catch(err => { console.log(err)} );
 });
 
-tape('Pagination works', function(assert) {
+tape('[github] Pagination works', function(assert) {
   let issues = issuesFixtures.manyIssues(); // contains 150 issues
 
   let optionsExist = {
@@ -88,7 +88,7 @@ tape('Pagination works', function(assert) {
   .catch(err => { console.log(err)} );
 });
 
-tape('Does not create issue because one exists', function(assert) {
+tape('[github] Does not create issue because one exists', function(assert) {
   let issue = issuesFixtures.issue1();
 
   let optionsExists = {
@@ -113,7 +113,7 @@ tape('Does not create issue because one exists', function(assert) {
   .catch(err => { console.log(err)} );
 });
 
-tape('Creates issue', function(assert) {
+tape('[github] Creates issue', function(assert) {
   let noIssue = []
   let issue = issuesFixtures.issue1();
 
@@ -145,7 +145,7 @@ tape('Creates issue', function(assert) {
   .catch(err => { console.log(err); });
 });
 
-tape('Closes issue', function(assert) {
+tape('[github] Closes issue', function(assert) {
   let closedIssue = issuesFixtures.closedIssue();
 
   let options = {

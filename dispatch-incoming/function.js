@@ -6,25 +6,50 @@ module.exports.fn = function(event, context, callback) {
   // decrypt the environment
   decrypt(process.env, function(err, res) {
     if (err) throw err;
-    const PDApiKey = process.env.dispatchIncomingPagerDutyApiKey;
-    const PDServiceId = process.env.dispatchIncomingPagerDutyServiceId;
-    const PDFromAddress = process.env.dispatchIncomingPagerDutyFromAddress;
-    const GithubRepo = process.env.dispatchIncomingGithubRepo;
-    const GithubOwner = process.env.dispatchIncomingGithubOwner;
-    const GithubToken = process.env.dispatchIncomingGithubToken;
-
-    if (event.Records.length > 1) {
-      callback('SNS contains more than one record.', null);
-    } else {
+    const PDApiKey = process.env.PagerDutyApiKey;
+    const PDServiceId = process.env.PagerDutyServiceId;
+    const PDFromAddress = process.env.PagerDutyFromAddress;
+    const GithubRepo = process.env.GithubRepo;
+    const GithubOwner = process.env.GithubOwner;
+    const GithubToken = process.env.GithubToken;
+    const SlackBotToken = process.env.SlackBotToken;
+    const SlackChannel = process.env.SlackChannel;
+    if (event.Records.length > 1) callback('SNS contains more than one record.', null);
+    else {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let priority = message.priority;
       let title = message.title;
       let body = message.body;
-
-      if (priority != 'self-service') {
+      // route alarms based on priority
+      if (priority == 'self-service') {
+        // create GH issue
+        const gh = require('../lib/github.js');
+        const options = {
+          owner: GithubOwner,
+          repo: GithubRepo,
+          token: GithubToken,
+          user: 'null', // TODO get from SNS
+          title: title,
+          body: 'test message body'
+        };
+        gh.createIssue(options)
+        .then(res => {
+          message.githubIssue = res.githubIssue;
+          // alert to Slack
+          const slack = require('../lib/slack.js');
+          const webClient = require('@slack/client').WebClient;
+          const client = new webClient(SlackBotToken);
+          slack.alertToSlack(message, client, SlackChannel, (err, status) => {
+            if (err) callback(err);
+            callback(null, status);
+          });
+        })
+        .catch(err => { callback(err, 'error handled'); });
+      }
+      else if (priority != 'self-service') {
         // create PD incident
-        var pd = require('../lib/pagerduty.js').createIncident;
-        var options = {
+        const pd = require('../lib/pagerduty.js').createIncident;
+        const options = {
           accessToken: PDApiKey,
           title: title, // TODO get the title from webhook event
           serviceId: PDServiceId,
@@ -36,26 +61,7 @@ module.exports.fn = function(event, context, callback) {
         .then(value => { callback(null, 'pagerduty incident triggered'); })
         .catch(error => { callback(error, 'error handled'); });
       }
-      // create GH issue
-      else if (priority == 'self-service') {
-        var gh = require('../lib/github.js')
-        var options = {
-          owner: GithubOwner,
-          repo: GithubRepo,
-          token: GithubToken,
-          user: 'null', // TODO get from SNS
-          title: title,
-          body: body
-        }
-        gh.createIssue(options)
-        .then(res => {
-          message.githubIssue = res.githubIssue;
-          callback(null, message);
-        })
-        .catch(err => { callback(err, 'error handled'); });
-      } else {
-        callback(null, 'unhandled response');
-      }
+      else callback(null, 'unhandled response');
     };
   });
 };
