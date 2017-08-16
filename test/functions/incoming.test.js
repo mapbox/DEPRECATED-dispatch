@@ -2,7 +2,7 @@
 
 const tape = require('tape');
 const nock = require('nock');
-const incoming = require('../../rules/incoming.js').fn;
+const incoming = require('../../dispatch-incoming/function.js').fn;
 
 process.env.dispatchIncomingPagerDutyApiKey = 'FakeApiToken';
 process.env.dispatchIncomingPagerDutyServiceId = 'XXXXXXX';
