@@ -34,7 +34,7 @@ const selfServiceEvent = {
 }
 
 tape('Creates a GH issue from self-service priority', function(assert) {
-  let noIssue = []
+  let noIssue = [];
   let ghIssue = require('../fixtures/github.js').issue1;
 
   nock('https://api.github.com')
@@ -47,8 +47,8 @@ tape('Creates a GH issue from self-service priority', function(assert) {
     .query({"access_token":"FakeApiToken"})
     .reply(201, ghIssue);
 
-  incoming(selfServiceEvent, function(err, res) {
-    console.log(res);
+  incoming(selfServiceEvent, {}, function(err, res) {
+    assert.deepEqual(res, 1, 'Github issue created');
     assert.end();
   });
 });

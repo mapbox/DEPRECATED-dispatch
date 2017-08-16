@@ -73,8 +73,8 @@ module.exports.fn = function(event, context, callback) {
       };
       var incident = pd(options);
       incident
-      .then(value => callback(null, 'pagerduty incident triggered'))
-      .catch(error => callback(error, 'error handled'));
+      .then(value => { callback(null, 'pagerduty incident triggered'); })
+      .catch(error => { callback(error, 'error handled'); });
     }
     // create GH issue
     else if (priority == 'self-service') {
@@ -83,13 +83,17 @@ module.exports.fn = function(event, context, callback) {
         owner: GithubOwner,
         repo: GithubRepo,
         token: GithubToken,
-        user: 'oliikit', // TODO get from SNS
-        title: 'there is a fire',
+        user: 'null', // TODO get from SNS
+        title: 'foobar',
         body: 'hurry hurry'
       }
       gh.createIssue(options)
-      .then(value => callback(null, 'github incident triggered'))
-      .catch(err => callback(err, 'error handled'));
+      .then(res => callback(null, res.githubIssue))
+      .catch(err => {
+        console.log(err);
+        callback(err, 'error handled');
+        process.exit(1);
+      });
     } else {
       callback(null, 'unhandled response');
     }
