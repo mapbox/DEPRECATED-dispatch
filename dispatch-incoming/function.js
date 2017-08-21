@@ -28,7 +28,7 @@ module.exports.fn = function(event, context, callback) {
           owner: GithubOwner,
           repo: GithubRepo,
           token: GithubToken,
-          user: 'null', // TODO get from SNS
+          user: 'k-mahoney',
           title: title,
           body: 'test message body'
         };
