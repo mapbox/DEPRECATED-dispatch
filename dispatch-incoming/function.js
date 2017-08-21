@@ -28,7 +28,7 @@ module.exports.fn = function(event, context, callback) {
           owner: GithubOwner,
           repo: GithubRepo,
           token: GithubToken,
-          user: 'k-mahoney',
+          user: 'null', // TODO get from dispatch-oracle
           title: title,
           body: 'test message body'
         };
