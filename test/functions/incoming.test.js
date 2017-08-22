@@ -2,7 +2,10 @@
 
 const tape = require('tape');
 const nock = require('nock');
+const sinon = require('sinon');
 const incoming = require('../../dispatch-incoming/function.js').fn;
+const slack = require('../../lib/slack.js');
+const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
 
 process.env.PagerDutyApiKey = 'FakeApiToken';
 process.env.PagerDutyServiceId = 'XXXXXXX';
@@ -39,11 +42,6 @@ const selfServiceEvent = {
 tape('[incoming] Creates a GH issue from self-service priority', function(assert) {
   let noIssue = [];
   let ghIssue = require('../fixtures/github.fixtures.js').issue1;
-  let actualResult = {
-    priority: 'self-service',
-    title: 'foobar',
-    body: 'hurry hurry',
-    githubIssue: 1 }
 
   nock('https://api.github.com')
     .get('/repos/null/island/issues')
@@ -55,10 +53,15 @@ tape('[incoming] Creates a GH issue from self-service priority', function(assert
     .query({"access_token":"FakeApiToken"})
     .reply(201, ghIssue);
 
+  const stub = sinon.stub(slack, 'alertToSlack').returns(null, slackFixtures.slack.status);
+
   incoming(selfServiceEvent, {}, function(err, res) {
-    assert.deepEqual(res, actualResult, 'Github issue created');
+    console.log(`ERR: ${err}`);
+    console.log(res);
+    assert.deepEqual(res, slackFixtures.slack.statusFinal, '-- Github issue created and Slack alerts');
     assert.end();
   });
+  slack.alertToSlack.restore();
 });
 
 tape('[incoming] Creates a PD incident from high priority', function(assert) {

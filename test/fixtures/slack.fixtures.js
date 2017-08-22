@@ -105,6 +105,14 @@ module.exports.slack = {
     res: true,
     timestamp: '1501777340.256863'
   },
+  statusFinal: {
+    user: '@kara',
+    id: 'U6GHXJQ1Z',
+    issue: 'https://api.github.com/repos/null/island/issues/7',
+    bot: 'B6G0UU6HW',
+    res: true,
+    timestamp: '1501777340.256863'
+  },
   success: {
     ok: true,
     channel: 'D6G0UU7MW',

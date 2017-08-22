@@ -28,19 +28,19 @@ module.exports.fn = function(event, context, callback) {
           owner: GithubOwner,
           repo: GithubRepo,
           token: GithubToken,
-          user: 'null', // TODO get from dispatch-oracle
+          user: 'k-mahoney', // TODO get from dispatch-oracle
           title: title,
           body: 'test message body'
         };
         gh.createIssue(options)
         .then(res => {
-          message.githubIssue = res.githubIssue;
           // alert to Slack
           const slack = require('../lib/slack.js');
           const webClient = require('@slack/client').WebClient;
           const client = new webClient(SlackBotToken);
           slack.alertToSlack(message, client, SlackChannel, (err, status) => {
             if (err) callback(err);
+            message.githubIssue = status.issue;
             callback(null, status);
           });
         })
