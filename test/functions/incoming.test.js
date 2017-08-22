@@ -39,7 +39,7 @@ const selfServiceEvent = {
   }]
 }
 
-tape('[incoming] Creates a GH issue from self-service priority', function(assert) {
+tape('[incoming] Creates a GH issue and Slack alert for self-service priority', function(assert) {
   let noIssue = [];
   let ghIssue = require('../fixtures/github.fixtures.js').issue1;
 
