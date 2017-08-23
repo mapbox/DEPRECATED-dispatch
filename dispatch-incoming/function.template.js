@@ -1,4 +1,4 @@
-var lambdaCfn = require('lambda-cfn');
+var lambdaCfn = require('@mapbox/lambda-cfn');
 var cf = require('@mapbox/cloudfriend');
 
 module.exports = lambdaCfn.build({
@@ -27,7 +27,15 @@ module.exports = lambdaCfn.build({
     },
     GithubToken: {
       Type: 'String',
-      Description: '[secure] GitHub OAuth Token'
+      Description: '[secure] GitHub OAuth token'
+    },
+    SlackBotToken: {
+      Type: 'String',
+      Description: '[secure] Slack API bot token'
+    },
+    SlackChannel: {
+      Type: 'String',
+      Description: 'Slack channel for dispatch-bot'
     }
   },
   statements: [

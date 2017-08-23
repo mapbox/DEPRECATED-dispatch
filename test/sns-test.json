@@ -1,0 +1,21 @@
+{
+  "timestamp" : "2017-07-31T00:54:06.655Z",
+  "title": "Test issue, please ignore",
+  "priority": "self-service",
+  "username": "k-mahoney",
+  "body": {
+    "issue": "Test issue, please ignore - check out this exciting issue body text.",
+    "directions": "Seriously, this is a test issue - please ignore it.",
+    "prompt": {
+      "message": "Test issue, please ignore?",
+      "actions": [
+        {
+          "value": "Yes"
+        },
+        {
+          "value": "No"
+        }
+      ]
+    }
+  }
+}

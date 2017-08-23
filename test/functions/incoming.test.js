@@ -2,14 +2,17 @@
 
 const tape = require('tape');
 const nock = require('nock');
+const sinon = require('sinon');
 const incoming = require('../../dispatch-incoming/function.js').fn;
+const slack = require('../../lib/slack.js');
+const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
 
-process.env.dispatchIncomingPagerDutyApiKey = 'FakeApiToken';
-process.env.dispatchIncomingPagerDutyServiceId = 'XXXXXXX';
-process.env.dispatchIncomingPagerDutyFromAddress = 'null@foo.bar';
-process.env.dispatchIncomingGithubRepo = 'island';
-process.env.dispatchIncomingGithubOwner = 'null';
-process.env.dispatchIncomingGithubToken = 'FakeApiToken';
+process.env.PagerDutyApiKey = 'FakeApiToken';
+process.env.PagerDutyServiceId = 'XXXXXXX';
+process.env.PagerDutyFromAddress = 'null@foo.bar';
+process.env.GithubRepo = 'island';
+process.env.GithubOwner = 'null';
+process.env.GithubToken = 'FakeApiToken';
 
 const highPriorityEvent = {
   Records:
@@ -36,14 +39,9 @@ const selfServiceEvent = {
   }]
 }
 
-tape('Creates a GH issue from self-service priority', function(assert) {
+tape('[incoming] Creates a GH issue and Slack alert for self-service priority', function(assert) {
   let noIssue = [];
-  let ghIssue = require('../fixtures/github.js').issue1;
-  let actualResult = {
-    priority: 'self-service',
-    title: 'foobar',
-    body: 'hurry hurry',
-    githubIssue: 1 }
+  let ghIssue = require('../fixtures/github.fixtures.js').issue1;
 
   nock('https://api.github.com')
     .get('/repos/null/island/issues')
@@ -55,14 +53,19 @@ tape('Creates a GH issue from self-service priority', function(assert) {
     .query({"access_token":"FakeApiToken"})
     .reply(201, ghIssue);
 
+  const stub = sinon.stub(slack, 'alertToSlack').returns(null, slackFixtures.slack.status);
+
   incoming(selfServiceEvent, {}, function(err, res) {
-    assert.deepEqual(res, actualResult, 'Github issue created');
+    console.log(`ERR: ${err}`);
+    console.log(res);
+    assert.deepEqual(res, slackFixtures.slack.statusFinal, '-- Github issue created and Slack alerts');
     assert.end();
   });
+  slack.alertToSlack.restore();
 });
 
-tape('Creates a PD incident from high priority', function(assert) {
-  let pdIncident = require('../fixtures/pagerduty.js').incident;
+tape('[incoming] Creates a PD incident from high priority', function(assert) {
+  let pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
     .post('/incidents', {"incident": {
@@ -81,7 +84,7 @@ tape('Creates a PD incident from high priority', function(assert) {
   });
 });
 
-tape('Throws error if there is more than 1 record', function(assert) {
+tape('[incoming] Throws error if there is more than 1 record', function(assert) {
   let badRecord = { Records: [ 'record1', 'record2'] }
 
   incoming(badRecord, {}, function(err, res) {

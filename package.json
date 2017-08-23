@@ -26,7 +26,8 @@
     "@slack/client": "^3.10.0",
     "aws-sdk": "^2.94.0",
     "decrypt-kms-env": "^3.0.0",
-    "github": "^9.2.0"
+    "github": "^9.2.0",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "nock": "^9.0.14",
