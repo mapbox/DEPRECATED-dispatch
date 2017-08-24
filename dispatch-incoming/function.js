@@ -1,7 +1,6 @@
 'use strict';
 
 const decrypt = require('../lib/utils.js').decrypt;
-const d3 = require('d3-queue');
 const request = require('request');
 
 module.exports.fn = function(event, context, callback) {
@@ -9,32 +8,39 @@ module.exports.fn = function(event, context, callback) {
   decrypt(process.env, function(err, res) {
     if (err) throw err;
 
-    const PDApiKey = process.env.PagerDutyApiKey;
-    const PDServiceId = process.env.PagerDutyServiceId;
-    const PDFromAddress = process.env.PagerDutyFromAddress;
-    const GithubRepo = process.env.GithubRepo;
-    const GithubOwner = process.env.GithubOwner;
-    const GithubToken = process.env.GithubToken;
-    const SlackBotToken = process.env.SlackBotToken;
-    const SlackChannel = process.env.SlackChannel;
-    const OracleUrl = process.env.OracleUrl;
-    const OracleSecret = process.env.OracleSecret;
+    const pagerDutyApiKey = process.env.PagerDutyApiKey;
+    const pagerDutyServiceId = process.env.PagerDutyServiceId;
+    const pagerDutyFromAddress = process.env.PagerDutyFromAddress;
+    const githubRepo = process.env.GithubRepo;
+    const githubOwner = process.env.GithubOwner;
+    const githubToken = process.env.GithubToken;
+    const slackBotToken = process.env.SlackBotToken;
+    const slackChannel = process.env.SlackChannel;
+    const oracleUrl = process.env.OracleUrl;
+    const oracleSecret = process.env.OracleSecret;
     let users;
 
     if (event.Records.length > 1) {
       return callback('SNS message contains more than one record', null);
     } else {
-      const q = d3.queue(1);
-      q.defer(oracle);
-      q.defer(incoming);
-      q.awaitAll(function(err, data) {
-        return callback(err, data);
+      oracle(function(err,data) {
+        if (err) return callback(err);
+        incoming(function(err,data) {
+          if (err) return callback(err);
+          return callback(null, data);
+        });
       });
     };
 
     function oracle(callback) {
-      let messageUsers = JSON.parse(event.Records[0].Sns.Message).users;
-      if (messageUsers.length > 1) {
+      let message = JSON.parse(event.Records[0].Sns.Message);
+      let msgType = message.type;
+      let messageUsers = message.users;
+
+      if (msgType === 'high') {
+        console.log('High priority message, skipping Oracle');
+        return callback();
+      } else if (messageUsers.length > 1) {
         users = messageUsers;
         console.log('Users array contains more than one user, skipping Oracle');
         return callback();
@@ -42,18 +48,18 @@ module.exports.fn = function(event, context, callback) {
         users = [ 'testUser' ];
         return callback();
       } else {
-        if (OracleUrl) {
-          let OracleCall = {
-            url: OracleUrl,
+        if (oracleUrl) {
+          let oracleCall = {
+            url: oracleUrl,
             qs: { query: messageUsers[0] }
           };
-          if (OracleSecret) {
-            OracleCall.headers = {
-              'x-api-key': OracleSecret
+          if (oracleSecret) {
+            oracleCall.headers = {
+              'x-api-key': oracleSecret
             };
           }
           console.log('querying Oracle for: ' + messageUsers[0]);
-          request.get(OracleCall, function(err, response, body) {
+          request.get(oracleCall, function(err, response, body) {
             if (err) return callback(err);
             if (body && body.github === 'mapbox/security-team') {
               console.log('Oracle query returned no results for: ' + messageUserName);
@@ -72,27 +78,25 @@ module.exports.fn = function(event, context, callback) {
     };
 
     function incoming(callback) {
+      let message = JSON.parse(event.Records[0].Sns.Message);
+      let msgType = message.type;
+
       const slack = require('../lib/slack.js');
       const webClient = require('@slack/client').WebClient;
-      const client = new webClient(SlackBotToken);
+      const client = new webClient(slackBotToken);
       const gh = require('../lib/github.js');
 
-      let message = JSON.parse(event.Records[0].Sns.Message);
-      let priority = message.priority;
-      let title = message.title;
-      let body = message.body;
-
-      if (!priority) {
+      if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
-      } else if (priority === 'self-service') {
+      } else if (msgType === 'self-service') {
         // create GH issue
         const options = {
-          owner: GithubOwner,
-          repo: GithubRepo,
-          token: GithubToken,
+          owner: githubOwner,
+          repo: githubRepo,
+          token: githubToken,
           user: users[0],
-          title: title,
-          body: body + '/n/n @' + users[0]
+          title: message.body.github.title,
+          body: message.body.github.body + '\n\n @' + users[0]
         };
         gh.createIssue(options)
           .then(res => {
@@ -100,6 +104,8 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
+              // add the GitHub issue and url
+              message.url = res.url;
               message.issue = res.issue;
               // override message username with username from Oracle
               // if no username, then delete so goes to channel
@@ -108,24 +114,24 @@ module.exports.fn = function(event, context, callback) {
               } else {
                 message.username = users[0];
               }
-              slack.alertToSlack(message, client, SlackChannel, (err, status) => {
+              slack.alertToSlack(message, client, slackChannel, (err, status) => {
                 if (err) return callback(err);
                 return callback(null, status);
               });
             }
           })
           .catch(err => { callback(err, 'error handled'); });
-      } else if (priority === 'broadcast') {
+      } else if (msgType === 'broadcast') {
         const options = {
-          owner: GithubOwner,
-          repo: GithubRepo,
-          token: GithubToken,
-          title: title,
-          body: body
+          owner: githubOwner,
+          repo: githubRepo,
+          token: githubToken,
+          title: message.body.github.title,
+          body: message.body.github.body + '\n\n @' + users[0]
         };
         var q = queue(1);
         if (users[0] === 'mapbox/security-team') {
-          return callback('Broadcast message without users list');
+          return callback('Error: broadcast message without users list');
         }
         gh.createIssue(options)
           .then(res => {
@@ -133,11 +139,13 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
+              // add the GitHub issue and url
+              message.url = res.url;
               message.issue = res.issue;
               // users is an array of people
               users.forEach((user) => {
                 message.username = user;
-                q.defer(slack.alertToSlack, message, client, SlackChannel);
+                q.defer(slack.alertToSlack, message, client, slackChannel);
               });
             }
             q.awaitAll(function(err,data) {
@@ -149,11 +157,11 @@ module.exports.fn = function(event, context, callback) {
         // create PD incident
         const pd = require('../lib/pagerduty.js').createIncident;
         const options = {
-          accessToken: PDApiKey,
-          title: title, // TODO get the title from webhook event
-          serviceId: PDServiceId,
+          accessToken: pagerDutyApiKey,
+          title: message.body.pagerduty.title, // TODO get the title from webhook event
+          serviceId: pagerDutyServiceId,
           incidentKey: 'testing', // TODO get the incident key from webhook event
-          from: PDFromAddress
+          from: pagerDutyFromAddress
         };
         var incident = pd(options);
         incident

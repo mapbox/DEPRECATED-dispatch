@@ -3,56 +3,41 @@
 module.exports.sns = {
   malformed: {
     timestamp: '2017-07-31T00:54:06.655Z',
-    title: 'User kara has disabled 2FA on their Github account',
-    priority: 'self_service',
-    username: 'kara',
-    body: {
-      issue: 'Two factor authentication has been disabled...',
-      directions: 'Ensure you re-enable 2FA on your Github account...'
-    }
+    type: 'self_service',
+    users: ['testUser'],
+    body: {}
   },
   malformedError: 'ERR: sns message parsing error',
   nullSNSError: 'ERR: null sns message',
   nullUsername: {
     timestamp: '2017-07-31T00:54:06.655Z',
-    title: 'User kara has disabled 2FA on their Github account',
-    priority: 'self_service',
-    username: null,
+    type: 'self_service',
+    users: [],
+    issue: 7,
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
     body: {
-      issue: 'Two factor authentication has been disabled...',
-      directions: 'Ensure you re-enable 2FA on your Github account...',
-      prompt: {
-        message: 'Did you turn off two-factor authentication on your GitHub account? ...',
-        actions: [
-          {
-            value: 'Yes'
-          },
-          {
-            value: 'No'
-          }
-        ]
+      slack: {
+        message: 'testSlackMessage',
+        actions: {
+          yes: 'testYesAction',
+          no: 'testNoAction'
+        }
       }
     }
   },
   success: {
     timestamp: '2017-07-31T00:54:06.655Z',
-    title: 'User kara has disabled 2FA on their Github account',
-    priority: 'self_service',
-    username: 'kara',
+    type: 'self_service',
+    users: ['testUser'],
     issue: '7',
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
     body: {
-      issue: 'Two factor authentication has been disabled...',
-      directions: 'Ensure you re-enable 2FA on your Github account...',
-      prompt: {
-        message: 'Did you turn off two-factor authentication on your GitHub account? ...',
-        actions: [
-          {
-            value: 'Yes'
-          },
-          {
-            value: 'No'
-          }
-        ]
+      slack: {
+        message: 'testSlackMessage',
+        actions: {
+          yes: 'testYesAction',
+          no: 'testNoAction'
+        }
       }
     }
   }
@@ -67,25 +52,25 @@ module.exports.slack = {
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
   message: {
-    text: 'Two factor authentication has been disabled...',
+    text: 'testSlackMessage',
     attachments: [
       {
-        text: 'Did you turn off two-factor authentication on your GitHub account? ...',
+        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'dispatch_callback',
         attachment_type: 'default',
         actions: [
           {
             name: 'yes',
-            text: 'Yes',
+            text: 'testYesAction',
             type: 'button',
-            value: 'Yes'
+            value: 1
           },
           {
             name: 'no',
-            text: 'No',
+            text: 'testNoAction',
             type: 'button',
-            value: 'No',
+            value: 0,
             style: 'danger'
           }
         ]
@@ -100,17 +85,19 @@ module.exports.slack = {
     acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
   status: {
-    user: '@kara',
+    user: '@testUser',
     id: 'U6GHXJQ1Z',
     bot: 'B6G0UU6HW',
     res: true,
     timestamp: '1501777340.256863',
-    issue: '7'
+    issue: '7',
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
   statusFinal: {
-    user: '@kara',
+    user: '@testUser',
     id: 'U6GHXJQ1Z',
-    issue: 'https://api.github.com/repos/null/island/issues/7',
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    issue: 7,
     bot: 'B6G0UU6HW',
     res: true,
     timestamp: '1501777340.256863'
@@ -129,7 +116,7 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  username: '@kara'
+  username: '@testUser'
 };
 
 module.exports.clients = {

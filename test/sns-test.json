@@ -1,7 +1,7 @@
 {
   "self-service message format": {
     "timestamp" : "2017-07-31T00:54:06.655Z",
-    "priority": "self-service",
+    "type": "self-service",
     "users": ["user1"],
     "body": {
       "github": {
@@ -19,7 +19,7 @@
   },
   "broadcast message format": {
     "timestamp" : "2017-07-31T00:54:06.655Z",
-    "priority": "broadcast",
+    "type": "broadcast",
     "users": ["user1","user2","user3"],
     "body": {
       "github": {
@@ -32,6 +32,15 @@
           "yes": "[optional] This value will be displayed as the positive Slack action",
           "no": "[optional] This value will be displayed as the negative Slack action"
         }
+      }
+    }
+  },
+  "high priority message format": {
+    "timestamp" : "2017-07-31T00:54:06.655Z",
+    "type": "high",
+    "body": {
+      "pagerduty": {
+        "title": "[required] Pagerduty incident description"
       }
     }
   }

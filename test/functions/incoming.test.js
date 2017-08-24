@@ -15,14 +15,17 @@ const incoming = require('../../dispatch-incoming/function.js').fn;
 const slack = require('../../lib/slack.js');
 const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
 
-
 const highPriorityEvent = {
   Records:
   [{ EventSource: 'aws:sns',
     Sns: {
       Message: JSON.stringify({
-        priority: 'high',
-        title: 'this is a test'
+        type: 'high',
+        body: {
+          pagerduty: {
+            title: 'testPagerDutyTitle'
+          }
+        }
       })
     }
   }]
@@ -35,18 +38,48 @@ const selfServiceEvent = {
       Sns: {
         Message: JSON.stringify(
           {
-            priority: 'self-service',
-            title: 'testTitle',
-            username: 'testUser',
+            type: 'self-service',
+            users: ['testUser'],
             body: {
-              issue: 'testIssue',
-              directions: 'testDirections',
-              prompt: {
-                message: 'testMessage',
-                actions: [
-                  { value: 'yes' },
-                  { value: 'no' }
-                ]
+              github: {
+                title: 'testGithubTitle',
+                body: 'testGithubBody'
+              },
+              slack: {
+                message: 'testSlackMessage',
+                actions: {
+                  yes: 'testYesAction',
+                  no: 'testNoAction'
+                }
+              }
+            }
+          }
+        )
+      }
+    }
+  ]
+};
+
+const BroadcastEvent = {
+  Records:
+  [
+    { EventSource: 'aws:sns',
+      Sns: {
+        Message: JSON.stringify(
+          {
+            type: 'broadcast',
+            users: ['testUser1', 'testUser2', 'testUser3'],
+            body: {
+              github: {
+                title: 'testGithubTitle',
+                body: 'testGithubBody'
+              },
+              slack: {
+                message: 'testSlackMessage',
+                actions: {
+                  yes: 'testYesAction',
+                  no: 'testNoAction'
+                }
               }
             }
           }
@@ -60,35 +93,29 @@ tape('[incoming] Creates a GH issue and Slack alert for self-service priority', 
   let noIssue = [];
   let ghIssue = require('../fixtures/github.fixtures.js').issue1;
 
-
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
     .query({state: 'open', access_token: 'FakeApiToken'})
     .reply(200, noIssue);
 
-  nock('https://api.github.com', {"encodedQueryParams":true})
-    .post('/repos/testOwner/testRepo/issues', {"title":"testTitle","body": {
-      issue: 'testIssue',
-      directions: 'testDirections',
-      prompt: {
-        message: 'testMessage',
-        actions: [
-          { value: 'yes' },
-          { value: 'no' }
-        ]
-      }},"assignees":["testUser"]})
+  nock('https://api.github.com', {encodedQueryParams:true})
+    .post('/repos/testOwner/testRepo/issues', {
+      title: 'testGithubTitle',
+      body: 'testGithubBody\n\n @testUser'
+    })
     .query({"access_token":"FakeApiToken"})
     .reply(201, ghIssue);
 
-  const stub = sinon.stub(slack, 'alertToSlack').returns(null, slackFixtures.slack.status);
+  nock('https://slack.com:443', {"encodedQueryParams":true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
 
   incoming(selfServiceEvent, {}, function(err, res) {
-    console.log(`ERR: ${err}`);
-    console.log(res);
-    assert.deepEqual(res, slackFixtures.slack.statusFinal, '-- Github issue created and Slack alerts');
+    assert.notOk(err, 'Does not error');
+    assert.deepEqual(res, slackFixtures.slack.statusFinal, 'Github issue and Slack alert created');
     assert.end();
   });
-  slack.alertToSlack.restore();
+
 });
 
 tape('[incoming] Creates a PD incident from high priority', function(assert) {
@@ -97,7 +124,7 @@ tape('[incoming] Creates a PD incident from high priority', function(assert) {
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
     .post('/incidents', {"incident": {
       "type":"incident",
-      "title":"this is a test",
+      "title":"testPagerDutyTitle",
       "service": {
         "id":"XXXXXXX",
         "type":"service_reference" },
@@ -115,7 +142,7 @@ tape('[incoming] Throws error if there is more than 1 record', function(assert) 
   let badRecord = { Records: [ 'record1', 'record2'] };
 
   incoming(badRecord, {}, function(err, res) {
-    assert.deepEqual(err, 'SNS contains more than one record.', 'Function returned error.');
+    assert.deepEqual(err, 'SNS message contains more than one record', 'Function returned error.');
     assert.end();
-  })
-})
+  });
+});

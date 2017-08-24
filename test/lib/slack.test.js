@@ -27,7 +27,7 @@ test('[slack] [ingestSNS] SNS parsing error', (t) => {
 test('[slack] [ingestSNS] missing username', (t) => {
   file.ingestSNS(fixtures.sns.nullUsername, channel, (err, username, message) => {
     t.equal(username, fixtures.slack.channel, '-- should return fallback channel');
-    t.deepEqual(message, fixtures.slack.message, '-- should return valid message object');
+    t.deepLooseEqual(message, fixtures.slack.message, '-- should return valid message object');
     t.end();
   });
 });

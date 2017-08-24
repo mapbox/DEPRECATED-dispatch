@@ -32,7 +32,7 @@ tape('[github] Finds requested issue', function(assert) {
       .query({state: 'open', access_token: 'FakeApiToken'})
       .reply(200, issue);
 
-  githubRequests.issueExists(optionsExists)
+  githubRequests.checkForIssue(optionsExists)
   .then(res => {
     assert.deepEqual(Array.isArray(res), true, 'Response is an array');
     assert.deepEqual(res, issue, 'Found issue');
@@ -56,7 +56,7 @@ tape('[github] Does not find a match to the requested issue', function(assert) {
       .query({state: 'open', access_token: 'FakeApiToken'})
       .reply(200, issue);
 
-  githubRequests.issueExists(optionsDoesntExist)
+  githubRequests.checkForIssue(optionsDoesntExist)
   .then(res => {
     assert.deepEqual(Array.isArray(res), true, 'Response is an array');
     assert.deepEqual(res, [], 'Returns empty array');
@@ -80,7 +80,7 @@ tape('[github] Pagination works', function(assert) {
       .query({state: 'open', access_token: 'FakeApiToken'})
       .reply(200, issues);
 
-  githubRequests.issueExists(optionsExist)
+  githubRequests.checkForIssue(optionsExist)
   .then(res => {
     assert.deepEqual(Array.isArray(res), true, 'Response is an array');
     assert.deepEqual(res, issues, 'Returns all 150 issues');

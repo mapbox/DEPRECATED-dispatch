@@ -7,8 +7,8 @@ const triage = require('../../dispatch-triage/function.js').fn;
 process.env.PagerDutyApiKey = 'FakeApiToken';
 process.env.PagerDutyServiceId = 'XXXXXXX';
 process.env.PagerDutyFromAddress = 'null@foo.bar';
-process.env.GithubRepo = 'island';
-process.env.GithubOwner = 'null';
+process.env.GithubRepo = 'testRepo';
+process.env.GithubOwner = 'testOwner';
 process.env.GithubToken = 'FakeApiToken';
 
 var okResponseEvent = require('../../test/fixtures/triage/ok');
