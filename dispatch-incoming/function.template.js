@@ -13,7 +13,7 @@ module.exports = lambdaCfn.build({
     },
     PagerDutyFromAddress: {
       Type: 'String',
-      Description: 'PagerDuty From address'
+      Description: 'PagerDuty account email address'
     },
     GithubOwner: {
       Type: 'String',

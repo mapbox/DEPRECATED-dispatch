@@ -74,4 +74,4 @@ module.exports.incident = {
       "self": "https://api.pagerduty.com/incidents/XXXXXXX",
       "html_url": "https://mapbox.pagerduty.com/incidents/XXXXXXX"
     }
-}
+};

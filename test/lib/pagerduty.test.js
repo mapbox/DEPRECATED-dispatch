@@ -15,14 +15,17 @@ tape('[pagerduty] Creates incident', function(assert) {
   };
 
   nock('https://api.pagerduty.com:443', {'encodedQueryParams':true})
-    .post('/incidents', {incident: {
-      type:'incident',
-      title:'testTitle',
-      service: {
-        id:'testServiceId',
-        type:'service_reference' },
-      incident_key:'testIncidentKey' }
-    })
+    .post('/incidents',
+          {
+            incident: {
+              type:'incident',
+              title:'testTitle',
+              service: {
+                id:'testServiceId',
+                type:'service_reference'
+              },
+              incident_key:'testIncidentKey' }
+          })
     .reply(201, incident);
 
   pd.createIncident(options)
@@ -30,5 +33,43 @@ tape('[pagerduty] Creates incident', function(assert) {
     assert.deepEqual(res.body, incident, 'Incident was created.');
     assert.end();
   })
+    .catch(err => { console.log(err);});
+});
+
+tape('[pagerduty] Creates a PD incident from high priority with body', function(assert) {
+
+  var bodyRequest = nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
+        .post('/incidents',
+              {
+                incident: {
+                  type: 'incident',
+                  title: 'testTitle',
+                  service: {
+                    id: 'testServiceId',
+                    type: 'service_reference'
+                  },
+                  body: {
+                    type: 'incident_body',
+                    details: 'testBody'
+                  },
+                  incident_key: 'testIncidentKey'
+                }
+              })
+        .reply(201, {});
+
+  let options = {
+    accessToken: 'FakeApiToken',
+    title: 'testTitle',
+    body: 'testBody',
+    serviceId: 'testServiceId',
+    incidentKey: 'testIncidentKey',
+    from: 'null@foo.bar'
+  };
+
+  pd.createIncident(options)
+    .then(res => {
+      assert.ok(bodyRequest.isDone(),'Incident with body was called once');
+      assert.end();
+    })
     .catch(err => { console.log(err);});
 });
