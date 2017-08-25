@@ -4,7 +4,6 @@ const decrypt = require('../lib/utils.js').decrypt;
 const request = require('request');
 
 module.exports.fn = function(event, context, callback) {
-  //console.log('EVENT: %s', JSON.stringify(event));
   // decrypt the environment
   decrypt(process.env, function(err, res) {
     if (err) throw err;
@@ -62,7 +61,6 @@ module.exports.fn = function(event, context, callback) {
           console.log('querying Oracle for: ' + messageUsers[0]);
           request.get(oracleCall, function(err, response, body) {
             if (err) return callback(err);
-
             body = JSON.parse(body);
             if (body && body.github === 'mapbox/security-team') {
               console.log('Oracle query returned no results for: ' + messageUserName);

@@ -31,23 +31,6 @@ const highPriorityEvent = {
   }]
 };
 
-const highPriorityEventWithBody = {
-  Records:
-  [{ EventSource: 'aws:sns',
-     Sns: {
-       Message: JSON.stringify({
-         type: 'high',
-         body: {
-           pagerduty: {
-             title: 'testPagerDutyTitle',
-             body: 'testPagerDutyBody'
-           }
-         }
-       })
-     }
-   }]
-};
-
 const selfServiceEvent = {
   Records:
   [
@@ -153,54 +136,7 @@ tape('[incoming] Creates a PD incident from high priority', function(assert) {
           })
     .reply(201, pdIncident);
 
-  nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
-    .post('/incidents',
-          {
-            incident: {
-              type: 'incident',
-              title: 'testPagerDutyTitle',
-              service: {
-                id: 'XXXXXXX',
-                type: 'service_reference'
-              },
-              body: {
-                type: 'incident_body',
-                details: 'testPagerDutyBody'
-              },
-              incident_key: 'testPagerDutyTitle'
-            }
-          })
-    .reply(201, pdIncident);
-
   incoming(highPriorityEvent, {}, function(err, res) {
-    assert.deepEqual(res, 'pagerduty incident triggered', 'PD incident was triggered');
-    assert.end();
-  });
-});
-
-tape('[incoming] Creates a PD incident from high priority with body', function(assert) {
-  let pdIncident = require('../fixtures/pagerduty.fixtures.js').incidentWithBody;
-
-  nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
-    .post('/incidents',
-          {
-            incident: {
-              type: 'incident',
-              title: 'testPagerDutyTitle',
-              service: {
-                id: 'XXXXXXX',
-                type: 'service_reference'
-              },
-              body: {
-                type: 'incident_body',
-                details: 'testPagerDutyBody'
-              },
-              incident_key: 'testPagerDutyTitle'
-            }
-          })
-    .reply(201, pdIncident);
-
-  incoming(highPriorityEventWithBody, {}, function(err, res) {
     assert.deepEqual(res, 'pagerduty incident triggered', 'PD incident was triggered');
     assert.end();
   });
