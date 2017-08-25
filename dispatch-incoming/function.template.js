@@ -41,7 +41,7 @@ module.exports = lambdaCfn.build({
     },
     OracleSecret: {
       Type: 'String',
-      Description: 'User oracle shared secret'
+      Description: '[secure] User oracle shared secret'
     }
   },
   statements: [
