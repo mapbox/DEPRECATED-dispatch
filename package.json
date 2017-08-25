@@ -4,7 +4,7 @@
   "description": "Security monitoring tool",
   "main": "index.js",
   "engines": {
-    "node": "4.3.2"
+    "node": "6.10.3"
   },
   "scripts": {
     "test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js"
@@ -26,7 +26,10 @@
     "@slack/client": "^3.10.0",
     "aws-sdk": "^2.94.0",
     "decrypt-kms-env": "^3.0.0",
-    "github": "^9.2.0"
+    "github": "^9.2.0",
+    "lodash": "^4.17.4",
+    "d3-queue": "^3.0.0",
+    "request": "^2.81.0"
   },
   "devDependencies": {
     "nock": "^9.0.14",

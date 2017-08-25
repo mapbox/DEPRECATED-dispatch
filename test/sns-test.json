@@ -1,0 +1,47 @@
+{
+  "self-service message format": {
+    "timestamp" : "2017-07-31T00:54:06.655Z",
+    "type": "self-service",
+    "users": ["user1"],
+    "body": {
+      "github": {
+        "title": "[required] GitHub issue title text",
+        "body": "[required] GitHub issue body text"
+      },
+      "slack": {
+        "message": "[required] Slack message contents",
+        "actions": {
+          "yes": "[required] This value will be displayed as the positive Slack action",
+          "no": "[required] This value will be displayed as the negative Slack action"
+        }
+      }
+    }
+  },
+  "broadcast message format": {
+    "timestamp" : "2017-07-31T00:54:06.655Z",
+    "type": "broadcast",
+    "users": ["user1","user2","user3"],
+    "body": {
+      "github": {
+        "title": "[required] GitHub issue title text that all list users will be linked to",
+        "body": "[required] GitHub issue body text"
+      },
+      "slack": {
+        "message": "[required] Slack message contents",
+        "actions": {
+          "yes": "[optional] This value will be displayed as the positive Slack action",
+          "no": "[optional] This value will be displayed as the negative Slack action"
+        }
+      }
+    }
+  },
+  "high priority message format": {
+    "timestamp" : "2017-07-31T00:54:06.655Z",
+    "type": "high",
+    "body": {
+      "pagerduty": {
+        "title": "[required] Pagerduty incident description"
+      }
+    }
+  }
+}
