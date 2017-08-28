@@ -61,19 +61,20 @@ module.exports.fn = function(event, context, callback) {
           console.log('querying Oracle for: ' + messageUsers[0]);
           request.get(oracleCall, function(err, response, body) {
             if (err) return callback(err);
+            body = JSON.parse(body);
             if (body && body.github === 'mapbox/security-team') {
               console.log('Oracle query returned no results for: ' + messageUserName);
               users = [ body.github ];
               return callback();
             }
-            console.log('Oracle replied: ' + body.username);
-            users = [ body.username ];
+            console.log('Oracle replied: ' + body.github);
+            users = [ body.github ];
             return callback();
           });
         } else {
           users = messageUsers;
+          return callback();
         }
-        return callback();
       }
     };
 
@@ -94,7 +95,7 @@ module.exports.fn = function(event, context, callback) {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
-          user: users[0],
+          user: message.users[0],
           title: message.body.github.title,
           body: message.body.github.body + '\n\n @' + users[0]
         };
@@ -130,7 +131,7 @@ module.exports.fn = function(event, context, callback) {
           body: message.body.github.body + '\n\n @' + users[0]
         };
         var q = queue(1);
-        if (users[0] === 'mapbox/security-team') {
+        if (message.users[0] === 'mapbox/security-team') {
           return callback('Error: broadcast message without users list');
         }
         gh.createIssue(options)
@@ -156,13 +157,16 @@ module.exports.fn = function(event, context, callback) {
       } else {
         // create PD incident
         const pd = require('../lib/pagerduty.js').createIncident;
-        const options = {
+        let options = {
           accessToken: pagerDutyApiKey,
-          title: message.body.pagerduty.title, // TODO get the title from webhook event
+          title: message.body.pagerduty.title,
           serviceId: pagerDutyServiceId,
-          incidentKey: 'testing', // TODO get the incident key from webhook event
+          incidentKey: message.body.pagerduty.title,
           from: pagerDutyFromAddress
         };
+        if (message.body.pagerduty.body) {
+          options.body = message.body.pagerduty.body;
+        }
         var incident = pd(options);
         incident
           .then(value => { callback(null, 'pagerduty incident triggered'); })

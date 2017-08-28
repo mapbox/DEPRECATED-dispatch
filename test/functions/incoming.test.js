@@ -122,14 +122,18 @@ tape('[incoming] Creates a PD incident from high priority', function(assert) {
   let pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
-    .post('/incidents', {"incident": {
-      "type":"incident",
-      "title":"testPagerDutyTitle",
-      "service": {
-        "id":"XXXXXXX",
-        "type":"service_reference" },
-      "incident_key":"testing" }
-    })
+    .post('/incidents',
+          {
+            incident: {
+              type: 'incident',
+              title: 'testPagerDutyTitle',
+              service: {
+                id: 'XXXXXXX',
+                type: 'service_reference'
+              },
+              incident_key: 'testPagerDutyTitle'
+            }
+          })
     .reply(201, pdIncident);
 
   incoming(highPriorityEvent, {}, function(err, res) {
