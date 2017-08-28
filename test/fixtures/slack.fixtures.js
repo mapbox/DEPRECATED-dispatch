@@ -114,6 +114,23 @@ module.exports.slack = {
     alert: true,
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
+  statusBroadcast: [ [
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' },
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' },
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' }
+  ] ],
   success: {
     ok: true,
     channel: 'D6G0UU7MW',

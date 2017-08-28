@@ -22,13 +22,13 @@ module.exports.fn = function(event, context, callback) {
     const slackChannel = process.env.SlackChannel;
     const oracleUrl = process.env.OracleUrl;
     const oracleSecret = process.env.OracleSecret;
-    let users;
     if (event.Records.length > 1) {
       return callback('SNS message contains more than one record', null);
     } else {
-      oracle(function(err,data) {
+      oracle(function(err, data) {
         if (err) return callback(err);
-        incoming(function(err,data) {
+        let users = data;
+        incoming(users, function(err, data) {
           if (err) return callback(err);
           return callback(null, data);
         });
@@ -43,12 +43,10 @@ module.exports.fn = function(event, context, callback) {
         console.log('High priority message, skipping Oracle');
         return callback();
       } else if (messageUsers.length > 1) {
-        users = messageUsers;
         console.log('Users array contains more than one user, skipping Oracle');
-        return callback();
+        return callback(null, messageUsers);
       } else if (process.env.NODE_ENV === 'test') {
-        users = [ 'testUser' ];
-        return callback();
+        return callback(null, [ 'testUser' ]);
       } else {
         if (oracleUrl) {
           let oracleCall = {
@@ -66,21 +64,17 @@ module.exports.fn = function(event, context, callback) {
             body = JSON.parse(body);
             if (body && body.github === 'mapbox/security-team') {
               console.log('Oracle query returned no results for: ' + messageUserName);
-              users = [ body.github ];
-              return callback();
+              return callback(null, [ body.github ]);
             }
             console.log('Oracle replied: ' + body.github);
-            users = [ body.github ];
-            return callback();
+            return callback(null, [ body.github ]);
           });
-        } else {
-          users = messageUsers;
-          return callback();
         }
+        else return callback(null, messageUsers);
       }
     };
 
-    function incoming(callback) {
+    function incoming(users, callback) {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
       const client = new webClient(slackBotToken);
@@ -118,12 +112,13 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(err => { callback(err, 'error handled'); });
       } else if (msgType === 'broadcast') {
+        let output  = [];
         let options = {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
           title: message.body.github.title,
-          body: message.body.github.body + '\n\n @' + users[0]
+          body: message.body.github.body + '\n\n @mapbox/security-team'
         };
         let q = queue(1);
         if (message.users[0] === 'mapbox/security-team') {
@@ -144,8 +139,9 @@ module.exports.fn = function(event, context, callback) {
               });
             }
             q.awaitAll(function(err, status) {
+              output.push(status);
               if (err) return callback(err);
-              return callback();
+              return callback(null, output);
             });
           });
       } else {

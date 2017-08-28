@@ -10,9 +10,11 @@ process.env.SlackChannel = 'testChannel';
 
 const tape = require('tape');
 const nock = require('nock');
+const sinon = require('sinon');
 const incoming = require('../../dispatch-incoming/function.js').fn;
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
 const githubFixtures = require('../fixtures/github.fixtures.js');
+const slack = require('../../lib/slack.js');
 const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
 const pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
@@ -39,6 +41,38 @@ tape('[incoming] self-service', (assert) => {
   incoming(incomingFixtures.selfServiceEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, slackFixtures.slack.status, '-- Github issue and Slack alert should be created');
+    assert.end();
+  });
+});
+
+tape('[incoming] broadcast', (assert) => {
+  nock('https://api.github.com')
+    .get('/repos/testOwner/testRepo/issues')
+    .query({state: 'open', access_token: 'FakeApiToken'})
+    .reply(200, []);
+
+  nock('https://api.github.com', {encodedQueryParams:true})
+    .post('/repos/testOwner/testRepo/issues', {
+      title: 'testGithubTitle',
+      body: 'testGithubBody\n\n @mapbox/security-team'
+    })
+    .query({'access_token':'FakeApiToken'})
+    .reply(201, githubFixtures.broadcastIssue);
+
+    // slack calls for [ 'testUser1', 'testUser2', 'testUser3' ]
+    nock('https://slack.com:443', {'encodedQueryParams':true})
+      .post('/api/chat.postMessage')
+      .reply(200, slackFixtures.slack.success);
+    nock('https://slack.com:443', {'encodedQueryParams':true})
+      .post('/api/chat.postMessage')
+      .reply(200, slackFixtures.slack.success);
+    nock('https://slack.com:443', {'encodedQueryParams':true})
+      .post('/api/chat.postMessage')
+      .reply(200, slackFixtures.slack.success);
+
+  incoming(incomingFixtures.broadcastEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, slackFixtures.slack.statusBroadcast, '-- Github issue and Slack alert should be created');
     assert.end();
   });
 });

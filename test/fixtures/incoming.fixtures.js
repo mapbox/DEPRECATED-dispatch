@@ -60,11 +60,7 @@ module.exports.broadcastEvent = {
                 body: 'testGithubBody'
               },
               slack: {
-                message: 'testSlackMessage',
-                actions: {
-                  yes: 'testYesAction',
-                  no: 'testNoAction'
-                }
+                message: 'testSlackMessage'
               }
             }
           }
