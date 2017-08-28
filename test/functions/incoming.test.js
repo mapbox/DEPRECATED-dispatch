@@ -29,10 +29,10 @@ tape('[incoming] self-service', (assert) => {
       title: 'testGithubTitle',
       body: 'testGithubBody\n\n @testUser'
     })
-    .query({"access_token":"FakeApiToken"})
+    .query({'access_token':'FakeApiToken'})
     .reply(201, githubFixtures.issue1);
 
-  nock('https://slack.com:443', {"encodedQueryParams":true})
+  nock('https://slack.com:443', {'encodedQueryParams':true})
     .post('/api/chat.postMessage')
     .reply(200, slackFixtures.slack.success);
 
@@ -45,18 +45,17 @@ tape('[incoming] self-service', (assert) => {
 
 tape('[incoming] Creates a PD incident from high priority', (assert) => {
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
-    .post('/incidents',
-          {
-            incident: {
-              type: 'incident',
-              title: 'testPagerDutyTitle',
-              service: {
-                id: 'XXXXXXX',
-                type: 'service_reference'
-              },
-              incident_key: 'testPagerDutyTitle'
-            }
-          })
+    .post('/incidents', {
+      incident: {
+        type: 'incident',
+        title: 'testPagerDutyTitle',
+        service: {
+          id: 'XXXXXXX',
+          type: 'service_reference'
+        },
+        incident_key: 'testPagerDutyTitle'
+      }
+    })
     .reply(201, pdIncident);
 
   incoming(incomingFixtures.highPriorityEvent, context, (err, res) => {
