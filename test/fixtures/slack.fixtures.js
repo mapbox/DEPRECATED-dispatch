@@ -3,7 +3,7 @@
 module.exports.sns = {
   broadcast: {
     type: 'broadcast',
-    users: ['testUser1', 'testUser2', 'testUser3'],
+    users: ['@testUser1', '@testUser2', '@testUser3'],
     body: {
       github: {
         title: 'testGithubTitle',
@@ -13,40 +13,17 @@ module.exports.sns = {
         message: 'testSlackMessage'
       }
     },
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-    username: 'testUser1'
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
   malformed: {
     type: 'self_service',
-    users: ['testUser'],
+    users: ['@testUser'],
     body: {}
   },
   malformedError: 'ERR: sns message parsing error',
-  nullSNSError: 'ERR: null sns message',
-  nullUsername: {
-    type: 'self_service',
-    users: [],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-    body: {
-      github: {
-        title: 'testGithubTitle',
-        body: 'testGithubBody'
-      },
-      slack: {
-        message: 'testSlackMessage',
-        actions: {
-          yes: 'testYesAction',
-          no: 'testNoAction'
-        }
-      }
-    }
-  },
   success: {
     type: 'self_service',
-    users: ['testUser'],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    users: ['@testUser'],
     body: {
       github: {
         title: 'testGithubTitle',
@@ -60,7 +37,7 @@ module.exports.sns = {
         }
       }
     },
-    username: 'testUser'
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   }
 };
 
@@ -117,28 +94,30 @@ module.exports.slack = {
     acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
   status: {
-    issue: 7,
-    user: '@testUser',
-    message: 'testSlackMessage',
     alert: true,
+    destination: '@testUser',
+    message: 'testSlackMessage',
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
   statusBroadcast: [ [
-    { issue: 7,
-      message: 'testSlackMessage',
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' },
-    { issue: 7,
+      destination: '@testUser1',
       message: 'testSlackMessage',
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    },
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser2' },
-    { issue: 7,
+      destination: '@testUser2',
       message: 'testSlackMessage',
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    },
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser3' }
+      destination: '@testUser3',
+      message: 'testSlackMessage',
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    }
   ] ],
   success: {
     ok: true,
