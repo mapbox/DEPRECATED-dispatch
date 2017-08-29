@@ -9,41 +9,24 @@ const _ = require('lodash');
 
 const channel = 'test-channel';
 
-test('[slack] [ingestSNS] SNS null error', (t) => {
-  file.ingestSNS(null, channel, (err) => {
-    t.equal(err, fixtures.sns.nullSNSError, '-- should pass through error message');
-    t.end();
-  });
-});
-
 test('[slack] [ingestSNS] SNS parsing error', (t) => {
-  file.ingestSNS(fixtures.sns.malformed, channel, (err) => {
+  file.ingestSNS(fixtures.sns.malformed, (err) => {
     t.equal(err, fixtures.sns.malformedError, '-- should pass through error message');
     t.end();
   });
 });
 
-test('[slack] [ingestSNS] missing username', (t) => {
-  file.ingestSNS(fixtures.sns.nullUsername, channel, (err, username, message) => {
-    t.equal(username, fixtures.slack.channel, '-- should return fallback channel');
-    t.deepLooseEqual(message, fixtures.slack.message, '-- should return valid message object');
-    t.end();
-  });
-});
-
 test('[slack] [ingestSNS] self-service success', (t) => {
-  file.ingestSNS(fixtures.sns.success, channel, (err, username, message) => {
+  file.ingestSNS(fixtures.sns.success, (err, message) => {
     t.ifError(err, '-- should not error');
-    t.equal(username, fixtures.slack.username, '-- should return @username');
     t.deepEqual(message, fixtures.slack.message, '-- should return valid message object');
     t.end();
   });
 });
 
 test('[slack] [ingestSNS] broadcast success', (t) => {
-  file.ingestSNS(fixtures.sns.broadcast, channel, (err, username, message) => {
+  file.ingestSNS(fixtures.sns.broadcast, (err, message) => {
     t.ifError(err, '-- should not error');
-    t.equal(username, fixtures.slack.username, '-- should return @username');
     t.deepEqual(message, fixtures.slack.messageBroadcast, '-- should return valid message object');
     t.end();
   });
@@ -56,13 +39,15 @@ test('[slack] [postAlert] missing message body', (t) => {
   });
 });
 
-test('[slack] [postAlert] cannot locate channel', (t) => {
+test('[slack] [postAlert] cannot locate destination (channel)', (t) => {
   file.postAlert(fixtures.slack.channel, fixtures.slack.message, fixtures.clients.noChannel, (err, res) => {
     t.equal(err.ok, false, '-- ok should be false');
     t.deepEqual(err, fixtures.slack.noChannel, '-- should pass through error response object');
     t.end();
   });
 });
+
+// NOTE: Add test for [postAlert] cannot locate destination (user)
 
 test('[slack] [postAlert] error', (t) => {
   file.postAlert(fixtures.slack.username, fixtures.slack.message, fixtures.clients.error, (err, res) => {
@@ -91,18 +76,18 @@ test('[slack] [postAlert] username success', (t) => {
 });
 
 test('[slack] [alertToSlack] ingestSNS error', (t) => {
-  const stub = sinon.stub(file, 'ingestSNS').returns(fixtures.sns.nullSNSError);
-  file.alertToSlack(null, fixtures.clients.empty, channel, (err, status) => {
-    t.equal(err, fixtures.sns.nullSNSError, '-- should pass through error message');
+  const stub = sinon.stub(file, 'ingestSNS').returns(fixtures.sns.malformedError);
+  file.alertToSlack({}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
+    t.equal(err, fixtures.sns.malformedError, '-- should pass through error message');
     t.end();
   });
   file.ingestSNS.restore();
 });
 
 test('[slack] [alertToSlack] postAlert error', (t) => {
-  const stub0 = sinon.stub(file, 'ingestSNS').returns(null, fixtures.slack.username, fixtures.slack.message);
+  const stub0 = sinon.stub(file, 'ingestSNS').returns(null, fixtures.slack.message);
   const stub1 = sinon.stub(file, 'postAlert').returns(fixtures.slack.error);
-  file.alertToSlack(fixtures.sns.success, fixtures.clients.error, channel, (err, status) => {
+  file.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.error, (err, status) => {
     t.equal(err.ok, false, '-- ok should be false');
     t.deepEqual(err, fixtures.slack.error, '-- should pass through error response object');
     t.end();
@@ -112,9 +97,9 @@ test('[slack] [alertToSlack] postAlert error', (t) => {
 });
 
 test('[slack] [alertToSlack] success', (t) => {
-  const stub0 = sinon.stub(file, 'ingestSNS').returns(null, fixtures.slack.username, fixtures.slack.message);
+  const stub0 = sinon.stub(file, 'ingestSNS').returns(null, fixtures.slack.message);
   const stub1 = sinon.stub(file, 'postAlert').returns(null, fixtures.slack.success);
-  file.alertToSlack(fixtures.sns.success, fixtures.clients.success, channel, (err, status) => {
+  file.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.success, (err, status) => {
     t.ifError(err, '-- should not error');
     t.equal(status.alert, true, '-- should be true');
     t.deepEqual(status, fixtures.slack.status, '-- should pass through status object');

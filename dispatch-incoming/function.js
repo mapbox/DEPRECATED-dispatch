@@ -9,7 +9,6 @@ const slack = require('../lib/slack.js');
 const webClient = require('@slack/client').WebClient;
 
 module.exports.fn = function(event, context, callback) {
-  // decrypt the environment
   decrypt(process.env, function(err, res) {
     if (err) throw err;
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
@@ -27,14 +26,15 @@ module.exports.fn = function(event, context, callback) {
     } else {
       oracle(function(err, data) {
         if (err) return callback(err);
-        let users = data;
-        incoming(users, function(err, data) {
+        let oracleOutput = data;
+        incoming(oracleOutput, function(err, data) {
           if (err) return callback(err);
           return callback(null, data);
         });
       });
     };
 
+    // NOTE: THIS IS BEING REMOVED -  need to refactor user(s) information object
     function oracle(callback) {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
@@ -94,17 +94,13 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
-              // add the GitHub issue and url to Slack alert input
+              // apend the GitHub issue URL to the message object
               message.url = res.url;
-              message.issue = res.issue;
-              // override message username with username from Oracle
-              // if no username, then delete so goes to channel
-              if (users[0] === 'mapbox/security-team') {
-                delete message.username;
-              } else {
-                message.username = users[0];
-              }
-              slack.alertToSlack(message, client, slackChannel, (err, status) => {
+              // alert to slack
+              let destination;
+              if (!(users[0].indexOf('@') > -1)) destination = `@${users[0]}`;
+              else destination = users[0];
+              slack.alertToSlack(message, destination, client, (err, status) => {
                 if (err) return callback(err);
                 return callback(null, status);
               });
@@ -112,40 +108,32 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(err => { callback(err, 'error handled'); });
       } else if (msgType === 'broadcast') {
-        let output  = [];
         let options = {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
           title: message.body.github.title,
-          body: message.body.github.body + '\n\n @mapbox/security-team'
+          body: message.body.github.body
         };
-        let q = queue(1);
-        if (message.users[0] === 'mapbox/security-team') {
-          return callback('Error: broadcast message without users list');
-        }
         gh.createIssue(options)
           .then(res => {
             if (res && res.status === 'exists') {
-              console.log('Issue ' + res.issue + ' already exists');
+              return callback('ERR: Issue ' + res.issue + ' already exists');
             } else {
-              // add the GitHub issue and url
+              // apend the GitHub issue URL to the message object
               message.url = res.url;
-              message.issue = res.issue;
-              // users is an array of people
+              // alert to slack
+              let q = queue();
               users.forEach((user) => {
-                message.username = user;
-                q.defer(slack.alertToSlack, message, client, slackChannel);
+                q.defer(slack.alertToSlack, message, user, client);
+              });
+              q.awaitAll(function(err, status) {
+                if (err) return callback(err);
+                return callback(null, status);
               });
             }
-            q.awaitAll(function(err, status) {
-              output.push(status);
-              if (err) return callback(err);
-              return callback(null, output);
-            });
           });
       } else {
-        // create PD incident
         let options = {
           accessToken: pagerDutyApiKey,
           title: message.body.pagerduty.title,

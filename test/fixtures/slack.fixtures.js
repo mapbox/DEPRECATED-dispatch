@@ -2,48 +2,33 @@
 
 module.exports.sns = {
   broadcast: {
-    timestamp: '2017-07-31T00:54:06.655Z',
-    type: 'self_service',
-    users: ['testUser'],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    type: 'broadcast',
+    users: ['@testUser1', '@testUser2', '@testUser3'],
     body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
       slack: {
         message: 'testSlackMessage'
       }
-    }
+    },
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   },
   malformed: {
-    timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
-    users: ['testUser'],
+    users: ['@testUser'],
     body: {}
   },
   malformedError: 'ERR: sns message parsing error',
-  nullSNSError: 'ERR: null sns message',
-  nullUsername: {
-    timestamp: '2017-07-31T00:54:06.655Z',
-    type: 'self_service',
-    users: [],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-    body: {
-      slack: {
-        message: 'testSlackMessage',
-        actions: {
-          yes: 'testYesAction',
-          no: 'testNoAction'
-        }
-      }
-    }
-  },
   success: {
-    timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
-    users: ['testUser'],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    users: ['@testUser'],
     body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
       slack: {
         message: 'testSlackMessage',
         actions: {
@@ -51,7 +36,8 @@ module.exports.sns = {
           no: 'testNoAction'
         }
       }
-    }
+    },
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   }
 };
 
@@ -67,7 +53,7 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
+        text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'dispatch_callback',
         attachment_type: 'default',
@@ -93,7 +79,7 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
+        text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'dispatch_callback',
         attachment_type: 'default'
@@ -108,29 +94,31 @@ module.exports.slack = {
     acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
   status: {
-    issue: 7,
-    user: '@testUser',
-    message: 'testSlackMessage',
     alert: true,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    destination: '@testUser',
+    message: 'testSlackMessage',
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   },
-  statusBroadcast: [ [
-    { issue: 7,
-      message: 'testSlackMessage',
+  statusBroadcast: [
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' },
-    { issue: 7,
+      destination: '@testUser1',
       message: 'testSlackMessage',
+      url: 'https://github.com/testOwner/testRepo/issues/7'
+    },
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' },
-    { issue: 7,
+      destination: '@testUser2',
       message: 'testSlackMessage',
+      url: 'https://github.com/testOwner/testRepo/issues/7'
+    },
+    {
       alert: true,
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' }
-  ] ],
+      destination: '@testUser3',
+      message: 'testSlackMessage',
+      url: 'https://github.com/testOwner/testRepo/issues/7'
+    }
+  ],
   success: {
     ok: true,
     channel: 'D6G0UU7MW',
@@ -145,7 +133,8 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  username: '@testUser'
+  username: '@testUser',
+  usernameBroadcast: '@testUser1'
 };
 
 module.exports.clients = {
