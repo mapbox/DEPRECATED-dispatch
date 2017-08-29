@@ -54,7 +54,7 @@ tape('[incoming] broadcast', (assert) => {
   nock('https://api.github.com', {encodedQueryParams:true})
     .post('/repos/testOwner/testRepo/issues', {
       title: 'testGithubTitle',
-      body: 'testGithubBody\n\n @mapbox/security-team'
+      body: 'testGithubBody'
     })
     .query({'access_token':'FakeApiToken'})
     .reply(201, githubFixtures.broadcastIssue);

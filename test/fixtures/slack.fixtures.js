@@ -99,7 +99,7 @@ module.exports.slack = {
     message: 'testSlackMessage',
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
-  statusBroadcast: [ [
+  statusBroadcast: [
     {
       alert: true,
       destination: '@testUser1',
@@ -118,7 +118,7 @@ module.exports.slack = {
       message: 'testSlackMessage',
       url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
     }
-  ] ],
+  ],
   success: {
     ok: true,
     channel: 'D6G0UU7MW',
