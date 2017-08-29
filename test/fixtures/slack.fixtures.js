@@ -13,7 +13,7 @@ module.exports.sns = {
         message: 'testSlackMessage'
       }
     },
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   },
   malformed: {
     type: 'self_service',
@@ -37,7 +37,7 @@ module.exports.sns = {
         }
       }
     },
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   }
 };
 
@@ -53,7 +53,7 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
+        text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'dispatch_callback',
         attachment_type: 'default',
@@ -79,7 +79,7 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
+        text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'dispatch_callback',
         attachment_type: 'default'
@@ -97,26 +97,26 @@ module.exports.slack = {
     alert: true,
     destination: '@testUser',
     message: 'testSlackMessage',
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   },
   statusBroadcast: [
     {
       alert: true,
       destination: '@testUser1',
       message: 'testSlackMessage',
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testOwner/testRepo/issues/7'
     },
     {
       alert: true,
       destination: '@testUser2',
       message: 'testSlackMessage',
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testOwner/testRepo/issues/7'
     },
     {
       alert: true,
       destination: '@testUser3',
       message: 'testSlackMessage',
-      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testOwner/testRepo/issues/7'
     }
   ],
   success: {

@@ -9,7 +9,6 @@ const slack = require('../lib/slack.js');
 const webClient = require('@slack/client').WebClient;
 
 module.exports.fn = function(event, context, callback) {
-  // decrypt the environment
   decrypt(process.env, function(err, res) {
     if (err) throw err;
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
@@ -135,7 +134,6 @@ module.exports.fn = function(event, context, callback) {
             }
           });
       } else {
-        // create PD incident
         let options = {
           accessToken: pagerDutyApiKey,
           title: message.body.pagerduty.title,
