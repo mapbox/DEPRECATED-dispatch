@@ -4,6 +4,8 @@ module.exports.sns = {
   broadcast: {
     type: 'broadcast',
     users: ['@testUser1', '@testUser2', '@testUser3'],
+    callback_id: 'testCallbackId',
+    issue: 7,
     body: {
       github: {
         title: 'testGithubTitle',
@@ -21,9 +23,12 @@ module.exports.sns = {
     body: {}
   },
   malformedError: 'ERR: sns message parsing error',
+  malformedNoIssueError: 'No GitHub issue number found in message body',
   success: {
     type: 'self_service',
     users: ['@testUser'],
+    callback_id: 'testCallbackId',
+    issue: 7,
     body: {
       github: {
         title: 'testGithubTitle',
@@ -55,7 +60,7 @@ module.exports.slack = {
       {
         text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-        callback_id: 'dispatch_callback',
+        callback_id: 'testCallbackId',
         attachment_type: 'default',
         actions: [
           {
@@ -81,7 +86,7 @@ module.exports.slack = {
       {
         text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-        callback_id: 'dispatch_callback',
+        callback_id: 'testCallbackId',
         attachment_type: 'default'
       }
     ]

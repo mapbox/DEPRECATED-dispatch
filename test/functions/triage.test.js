@@ -2,7 +2,7 @@
 
 const tape = require('tape');
 const nock = require('nock');
-const triage = require('../../dispatch-triage/function.js').fn;
+const triage = require('../../triage/function.js').fn;
 
 process.env.PagerDutyApiKey = 'FakeApiToken';
 process.env.PagerDutyServiceId = 'XXXXXXX';
@@ -17,7 +17,7 @@ var notOkResponseEvent = require('../../test/fixtures/triage/notok');
 tape('[triage] Closes Github issue if ok', function(t) {
 
   nock('https://api.github.com:443', {"encodedQueryParams":true})
-    .patch('/repos/null/island/issues/1', {"state":"closed"})
+    .patch('/repos/testOwner/testRepo/issues/7', {"state":"closed"})
     .query({"access_token":"FakeApiToken"})
     .reply(200, {});
 
@@ -33,12 +33,12 @@ tape('[triage] Escalates to PagerDuty if not ok', function(t) {
 
   nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
     .post('/incidents', {"incident": {
-      "type":"incident",
-      "title":"everything is not ok", // TODO this title is hardcoded in the triage lambda function
+      "type": "incident",
+      "title": "Two factor authentication has been disabled...",
       "service": {
         "id":"XXXXXXX",
-        "type":"service_reference" },
-      "incident_key":"testing" }
+        "type": "service_reference" },
+      "incident_key": "6cf9397c71e2" }
     })
     .reply(201, pdIncident);
 

@@ -152,7 +152,7 @@ tape('[github] Closes issue', function(assert) {
     token: 'FakeApiToken',
     owner: 'testOwner',
     repo: 'testRepo',
-    issue: '1'
+    number: '1'
   };
 
   nock('https://api.github.com:443', {"encodedQueryParams":true})
