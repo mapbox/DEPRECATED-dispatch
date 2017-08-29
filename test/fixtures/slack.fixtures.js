@@ -2,19 +2,19 @@
 
 module.exports.sns = {
   broadcast: {
-    timestamp: '2017-07-31T00:54:06.655Z',
-    type: 'self_service',
-    users: ['testUser'],
-    issue: 7,
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    type: 'broadcast',
+    users: ['testUser1', 'testUser2', 'testUser3'],
     body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
       slack: {
         message: 'testSlackMessage'
       }
     }
   },
   malformed: {
-    timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
     users: ['testUser'],
     body: {}
@@ -22,12 +22,15 @@ module.exports.sns = {
   malformedError: 'ERR: sns message parsing error',
   nullSNSError: 'ERR: null sns message',
   nullUsername: {
-    timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
     users: [],
     issue: 7,
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
     body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
       slack: {
         message: 'testSlackMessage',
         actions: {
@@ -38,12 +41,15 @@ module.exports.sns = {
     }
   },
   success: {
-    timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
     users: ['testUser'],
     issue: 7,
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
     body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
       slack: {
         message: 'testSlackMessage',
         actions: {
