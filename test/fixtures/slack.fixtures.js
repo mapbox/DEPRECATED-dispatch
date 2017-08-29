@@ -12,7 +12,9 @@ module.exports.sns = {
       slack: {
         message: 'testSlackMessage'
       }
-    }
+    },
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    username: 'testUser1'
   },
   malformed: {
     type: 'self_service',
@@ -57,7 +59,8 @@ module.exports.sns = {
           no: 'testNoAction'
         }
       }
-    }
+    },
+    username: 'testUser'
   }
 };
 
@@ -130,12 +133,12 @@ module.exports.slack = {
       message: 'testSlackMessage',
       alert: true,
       url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' },
+      user: '@testUser2' },
     { issue: 7,
       message: 'testSlackMessage',
       alert: true,
       url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-      user: '@testUser1' }
+      user: '@testUser3' }
   ] ],
   success: {
     ok: true,
@@ -151,7 +154,8 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  username: '@testUser'
+  username: '@testUser',
+  usernameBroadcast: '@testUser1'
 };
 
 module.exports.clients = {

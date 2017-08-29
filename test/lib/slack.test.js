@@ -43,7 +43,7 @@ test('[slack] [ingestSNS] self-service success', (t) => {
 test('[slack] [ingestSNS] broadcast success', (t) => {
   file.ingestSNS(fixtures.sns.broadcast, channel, (err, username, message) => {
     t.ifError(err, '-- should not error');
-    t.equal(username, fixtures.slack.username, '-- should return @username');
+    t.equal(username, fixtures.slack.usernameBroadcast, '-- should return @username');
     t.deepEqual(message, fixtures.slack.messageBroadcast, '-- should return valid message object');
     t.end();
   });

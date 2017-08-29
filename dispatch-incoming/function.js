@@ -134,10 +134,9 @@ module.exports.fn = function(event, context, callback) {
               message.issue = res.issue;
               // users is an array of people
               users.forEach((user) => {
-                console.log('\n');
-                console.log('------ BROADCAST USER ------');
-                console.log(user);
-                console.log('----------------------------\n');
+
+                console.log(`Broadcasting to user ${user}`);
+
                 message.username = user;
                 q.defer(slack.alertToSlack, message, client, slackChannel);
               });
