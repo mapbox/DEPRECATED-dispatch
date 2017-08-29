@@ -1,6 +1,18 @@
 'use strict';
 
 module.exports.sns = {
+  broadcast: {
+    timestamp: '2017-07-31T00:54:06.655Z',
+    type: 'self_service',
+    users: ['testUser'],
+    issue: 7,
+    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+    body: {
+      slack: {
+        message: 'testSlackMessage'
+      }
+    }
+  },
   malformed: {
     timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
@@ -29,7 +41,7 @@ module.exports.sns = {
     timestamp: '2017-07-31T00:54:06.655Z',
     type: 'self_service',
     users: ['testUser'],
-    issue: '7',
+    issue: 7,
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
     body: {
       slack: {
@@ -77,6 +89,17 @@ module.exports.slack = {
       }
     ]
   },
+  messageBroadcast: {
+    text: 'testSlackMessage',
+    attachments: [
+      {
+        text: 'testSlackMessage https://api.github.com/repos/testOwner/testRepo/issues/7',
+        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        callback_id: 'dispatch_callback',
+        attachment_type: 'default'
+      }
+    ]
+  },
   missingMessageError: 'ERR: missing message body',
   noChannel: {
     ok: false,
@@ -85,23 +108,29 @@ module.exports.slack = {
     acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
   status: {
+    issue: 7,
     user: '@testUser',
-    id: 'U6GHXJQ1Z',
-    bot: 'B6G0UU6HW',
-    res: true,
-    timestamp: '1501777340.256863',
-    issue: '7',
+    message: 'testSlackMessage',
+    alert: true,
     url: 'https://api.github.com/repos/testOwner/testRepo/issues/7'
   },
-  statusFinal: {
-    user: '@testUser',
-    id: 'U6GHXJQ1Z',
-    url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-    issue: 7,
-    bot: 'B6G0UU6HW',
-    res: true,
-    timestamp: '1501777340.256863'
-  },
+  statusBroadcast: [ [
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' },
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' },
+    { issue: 7,
+      message: 'testSlackMessage',
+      alert: true,
+      url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+      user: '@testUser1' }
+  ] ],
   success: {
     ok: true,
     channel: 'D6G0UU7MW',

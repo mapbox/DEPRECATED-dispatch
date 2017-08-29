@@ -7,7 +7,6 @@ const test = require('tape');
 const webClient = require('@slack/client').WebClient;
 const _ = require('lodash');
 
-/* Setup variables */
 const channel = 'test-channel';
 
 test('[slack] [ingestSNS] SNS null error', (t) => {
@@ -32,11 +31,20 @@ test('[slack] [ingestSNS] missing username', (t) => {
   });
 });
 
-test('[slack] [ingestSNS] success', (t) => {
+test('[slack] [ingestSNS] self-service success', (t) => {
   file.ingestSNS(fixtures.sns.success, channel, (err, username, message) => {
     t.ifError(err, '-- should not error');
     t.equal(username, fixtures.slack.username, '-- should return @username');
     t.deepEqual(message, fixtures.slack.message, '-- should return valid message object');
+    t.end();
+  });
+});
+
+test('[slack] [ingestSNS] broadcast success', (t) => {
+  file.ingestSNS(fixtures.sns.broadcast, channel, (err, username, message) => {
+    t.ifError(err, '-- should not error');
+    t.equal(username, fixtures.slack.username, '-- should return @username');
+    t.deepEqual(message, fixtures.slack.messageBroadcast, '-- should return valid message object');
     t.end();
   });
 });
@@ -95,7 +103,6 @@ test('[slack] [alertToSlack] postAlert error', (t) => {
   const stub0 = sinon.stub(file, 'ingestSNS').returns(null, fixtures.slack.username, fixtures.slack.message);
   const stub1 = sinon.stub(file, 'postAlert').returns(fixtures.slack.error);
   file.alertToSlack(fixtures.sns.success, fixtures.clients.error, channel, (err, status) => {
-
     t.equal(err.ok, false, '-- ok should be false');
     t.deepEqual(err, fixtures.slack.error, '-- should pass through error response object');
     t.end();
@@ -109,7 +116,7 @@ test('[slack] [alertToSlack] success', (t) => {
   const stub1 = sinon.stub(file, 'postAlert').returns(null, fixtures.slack.success);
   file.alertToSlack(fixtures.sns.success, fixtures.clients.success, channel, (err, status) => {
     t.ifError(err, '-- should not error');
-    t.equal(status.res, true, '-- should be true');
+    t.equal(status.alert, true, '-- should be true');
     t.deepEqual(status, fixtures.slack.status, '-- should pass through status object');
     t.end();
   });

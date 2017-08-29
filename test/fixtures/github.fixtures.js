@@ -3,6 +3,30 @@ module.exports.issue1 = issue1;
 module.exports.manyIssues = manyIssues;
 module.exports.closedIssue = closedIssue;
 
+module.exports.broadcastIssue = {
+  url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
+  repository_url: 'https://api.github.com/repos/testOwner/testRepo',
+  labels_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/labels{/name}',
+  comments_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/comments',
+  events_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/events',
+  html_url: 'https://github.com/testOwner/testRepo/issues/7',
+  id: 123,
+  number: 7,
+  title: 'testGithubTitle',
+  user: {},
+  labels: [],
+  state: 'open',
+  locked: false,
+  assignee: null,
+  assignees: [],
+  milestone: null,
+  comments: 0,
+  created_at: '2017-08-02T23:36:11Z',
+  updated_at: '2017-08-02T23:36:11Z',
+  closed_at: null,
+  body: 'testGithubBody\n\n @mapbox/security-team'
+};
+
 const dataDump = {
   url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
   repository_url: 'https://api.github.com/repos/testOwner/testRepo',

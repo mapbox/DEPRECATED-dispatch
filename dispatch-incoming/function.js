@@ -1,13 +1,17 @@
 'use strict';
 
 const decrypt = require('../lib/utils.js').decrypt;
+const gh = require('../lib/github.js');
+const pd = require('../lib/pagerduty.js').createIncident;
+const queue = require('d3-queue').queue;
 const request = require('request');
+const slack = require('../lib/slack.js');
+const webClient = require('@slack/client').WebClient;
 
 module.exports.fn = function(event, context, callback) {
   // decrypt the environment
   decrypt(process.env, function(err, res) {
     if (err) throw err;
-
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
     const pagerDutyServiceId = process.env.PagerDutyServiceId;
     const pagerDutyFromAddress = process.env.PagerDutyFromAddress;
@@ -18,14 +22,13 @@ module.exports.fn = function(event, context, callback) {
     const slackChannel = process.env.SlackChannel;
     const oracleUrl = process.env.OracleUrl;
     const oracleSecret = process.env.OracleSecret;
-    let users;
-
     if (event.Records.length > 1) {
       return callback('SNS message contains more than one record', null);
     } else {
-      oracle(function(err,data) {
+      oracle(function(err, data) {
         if (err) return callback(err);
-        incoming(function(err,data) {
+        let users = data;
+        incoming(users, function(err, data) {
           if (err) return callback(err);
           return callback(null, data);
         });
@@ -36,17 +39,14 @@ module.exports.fn = function(event, context, callback) {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
       let messageUsers = message.users;
-
       if (msgType === 'high') {
         console.log('High priority message, skipping Oracle');
         return callback();
       } else if (messageUsers.length > 1) {
-        users = messageUsers;
         console.log('Users array contains more than one user, skipping Oracle');
-        return callback();
+        return callback(null, messageUsers);
       } else if (process.env.NODE_ENV === 'test') {
-        users = [ 'testUser' ];
-        return callback();
+        return callback(null, [ 'testUser' ]);
       } else {
         if (oracleUrl) {
           let oracleCall = {
@@ -64,34 +64,24 @@ module.exports.fn = function(event, context, callback) {
             body = JSON.parse(body);
             if (body && body.github === 'mapbox/security-team') {
               console.log('Oracle query returned no results for: ' + messageUserName);
-              users = [ body.github ];
-              return callback();
+              return callback(null, [ body.github ]);
             }
             console.log('Oracle replied: ' + body.github);
-            users = [ body.github ];
-            return callback();
+            return callback(null, [ body.github ]);
           });
-        } else {
-          users = messageUsers;
-          return callback();
         }
+        else return callback(null, messageUsers);
       }
     };
 
-    function incoming(callback) {
+    function incoming(users, callback) {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
-
-      const slack = require('../lib/slack.js');
-      const webClient = require('@slack/client').WebClient;
       const client = new webClient(slackBotToken);
-      const gh = require('../lib/github.js');
-
       if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
       } else if (msgType === 'self-service') {
-        // create GH issue
-        const options = {
+        let options = {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
@@ -101,11 +91,10 @@ module.exports.fn = function(event, context, callback) {
         };
         gh.createIssue(options)
           .then(res => {
-            // alert to Slack
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
-              // add the GitHub issue and url
+              // add the GitHub issue and url to Slack alert input
               message.url = res.url;
               message.issue = res.issue;
               // override message username with username from Oracle
@@ -123,20 +112,20 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(err => { callback(err, 'error handled'); });
       } else if (msgType === 'broadcast') {
-        const options = {
+        let output  = [];
+        let options = {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
           title: message.body.github.title,
-          body: message.body.github.body + '\n\n @' + users[0]
+          body: message.body.github.body + '\n\n @mapbox/security-team'
         };
-        var q = queue(1);
+        let q = queue(1);
         if (message.users[0] === 'mapbox/security-team') {
           return callback('Error: broadcast message without users list');
         }
         gh.createIssue(options)
           .then(res => {
-            // alert to Slack
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
@@ -149,14 +138,14 @@ module.exports.fn = function(event, context, callback) {
                 q.defer(slack.alertToSlack, message, client, slackChannel);
               });
             }
-            q.awaitAll(function(err,data) {
+            q.awaitAll(function(err, status) {
+              output.push(status);
               if (err) return callback(err);
-              return callback();
+              return callback(null, output);
             });
           });
       } else {
         // create PD incident
-        const pd = require('../lib/pagerduty.js').createIncident;
         let options = {
           accessToken: pagerDutyApiKey,
           title: message.body.pagerduty.title,
@@ -167,7 +156,7 @@ module.exports.fn = function(event, context, callback) {
         if (message.body.pagerduty.body) {
           options.body = message.body.pagerduty.body;
         }
-        var incident = pd(options);
+        let incident = pd(options);
         incident
           .then(value => { callback(null, 'pagerduty incident triggered'); })
           .catch(error => { callback(error, 'error handled'); });
