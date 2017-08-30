@@ -138,7 +138,7 @@ tape('[github] Creates issue', function(assert) {
 
   githubRequests.createIssue(options)
   .then(res => {
-    assert.deepEqual(res.issue, issue.number, 'Issue created');
+    assert.deepEqual(res.number, issue.number, 'Issue created');
     assert.equal(res.user, issue.assignee.login, 'Issue is assigned');
     assert.end();
   })
