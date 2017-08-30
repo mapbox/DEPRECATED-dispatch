@@ -63,7 +63,7 @@ module.exports.fn = function(event, context, callback) {
             if (err) return callback(err);
             body = JSON.parse(body);
             if (body && body.github === 'mapbox/security-team') {
-              console.log('Oracle query returned no results for: ' + messageUserName);
+              console.log('Oracle query returned no results for: ' + messageUsers[0]);
               return callback(null, [ body.github ]);
             }
             console.log('Oracle replied: ' + body.github);
@@ -87,16 +87,16 @@ module.exports.fn = function(event, context, callback) {
           token: githubToken,
           user: message.users[0],
           title: message.body.github.title,
-          body: message.body.github.body + '\n\n @' + users[0]
+          body: message.body.github.body + '\n\n @' + message.users[0]
         };
         gh.createIssue(options)
           .then(res => {
             if (res && res.status === 'exists') {
               console.log('Issue ' + res.issue + ' already exists');
             } else {
-              // apend the GitHub issue URL to the message object
+              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
-              // alert to slack
+              message.issue = res.issue;
               let destination;
               if (!(users[0].indexOf('@') > -1)) destination = `@${users[0]}`;
               else destination = users[0];
@@ -120,8 +120,9 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               return callback('ERR: Issue ' + res.issue + ' already exists');
             } else {
-              // apend the GitHub issue URL to the message object
+              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
+              message.issue = res.issue;
               // alert to slack
               let q = queue();
               users.forEach((user) => {

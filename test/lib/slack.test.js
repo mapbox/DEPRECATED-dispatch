@@ -7,8 +7,6 @@ const test = require('tape');
 const webClient = require('@slack/client').WebClient;
 const _ = require('lodash');
 
-const channel = 'test-channel';
-
 test('[slack] [ingestSNS] SNS parsing error', (t) => {
   file.ingestSNS(fixtures.sns.malformed, (err) => {
     t.equal(err, fixtures.sns.malformedError, '-- should pass through error message');
@@ -77,11 +75,18 @@ test('[slack] [postAlert] username success', (t) => {
 
 test('[slack] [alertToSlack] ingestSNS error', (t) => {
   const stub = sinon.stub(file, 'ingestSNS').returns(fixtures.sns.malformedError);
-  file.alertToSlack({}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
+  file.alertToSlack({issue: 7}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
     t.equal(err, fixtures.sns.malformedError, '-- should pass through error message');
     t.end();
   });
   file.ingestSNS.restore();
+});
+
+test('[slack] [alertToSlack] encode error', (t) => {
+  file.alertToSlack({}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
+    t.equal(err, fixtures.sns.malformedNoIssueError, '-- should pass through error message');
+    t.end();
+  });
 });
 
 test('[slack] [alertToSlack] postAlert error', (t) => {
