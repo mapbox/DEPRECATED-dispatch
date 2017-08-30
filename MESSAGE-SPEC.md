@@ -11,7 +11,7 @@ Self service messages accept only a single user.
     type: 'self-service', // required
     requestId: 'STRING_VALUE', // optional, id for logging
     users: [ // see complete users array specification below
-        'STRING_VALUE': {
+        {
             slack: 'STRING_VALUE', // required, Slack handle
             github: 'STRING_VALUE' // required, GitHub handle
         }
@@ -45,10 +45,10 @@ Broadcast messages accept one or more users.
     type: 'broadcast', // required
     requestId: 'STRING_VALUE', // optional, id for logging
     users: [ // see complete users array specification below
-        'STRING_VALUE1': {
+        {
             slack: 'STRING_VALUE' // required, Slack handle
         },
-        'STRING_VALUE2': {
+        {
             slack: 'STRING_VALUE'  // required, Slack handle
         }
     ],
@@ -88,13 +88,13 @@ It is the repsonsiblity of the caller to build and format the message's `users` 
 
 ``` javascript
     users: [
-        'user1': {
+        {
             slack: 'user1SlackHandle',
             github: 'user1GitHubHandle',
             foo: 'bar', // ignored
             rab: 'oof' // ignored
         },
-        'user2': {
+        {
             slack: 'user2SlackHandle',
             github: 'user2GitHubHandle',
             foobar: 'foobaz', // ignored
