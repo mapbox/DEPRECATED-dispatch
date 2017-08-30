@@ -24,7 +24,7 @@ module.exports.selfServiceEvent = {
         Message: JSON.stringify(
           {
             type: 'self-service',
-            users: ['@testUser'],
+            users: ['testUser'],
             body: {
               github: {
                 title: 'testGithubTitle',
@@ -53,7 +53,7 @@ module.exports.broadcastEvent = {
         Message: JSON.stringify(
           {
             type: 'broadcast',
-            users: ['@testUser1', '@testUser2', '@testUser3'],
+            users: ['testUser1', 'testUser2', 'testUser3'],
             body: {
               github: {
                 title: 'testGithubTitle',

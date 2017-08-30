@@ -107,19 +107,19 @@ module.exports.slack = {
   statusBroadcast: [
     {
       alert: true,
-      destination: '@testUser1',
+      destination: 'testUser1',
       message: 'testSlackMessage',
       url: 'https://github.com/testOwner/testRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testUser2',
+      destination: 'testUser2',
       message: 'testSlackMessage',
       url: 'https://github.com/testOwner/testRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testUser3',
+      destination: 'testUser3',
       message: 'testSlackMessage',
       url: 'https://github.com/testOwner/testRepo/issues/7'
     }
