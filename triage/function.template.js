@@ -11,7 +11,7 @@ module.exports = lambdaCfn.build({
     },
     PagerDutyServiceId: {
       Type: 'String',
-      Description: 'PagerDuty service Id'
+      Description: 'PagerDuty service ID'
     },
     PagerDutyFromAddress: {
       Type: 'String',
