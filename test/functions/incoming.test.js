@@ -99,6 +99,14 @@ tape('[incoming] Creates a PD incident from high priority', (assert) => {
   });
 });
 
+tape('[incoming] malformed SNS message error', (assert) => {
+  const badRecord = { Records: 'record1' };
+  incoming(badRecord, context, (err, res) => {
+    assert.deepEqual(err, 'SNS message malformed', '-- should pass through error message');
+    assert.end();
+  });
+});
+
 tape('[incoming] > 1 record in SNS message error', (assert) => {
   const badRecord = { Records: [ 'record1', 'record2'] };
   incoming(badRecord, context, (err, res) => {
