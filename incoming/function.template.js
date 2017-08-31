@@ -10,7 +10,7 @@ module.exports = lambdaCfn.build({
     },
     PagerDutyServiceId: {
       Type: 'String',
-      Description: 'PagerDuty service Id'
+      Description: 'PagerDuty service ID'
     },
     PagerDutyFromAddress: {
       Type: 'String',
@@ -35,14 +35,6 @@ module.exports = lambdaCfn.build({
     SlackChannel: {
       Type: 'String',
       Description: 'Slack channel for dispatch-bot'
-    },
-    OracleUrl: {
-      Type: 'String',
-      Description: 'User oracle URL '
-    },
-    OracleSecret: {
-      Type: 'String',
-      Description: '[secure] User oracle shared secret'
     }
   },
   statements: [
