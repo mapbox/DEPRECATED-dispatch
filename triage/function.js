@@ -40,6 +40,8 @@ module.exports.fn = function(event, context, callback) {
       const githubOwner = process.env.GithubOwner;
       const githubRepo = process.env.GithubRepo;
       var response = payload.actions[0].name;
+      var responseText = payload.actions[0].value;
+      var log;
 
       console.log('%s: found payload response: %s', res.requestId, response);
       if (response == 'yes') {
@@ -54,13 +56,16 @@ module.exports.fn = function(event, context, callback) {
 
         closeIssue
           .then(value => {
-            console.log(`${res.requestId}: closed GitHub issue ${res.github}`);
+            log =`${res.requestId}: closed GitHub issue ${res.github}`;
+            console.log(log);
             // this callback text is displayed to the slack user
-            return callback(null,`${res.requestId}: closed GitHub issue ${res.github}`);
+            return callback(null, responseText ? responseText : log);
           })
           .catch(error => {
-            console.log(`${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`);
-            return callback(null, `${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`); // TODO fix this error handling.  When error is passed as first arg, there's an error
+            log = `${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`;
+            console.log(log);
+            // if get a failure to close here, return the failure to the user
+            return callback(null, log);
           });
       } else if (response == 'no') {
         var createIncident = require('../lib/pagerduty.js').createIncident;
@@ -75,20 +80,24 @@ module.exports.fn = function(event, context, callback) {
         var incident = createIncident(options);
         incident
           .then(value => {
-            console.log(`${res.requestId}: Created PagerDuty incident successfully`);
-            return callback(null, `${res.requestId}: Created PagerDuty incident successfully`);
+            log = `${res.requestId}: Created PagerDuty incident successfully`;
+            console.log(log);
+            return callback(null, responseText ? responseText : log);
           })
           .catch(error => {
             if (error.errorMessage && /matching dedup key already exists/.test(error.errorMessage)) {
-              console.log(`${res.requestId}: found matching PagerDuty incident, skipping`);
-              return callback(null, `${res.requestId}: found matching PagerDuty incident, skipping`);
+              log = `${res.requestId}: found matching PagerDuty incident, skipping`;
+              console.log(log);
+              return callback(null, responseText ? responseText : log);
             }
-            console.log(`${res.requestId}: error: failed to create PagerDuty incident, ${error}`);
-            return callback(`${res.requestId}: error: failed to create PagerDuty incident, ${error}`);
+            log = `${res.requestId}: error: failed to create PagerDuty incident, ${error}`;
+            console.log(log);
+            return callback(log);
           });
       } else {
-        console.log(`${res.requestId}: error: unhandled payload response`);
-        return callback(`${res.requestId}: error: unhandled payload response`);
+        log = `${res.requestId}: error: unhandled payload response`;
+        console.log(log);
+        return callback(log);
       }
     });
   });
