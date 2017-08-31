@@ -4,6 +4,8 @@ Dispatch will create a GitHub issue and an interactive Slack notification for th
 
 Self service messages accept only a single user.
 
+If action responses are not passed, the response will default to the return value of the Dispatch triage function, which most likely will be something ugly and not undestandable to the user, so it's recommended to pass response text.
+
 ### Self-service message specification
 
 ``` javascript
@@ -24,8 +26,10 @@ Self service messages accept only a single user.
         slack: {
             message: 'STRING_VALUE', // required, Slack message
             actions: {
-                yes: 'STRING_VALUE', // Slack button text for 'yes' action type
-                no: 'STRING_VALUE', // Slack button text for 'no' action type
+                yes: 'STRING_VALUE', // required, Slack button text for 'yes' action type
+                yes_response: 'STRING_VALUE', // optional, Dispatch Triage response to return to user
+                no: 'STRING_VALUE', // required, Slack button text for 'no' action type
+                no_response: 'STRING_VALUE', // optional, Dispatch Triage response to return to user
             }
         }
     }
@@ -86,6 +90,8 @@ Dispatch will open a PagerDuty incident.
 
 It is the repsonsiblity of the caller to build and format the message's `users` array correctly for the type of message the caller would like to dispatch. The user objects passed in the array can contain any number of additional fields beyond those required by the Dispatch message type, and Dispatch-incoming will ignore these.
 
+If the Slack handle does not contain an `@` symbol, it will be automatically added. GitHub handles should not contain an `@` symbol.
+
 ``` javascript
     users: [
         {
@@ -104,4 +110,6 @@ It is the repsonsiblity of the caller to build and format the message's `users` 
     ]
 ```
 
-If a message type requires a user attribute that is not available, for example, a user doesn't have a slack account yet, passing an empty user object will alert the Dispatch-incoming default channel configured by the stack `SlackChannel` parameter.
+If a Slack or GitHub handle is not passed in the `users` array, Dispatch will attempt to use sane defaults:
+- Slack: defaults to the channel set by the `SlackChannel` stack parameter
+- GitHub: defaults to `@mapbox/security-team`

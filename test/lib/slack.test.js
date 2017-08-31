@@ -22,6 +22,14 @@ test('[slack] [ingestSNS] self-service success', (t) => {
   });
 });
 
+test('[slack] [ingestSNS] self-service with response text success', (t) => {
+  file.ingestSNS(fixtures.sns.successWithResponse, (err, message) => {
+    t.ifError(err, '-- should not error');
+    t.deepEqual(message, fixtures.slack.messageWithResponseText, '-- should return valid message object');
+    t.end();
+  });
+});
+
 test('[slack] [ingestSNS] broadcast success', (t) => {
   file.ingestSNS(fixtures.sns.broadcast, (err, message) => {
     t.ifError(err, '-- should not error');

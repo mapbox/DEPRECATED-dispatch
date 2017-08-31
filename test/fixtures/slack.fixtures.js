@@ -43,6 +43,28 @@ module.exports.sns = {
       }
     },
     url: 'https://github.com/testOwner/testRepo/issues/7'
+  },
+  successWithResponse: {
+    type: 'self_service',
+    users: ['@testUser'],
+    callback_id: 'testCallbackId',
+    number: 7,
+    body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
+      slack: {
+        message: 'testSlackMessage',
+        actions: {
+          yes: 'testYesAction',
+          yes_response: 'yes response',
+          no: 'testNoAction',
+          no_response: 'no response'
+        }
+      }
+    },
+    url: 'https://github.com/testOwner/testRepo/issues/7'
   }
 };
 
@@ -67,13 +89,39 @@ module.exports.slack = {
             name: 'yes',
             text: 'testYesAction',
             type: 'button',
-            value: 1
+            value: false
           },
           {
             name: 'no',
             text: 'testNoAction',
             type: 'button',
-            value: 0,
+            value: false,
+            style: 'danger'
+          }
+        ]
+      }
+    ]
+  },
+  messageWithResponseText: {
+    text: 'testSlackMessage',
+    attachments: [
+      {
+        text: 'testSlackMessage https://github.com/testOwner/testRepo/issues/7',
+        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        callback_id: 'testCallbackId',
+        attachment_type: 'default',
+        actions: [
+          {
+            name: 'yes',
+            text: 'testYesAction',
+            type: 'button',
+            value: 'yes response'
+          },
+          {
+            name: 'no',
+            text: 'testNoAction',
+            type: 'button',
+            value: 'no response',
             style: 'danger'
           }
         ]
