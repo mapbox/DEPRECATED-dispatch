@@ -10,7 +10,6 @@ const webClient = require('@slack/client').WebClient;
 const crypto = require('crypto');
 
 module.exports.fn = function(event, context, callback) {
-
   decrypt(process.env, function(err, res) {
     if (err) throw err;
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
@@ -62,12 +61,13 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(err => { callback(err, `${requestId} error handled`); });
       } else if (msgType === 'broadcast') {
+        let userArray = message.users.map(function (obj) { return obj.slack; });
         let options = {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
           title: message.body.github.title,
-          body: message.body.github.body
+          body: message.body.github.body + '\n\n' + userArray.toString()
         };
         gh.createIssue(options)
           .then(res => {
