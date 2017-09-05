@@ -3,6 +3,7 @@ var lambdaCfn = require('@mapbox/lambda-cfn');
 module.exports = lambdaCfn.build({
   name: 'dispatchIncoming',
   memorySize: '1536',
+  timeout: '300',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',

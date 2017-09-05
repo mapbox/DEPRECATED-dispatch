@@ -73,7 +73,7 @@ module.exports.fn = function(event, context, callback) {
               message.url = res.url;
               message.number = res.number;
               // alert to slack
-              let q = queue();
+              let q = queue(1);
               message.users.forEach((user) => {
                 user = checkUser(user);
                 q.defer(slack.alertToSlack, message, user.slack, client);
