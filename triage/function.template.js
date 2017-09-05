@@ -1,8 +1,7 @@
 var lambdaCfn = require('@mapbox/lambda-cfn');
-var cf = require('@mapbox/cloudfriend');
 
 module.exports = lambdaCfn.build({
-  name: 'dispatchTriage',
+  name: 'triage',
   memorySize: '1536',
   parameters: {
     PagerDutyApiKey: {
