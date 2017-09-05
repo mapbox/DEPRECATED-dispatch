@@ -94,7 +94,7 @@ tape('[incoming] Creates a PD incident from high priority', (assert) => {
 
   incoming(incomingFixtures.highPriorityEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
-    assert.deepEqual(res, 'pagerduty incident triggered', '-- PD incident should be triggered');
+    assert.deepEqual(res, '123 pagerduty incident triggered', '-- PD incident should be triggered');
     assert.end();
   });
 });

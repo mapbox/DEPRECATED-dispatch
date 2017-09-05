@@ -83,7 +83,7 @@ test('[slack] [postAlert] username success', (t) => {
 
 test('[slack] [alertToSlack] ingestSNS error', (t) => {
   const stub = sinon.stub(file, 'ingestSNS').returns(fixtures.sns.malformedError);
-  file.alertToSlack({number: 7}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
+  file.alertToSlack({number: 7, requestId: 123}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
     t.equal(err, fixtures.sns.malformedError, '-- should pass through error message');
     t.end();
   });

@@ -20,9 +20,10 @@ module.exports.sns = {
   malformed: {
     type: 'self_service',
     users: ['@testUser'],
-    body: {}
+    body: {},
+    requestId: 123
   },
-  malformedError: 'ERR: sns message parsing error',
+  malformedError: '123 sns message parsing error',
   malformedNoIssueError: 'No GitHub issue number found in message body',
   success: {
     type: 'self_service',
@@ -139,7 +140,7 @@ module.exports.slack = {
       }
     ]
   },
-  missingMessageError: 'ERR: missing message body',
+  missingMessageError: 'ERROR: missing Slack message body',
   noChannel: {
     ok: false,
     error: 'channel_not_found',
@@ -193,7 +194,8 @@ module.exports.slack = {
 module.exports.clients = {
   empty: {
     _token:'test-token',
-    slackAPIUrl:'test-url'
+    slackAPIUrl:'test-url',
+    requestId: 123
   },
   error: {
     _token:'test-token',
