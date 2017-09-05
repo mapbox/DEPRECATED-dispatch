@@ -57,6 +57,10 @@ Broadcast messages accept one or more users.
         }
     ],
     body: {
+      github: {
+            title: 'STRING_VALUE', // required, GitHub issue title
+            body: 'STRING_VALUE' // required, GitHub issue body
+        }
         slack: {
             message: 'STRING_VALUE', // required, Slack message
         }
@@ -88,7 +92,7 @@ Dispatch will open a PagerDuty incident.
 
 ## Users array specification
 
-It is the repsonsiblity of the caller to build and format the message's `users` array correctly for the type of message the caller would like to dispatch. The user objects passed in the array can contain any number of additional fields beyond those required by the Dispatch message type, and Dispatch-incoming will ignore these.
+It is the responsibility of the caller to build and format the message's `users` array correctly for the type of message the caller would like to dispatch. The user objects passed in the array can contain any number of additional fields beyond those required by the Dispatch message type, and Dispatch-incoming will ignore these.
 
 If the Slack handle does not contain an `@` symbol, it will be automatically added. GitHub handles should not contain an `@` symbol.
 
