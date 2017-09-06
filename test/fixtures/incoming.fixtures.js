@@ -10,7 +10,8 @@ module.exports.highPriorityEvent = {
           pagerduty: {
             title: 'testPagerDutyTitle'
           }
-        }
+        },
+        requestId: 123
       })
     }
   }]

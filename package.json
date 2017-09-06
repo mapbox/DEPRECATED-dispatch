@@ -20,14 +20,12 @@
   },
   "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
-    "@mapbox/cloudfriend": "^1.8.2",
     "@mapbox/lambda-cfn": "^2.0.0",
     "@mapbox/pagerduty": "^1.0.0",
     "@slack/client": "^3.10.0",
     "aws-sdk": "^2.94.0",
     "decrypt-kms-env": "^3.0.0",
     "github": "^9.2.0",
-    "lodash": "^4.17.4",
     "d3-queue": "^3.0.0",
     "request": "^2.81.0",
     "base64url": "0.0.6"

@@ -7,6 +7,7 @@ const queue = require('d3-queue').queue;
 const request = require('request');
 const slack = require('../lib/slack.js');
 const webClient = require('@slack/client').WebClient;
+const crypto = require('crypto');
 
 module.exports.fn = function(event, context, callback) {
 
@@ -30,6 +31,8 @@ module.exports.fn = function(event, context, callback) {
       let msgType = message.type;
       const client = new webClient(slackBotToken);
 
+      const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
+
       if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
       } else if (msgType === 'self-service') {
@@ -41,21 +44,23 @@ module.exports.fn = function(event, context, callback) {
           title: message.body.github.title,
           body: message.body.github.body + '\n\n @' + user.github
         };
+        console.log(`${requestId} creating issue ${message.body.github.title} for ${user.github}`);
         gh.createIssue(options)
           .then(res => {
             if (res && res.status === 'exists') {
-              console.log('Issue ' + res.issue + ' already exists');
+              console.log(`${requestId} issue ${res.issue} already exists`);
             } else {
-              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
               message.number = res.number;
+              message.requestId = requestId;
+              console.log(`${requestId} issue ${res.number} created for ${message.body.github.title}`);
               slack.alertToSlack(message, user.slack, client, (err, status) => {
                 if (err) return callback(err);
                 return callback(null, status);
               });
             }
           })
-          .catch(err => { callback(err, 'error handled'); });
+          .catch(err => { callback(err, `${requestId} error handled`); });
       } else if (msgType === 'broadcast') {
         let options = {
           owner: githubOwner,
@@ -67,12 +72,12 @@ module.exports.fn = function(event, context, callback) {
         gh.createIssue(options)
           .then(res => {
             if (res && res.status === 'exists') {
-              return callback('ERR: Issue ' + res.issue + ' already exists');
+              console.log(`${requestId} issue ${res.issue} already exists`);
             } else {
-              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
               message.number = res.number;
-              // alert to slack
+              message.requestId = requestId;
+              console.log(`${requestId} issue ${res.number} created for ${message.body.github.title}`);
               let q = queue(1);
               message.users.forEach((user) => {
                 user = checkUser(user);
@@ -97,24 +102,21 @@ module.exports.fn = function(event, context, callback) {
         }
         let incident = pd(options);
         incident
-          .then(value => { callback(null, 'pagerduty incident triggered'); })
-          .catch(error => { callback(error, 'error handled'); });
+          .then(value => { callback(null, `${requestId} pagerduty incident triggered`); })
+          .catch(error => { callback(error, `${requestId} error handled`); });
       }
-    }
+    };
 
     function checkUser(user) {
       if (!user.github) {
-        // cc security team if github user missing
         user.github = 'mapbox/security-team';
       }
       if (!user.slack) {
-        // use backup channel when slack user missing
         user.slack = `#${slackChannel}`;
       } else {
         if (!(user.slack.indexOf('@') > -1)) user.slack = `@${user.slack}`;
       }
       return user;
-    }
-
+    };
   });
 };
