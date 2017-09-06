@@ -7,6 +7,7 @@
     "node": "6.10.3"
   },
   "scripts": {
+    "pretest": "eslint cloudformation dispatch-incoming dispatch-triage lib test",
     "test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js"
   },
   "repository": {
