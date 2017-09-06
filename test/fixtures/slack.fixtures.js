@@ -15,7 +15,8 @@ module.exports.sns = {
         message: 'testSlackMessage'
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7',
+    requestId: 123
   },
   malformed: {
     type: 'self_service',
@@ -43,7 +44,8 @@ module.exports.sns = {
         }
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7',
+    requestId: 123
   },
   successWithResponse: {
     type: 'self_service',
@@ -65,7 +67,8 @@ module.exports.sns = {
         }
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testOwner/testRepo/issues/7',
+    requestId: 123
   }
 };
 
@@ -140,7 +143,7 @@ module.exports.slack = {
       }
     ]
   },
-  missingMessageError: 'ERROR: missing Slack message body',
+  missingMessageError: '123 missing Slack message body',
   noChannel: {
     ok: false,
     error: 'channel_not_found',

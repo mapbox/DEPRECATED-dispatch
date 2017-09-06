@@ -5,7 +5,6 @@ const fixtures = require('../../test/fixtures/slack.fixtures.js');
 const sinon = require('sinon');
 const test = require('tape');
 const webClient = require('@slack/client').WebClient;
-const _ = require('lodash');
 
 test('[slack] [ingestSNS] SNS parsing error', (t) => {
   file.ingestSNS(fixtures.sns.malformed, (err) => {
@@ -39,7 +38,7 @@ test('[slack] [ingestSNS] broadcast success', (t) => {
 });
 
 test('[slack] [postAlert] missing message body', (t) => {
-  file.postAlert(fixtures.slack.username, null, fixtures.clients.empty, (err, res) => {
+  file.postAlert(fixtures.slack.username, {requestId: 123}, fixtures.clients.empty, (err, res) => {
     t.equal(err, fixtures.slack.missingMessageError, '-- should pass through error message');
     t.end();
   });
@@ -91,7 +90,7 @@ test('[slack] [alertToSlack] ingestSNS error', (t) => {
 });
 
 test('[slack] [alertToSlack] encode error', (t) => {
-  file.alertToSlack({}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
+  file.alertToSlack({requestId: 123}, fixtures.slack.username, fixtures.clients.empty, (err, status) => {
     t.equal(err, fixtures.sns.malformedNoIssueError, '-- should pass through error message');
     t.end();
   });

@@ -7,9 +7,7 @@ const queue = require('d3-queue').queue;
 const request = require('request');
 const slack = require('../lib/slack.js');
 const webClient = require('@slack/client').WebClient;
-
 const crypto = require('crypto');
-
 
 module.exports.fn = function(event, context, callback) {
 
@@ -52,7 +50,6 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               console.log(`${requestId} issue ${res.issue} already exists`);
             } else {
-              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
               message.number = res.number;
               message.requestId = requestId;
@@ -77,12 +74,10 @@ module.exports.fn = function(event, context, callback) {
             if (res && res.status === 'exists') {
               console.log(`${requestId} issue ${res.issue} already exists`);
             } else {
-              // add the GitHub issue number and url to Slack alert object
               message.url = res.url;
               message.number = res.number;
               message.requestId = requestId;
               console.log(`${requestId} issue ${res.number} created for ${message.body.github.title}`);
-              // alert to slack
               let q = queue(1);
               message.users.forEach((user) => {
                 user = checkUser(user);
@@ -114,19 +109,14 @@ module.exports.fn = function(event, context, callback) {
 
     function checkUser(user) {
       if (!user.github) {
-        //console.log(`${requestId} no GitHub username found, defaulting to mapbox/security-team`);
-        // cc security team if github user missing
         user.github = 'mapbox/security-team';
       }
       if (!user.slack) {
-        //console.log(`${requestId} no Slack username found, defaulting to ${slackChannel}`);
-        // use backup channel when slack user missing
         user.slack = `#${slackChannel}`;
       } else {
         if (!(user.slack.indexOf('@') > -1)) user.slack = `@${user.slack}`;
       }
       return user;
     };
-
   });
 };
