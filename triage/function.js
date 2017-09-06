@@ -70,10 +70,11 @@ module.exports.fn = function(event, context, callback) {
           });
       } else if (response == 'no') {
         var createIncident = require('../lib/pagerduty.js').createIncident;
-        var pagerDutyBody = `${res.requestId}: user ${payload.user.name} responded ${response} for self-service issue ${res.github} \n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
+        var pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
+        var pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
         var options = {
           accessToken: pagerDutyApiKey,
-          title: payload.original_message.text,
+          title: pagerDutyTitle,
           serviceId: (res.pagerDutyServiceId ? res.pagerDutyServiceId : pagerDutyServiceId),
           incidentKey: res.requestId,
           from: pagerDutyFromAddress,

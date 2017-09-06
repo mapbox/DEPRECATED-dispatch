@@ -35,7 +35,7 @@ tape('[triage] Escalates to PagerDuty if not ok', function(t) {
     .post('/incidents', {
       'incident': {
         'type': 'incident',
-        'title': 'Two factor authentication has been disabled...',
+        'title': '6cf9397c71e2: user kara responded \'no\' for self-service issue 7',
         'service': {
           'id':'XXXXXXX',
           'type': 'service_reference' },
