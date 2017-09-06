@@ -7,7 +7,9 @@
     "node": "6.10.3"
   },
   "scripts": {
-    "test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js"
+    "lint": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js",
+    "unit-test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js",
+    "test": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js && NODE_ENV=test tape test/*.test.js test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +35,7 @@
   "devDependencies": {
     "nock": "^9.0.14",
     "sinon": "^2.1.0",
-    "tape": "^4.8.0"
+    "tape": "^4.8.0",
+    "eslint": "^4.4.1"
   }
 }

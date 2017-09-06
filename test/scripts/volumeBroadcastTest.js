@@ -1,4 +1,3 @@
-var d3 = require('d3-queue');
 var AWS = require('aws-sdk');
 var crypto = require('crypto');
 

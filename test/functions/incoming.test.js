@@ -10,20 +10,19 @@ process.env.SlackChannel = 'testChannel';
 
 const tape = require('tape');
 const nock = require('nock');
-const sinon = require('sinon');
 const incoming = require('../../incoming/function.js').fn;
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
 const githubFixtures = require('../fixtures/github.fixtures.js');
-const slack = require('../../lib/slack.js');
 const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
 const pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
 const context = {};
 
+
 tape('[incoming] self-service', (assert) => {
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
+    .query({state: 'open', 'access_token': 'FakeApiToken'})
     .reply(200, []);
 
   nock('https://api.github.com', {encodedQueryParams:true})
@@ -48,10 +47,10 @@ tape('[incoming] self-service', (assert) => {
 tape('[incoming] broadcast', (assert) => {
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
+    .query({state: 'open', access_token: 'FakeApiToken'}) // eslint-disable-line camelcase
     .reply(200, []);
 
-  nock('https://api.github.com', {encodedQueryParams:true})
+  nock('https://api.github.com', {encodedQueryParams: true})
     .post('/repos/testOwner/testRepo/issues', {
       title: 'testGithubTitle',
       body: 'testGithubBody\n\ntestUser1,testUser2,testUser3'
@@ -59,16 +58,16 @@ tape('[incoming] broadcast', (assert) => {
     .query({'access_token':'FakeApiToken'})
     .reply(201, githubFixtures.broadcastIssue);
 
-    // slack calls for [ 'testUser1', 'testUser2', 'testUser3' ]
-    nock('https://slack.com:443', {'encodedQueryParams':true})
-      .post('/api/chat.postMessage')
-      .reply(200, slackFixtures.slack.success);
-    nock('https://slack.com:443', {'encodedQueryParams':true})
-      .post('/api/chat.postMessage')
-      .reply(200, slackFixtures.slack.success);
-    nock('https://slack.com:443', {'encodedQueryParams':true})
-      .post('/api/chat.postMessage')
-      .reply(200, slackFixtures.slack.success);
+  // slack calls for [ 'testUser1', 'testUser2', 'testUser3' ]
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
 
   incoming(incomingFixtures.broadcastEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
@@ -78,7 +77,7 @@ tape('[incoming] broadcast', (assert) => {
 });
 
 tape('[incoming] Creates a PD incident from high priority', (assert) => {
-  nock('https://api.pagerduty.com:443', {"encodedQueryParams":true})
+  nock('https://api.pagerduty.com:443', {encodedQueryParams: true})
     .post('/incidents', {
       incident: {
         type: 'incident',
@@ -87,7 +86,7 @@ tape('[incoming] Creates a PD incident from high priority', (assert) => {
           id: 'XXXXXXX',
           type: 'service_reference'
         },
-        incident_key: 'testPagerDutyTitle'
+        incident_key: 'testPagerDutyTitle' // eslint-disable-line camelcase
       }
     })
     .reply(201, pdIncident);
@@ -101,7 +100,7 @@ tape('[incoming] Creates a PD incident from high priority', (assert) => {
 
 tape('[incoming] malformed SNS message error', (assert) => {
   const badRecord = { Records: 'record1' };
-  incoming(badRecord, context, (err, res) => {
+  incoming(badRecord, context, (err) => {
     assert.deepEqual(err, 'SNS message malformed', '-- should pass through error message');
     assert.end();
   });
@@ -109,7 +108,7 @@ tape('[incoming] malformed SNS message error', (assert) => {
 
 tape('[incoming] > 1 record in SNS message error', (assert) => {
   const badRecord = { Records: [ 'record1', 'record2'] };
-  incoming(badRecord, context, (err, res) => {
+  incoming(badRecord, context, (err) => {
     assert.deepEqual(err, 'SNS message contains more than one record', '-- should pass through error message');
     assert.end();
   });

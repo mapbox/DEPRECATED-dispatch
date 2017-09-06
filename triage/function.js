@@ -20,6 +20,7 @@ module.exports.fn = function(event, context, callback) {
 
   // validate callback decode for minimum info
   decode(payload.callback_id, (err, res) => {
+    if (err) return callback(err);
     if (!res.github) {
       console.log(`${res.requestId}: Slack callback_id missing github issue`);
       return callback(`${res.requestId}: Slack callback_id missing github issue`);
@@ -27,7 +28,7 @@ module.exports.fn = function(event, context, callback) {
     console.log('%s: callback_id decoded: issue %s', res.requestId, res.github);
 
     // decrypt the environment
-    decrypt(process.env, function(err, scrubbed) {
+    decrypt(process.env, function(err) {
       if (err) {
         console.log('%s: decrypt error: %s', res.requestId, err);
         return callback('error: ' + err);
@@ -55,7 +56,7 @@ module.exports.fn = function(event, context, callback) {
         });
 
         closeIssue
-          .then(value => {
+          .then(value => { // eslint-disable-line no-unused-vars
             log =`${res.requestId}: closed GitHub issue ${res.github}`;
             console.log(log);
             // this callback text is displayed to the slack user
@@ -79,7 +80,7 @@ module.exports.fn = function(event, context, callback) {
         console.log(`${res.requestId}: creating PagerDuty incident`);
         var incident = createIncident(options);
         incident
-          .then(value => {
+          .then(value => { // eslint-disable-line no-unused-vars
             log = `${res.requestId}: Created PagerDuty incident successfully`;
             console.log(log);
             return callback(null, responseText ? responseText : log);

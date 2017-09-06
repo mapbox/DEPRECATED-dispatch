@@ -4,7 +4,8 @@ const file = require('../../lib/slack.js');
 const fixtures = require('../../test/fixtures/slack.fixtures.js');
 const sinon = require('sinon');
 const test = require('tape');
-const webClient = require('@slack/client').WebClient;
+
+/* eslint-disable no-unused-vars */
 
 test('[slack] [ingestSNS] SNS parsing error', (t) => {
   file.ingestSNS(fixtures.sns.malformed, (err) => {

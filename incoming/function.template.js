@@ -45,7 +45,7 @@ module.exports = lambdaCfn.build({
         'kms:Decrypt'
       ],
       Resource: {
-        "Fn::ImportValue":"cloudformation-kms-production"
+        'Fn::ImportValue': 'cloudformation-kms-production'
       }
     }
   ],
