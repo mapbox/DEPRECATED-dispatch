@@ -1,4 +1,7 @@
 'use strict';
+
+/* eslint-disable camelcase */
+
 module.exports.issue1 = issue1;
 module.exports.manyIssues = manyIssues;
 module.exports.closedIssue = closedIssue;

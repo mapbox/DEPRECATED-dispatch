@@ -4,7 +4,7 @@ module.exports.sns = {
   broadcast: {
     type: 'broadcast',
     users: ['@testUser1', '@testUser2', '@testUser3'],
-    callback_id: 'testCallbackId',
+    'callback_id': 'testCallbackId',
     number: 7,
     body: {
       github: {
@@ -29,7 +29,7 @@ module.exports.sns = {
   success: {
     type: 'self_service',
     users: ['@testUser'],
-    callback_id: 'testCallbackId',
+    'callback_id': 'testCallbackId',
     number: 7,
     body: {
       github: {
@@ -50,7 +50,7 @@ module.exports.sns = {
   successWithResponse: {
     type: 'self_service',
     users: ['@testUser'],
-    callback_id: 'testCallbackId',
+    'callback_id': 'testCallbackId',
     number: 7,
     body: {
       github: {
@@ -61,9 +61,9 @@ module.exports.sns = {
         message: 'testSlackMessage',
         actions: {
           yes: 'testYesAction',
-          yes_response: 'yes response',
+          'yes_response': 'yes response',
           no: 'testNoAction',
-          no_response: 'no response'
+          'no_response': 'no response'
         }
       }
     },
@@ -86,8 +86,8 @@ module.exports.slack = {
       {
         text: 'https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-        callback_id: 'testCallbackId',
-        attachment_type: 'default',
+        'callback_id': 'testCallbackId',
+        'attachment_type': 'default',
         actions: [
           {
             name: 'yes',
@@ -112,8 +112,8 @@ module.exports.slack = {
       {
         text: 'https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-        callback_id: 'testCallbackId',
-        attachment_type: 'default',
+        'callback_id': 'testCallbackId',
+        'attachment_type': 'default',
         actions: [
           {
             name: 'yes',
@@ -137,8 +137,8 @@ module.exports.slack = {
     attachments: [
       {
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
-        callback_id: 'testCallbackId',
-        attachment_type: 'default'
+        'callback_id': 'testCallbackId',
+        'attachment_type': 'default'
       }
     ]
   },
@@ -183,7 +183,7 @@ module.exports.slack = {
      { type: 'message',
        user: 'U6GHXJQ1Z',
        text: 'Two factor authentication has been disabled...',
-       bot_id: 'B6G0UU6HW',
+       'bot_id': 'B6G0UU6HW',
        attachments: [ [Object] ],
        ts: '1501777340.256863' },
     scopes: [ 'identify', 'bot:basic' ],
@@ -240,7 +240,7 @@ module.exports.clients = {
             type: 'message',
             user: 'U6GHXJQ1Z',
             text: 'Two factor authentication has been disabled...',
-            bot_id: 'B6G0UU6HW',
+            'bot_id': 'B6G0UU6HW',
             attachments: [ [Object] ],
             ts: '1501777340.256863'
           },

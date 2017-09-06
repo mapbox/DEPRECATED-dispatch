@@ -4,13 +4,12 @@ const decrypt = require('../lib/utils.js').decrypt;
 const gh = require('../lib/github.js');
 const pd = require('../lib/pagerduty.js').createIncident;
 const queue = require('d3-queue').queue;
-const request = require('request');
 const slack = require('../lib/slack.js');
-const webClient = require('@slack/client').WebClient;
+const WebClient = require('@slack/client').WebClient;
 const crypto = require('crypto');
 
 module.exports.fn = function(event, context, callback) {
-  decrypt(process.env, function(err, res) {
+  decrypt(process.env, function(err) {
     if (err) throw err;
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
     const pagerDutyServiceId = process.env.PagerDutyServiceId;
@@ -28,8 +27,7 @@ module.exports.fn = function(event, context, callback) {
     } else {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
-      const client = new webClient(slackBotToken);
-
+      const client = new WebClient(slackBotToken);
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
 
       if (!msgType) {
@@ -61,7 +59,7 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(err => { callback(err, `${requestId} error handled`); });
       } else if (msgType === 'broadcast') {
-        let userArray = message.users.map(function (obj) { return obj.slack; });
+        let userArray = message.users.map(function(obj) { return obj.slack; });
         let options = {
           owner: githubOwner,
           repo: githubRepo,
@@ -102,7 +100,7 @@ module.exports.fn = function(event, context, callback) {
         }
         let incident = pd(options);
         incident
-          .then(value => { callback(null, `${requestId} pagerduty incident triggered`); })
+          .then(value => { callback(null, `${requestId} pagerduty incident triggered`); }) // eslint-disable-line no-unused-vars
           .catch(error => { callback(error, `${requestId} error handled`); });
       }
     };
