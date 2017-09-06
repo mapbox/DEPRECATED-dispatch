@@ -136,7 +136,6 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'https://github.com/testOwner/testRepo/issues/7',
         fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
         callback_id: 'testCallbackId',
         attachment_type: 'default'
