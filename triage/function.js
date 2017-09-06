@@ -25,12 +25,12 @@ module.exports.fn = function(event, context, callback) {
       console.log(`${res.requestId}: Slack callback_id missing github issue`);
       return callback(`${res.requestId}: Slack callback_id missing github issue`);
     }
-    console.log('%s: callback_id decoded: issue %s', res.requestId, res.github);
+    console.log(`${res.requestId}: callback_id decoded issue ${res.github}`);
 
     // decrypt the environment
     decrypt(process.env, function(err) {
       if (err) {
-        console.log('%s: decrypt error: %s', res.requestId, err);
+        console.log(`${res.requestId}: decrypt error ${err}`);
         return callback('error: ' + err);
       }
 
@@ -44,9 +44,9 @@ module.exports.fn = function(event, context, callback) {
       var responseText = payload.actions[0].value;
       var log;
 
-      console.log('%s: found payload response: %s', res.requestId, response);
+      console.log(`${res.requestId}: found payload response '${response}'`);
       if (response == 'yes') {
-        console.log('%s: closing GitHub issue %s', res.requestId, res.github);
+        console.log(`${res.requestId}: closing GitHub issue ${res.github}`);
         var github = require('../lib/github.js');
         var closeIssue = github.closeIssue({
           token: githubToken,
@@ -70,12 +70,15 @@ module.exports.fn = function(event, context, callback) {
           });
       } else if (response == 'no') {
         var createIncident = require('../lib/pagerduty.js').createIncident;
+        var pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
+        var pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
         var options = {
           accessToken: pagerDutyApiKey,
-          title: payload.original_message.text,
+          title: pagerDutyTitle,
           serviceId: (res.pagerDutyServiceId ? res.pagerDutyServiceId : pagerDutyServiceId),
           incidentKey: res.requestId,
-          from: pagerDutyFromAddress
+          from: pagerDutyFromAddress,
+          body: pagerDutyBody
         };
         console.log(`${res.requestId}: creating PagerDuty incident`);
         var incident = createIncident(options);
