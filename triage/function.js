@@ -42,6 +42,7 @@ module.exports.fn = function(event, context, callback) {
       const githubRepo = process.env.GithubRepo;
       var response = payload.actions[0].name;
       var responseText = payload.actions[0].value;
+      var responseObject;
       var log;
 
       console.log(`${res.requestId}: found payload response '${response}'`);
@@ -60,7 +61,20 @@ module.exports.fn = function(event, context, callback) {
             log =`${res.requestId}: closed GitHub issue ${res.github}`;
             console.log(log);
             // this callback text is displayed to the slack user
-            return callback(null, responseText ? responseText : log);
+            responseObject = {
+              attachments: [
+                {
+                  'attachment_type': 'default',
+                  fallback: `Could not load Slack response, ${log}`,
+                  text: responseText,
+                  color: '#008E00',
+                  footer: 'Dispatch alert acknowledged',
+                  ts: Math.floor((new Date).getTime()/1000),
+                  'replace_original': false
+                }
+              ]
+            };
+            return callback(null, responseObject);
           })
           .catch(error => {
             log = `${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`;
@@ -86,7 +100,20 @@ module.exports.fn = function(event, context, callback) {
           .then(value => { // eslint-disable-line no-unused-vars
             log = `${res.requestId}: Created PagerDuty incident successfully`;
             console.log(log);
-            return callback(null, responseText ? responseText : log);
+            responseObject = {
+              attachments: [
+                {
+                  'attachment_type': 'default',
+                  fallback: `Could not load Slack response, ${log}`,
+                  text: responseText,
+                  color: '#CC0000',
+                  footer: 'Dispatch alert escalated',
+                  ts: Math.floor((new Date).getTime()/1000),
+                  'replace_original': false
+                }
+              ]
+            };
+            return callback(null, responseObject);
           })
           .catch(error => {
             if (error.errorMessage && /matching dedup key already exists/.test(error.errorMessage)) {

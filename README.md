@@ -57,7 +57,7 @@ For the complete message specification see [`MESSAGE-SPEC.md`](MESSAGE-SPEC.md).
 - **Self-service example**, replace `$SNS_ARN`, `$USER`
   ```
   aws sns publish --topic-arn "$SNS_ARN" --subject "" \
-  --message "{\"type\":\"self-service\",\"users\":[{\"slack\": \"$USER\",\"github\":\"$USER\"}],\"body\":{\"github\":{\"title\":\"self-service title\",\"body\":\"self-service body\"},\"slack\":{\"message\":\"testSlackMessage\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
+  --message "{\"type\":\"self-service\",\"users\":[{\"slack\": \"$USER\",\"github\":\"$USER\"}],\"body\":{\"github\":{\"title\":\"self-service title\",\"body\":\"self-service body\"},\"slack\":{\"message\":\"testSlackMessage\",\"prompt\":\"testSlackPrompt\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
   ```
 
 - **High priority example**, replace `$SNS_ARN`
@@ -69,5 +69,5 @@ For the complete message specification see [`MESSAGE-SPEC.md`](MESSAGE-SPEC.md).
 - **Broadcast example**, replace `$SNS_ARN`, `$USER1`,`$USER2`
   ```
   aws sns publish --topic-arn "$SNS_ARN" --subject "" \
-  --message "{\"type\":\"broadcast\",\"users\":[{\"slack\": \"$USER1\",\"github\":\"$USER1\"},{\"slack\": \"$USER2\",\"github\":\"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
+  --message "{\"type\":\"broadcast\",\"users\":[{\"slack\": \"$USER1\",\"github\":\"$USER1\"},{\"slack\": \"$USER2\",\"github\":\"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\",\"prompt\":\"testSlackPrompt\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
   ```

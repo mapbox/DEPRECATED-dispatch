@@ -25,6 +25,7 @@ If action responses are not passed, the response will default to the return valu
         }
         slack: {
             message: 'STRING_VALUE', // required, Slack message
+            prompt: 'STRING_VALUE', // required, Slack prompt for yes or not response
             actions: {
                 yes: 'STRING_VALUE', // required, Slack button text for 'yes' action type
                 yes_response: 'STRING_VALUE', // optional, Dispatch Triage response to return to user
@@ -35,6 +36,12 @@ If action responses are not passed, the response will default to the return valu
     }
 }
 ```
+
+#### Message vs. prompt
+
+To illustrate the difference between the `message` and `prompt` pieces of the `body` object, see below:
+
+![messagevsprompt](https://github.com/mapbox/dispatch/blob/master/assets/message-vs-prompt.png)
 
 ## Broadcast dispatch
 
