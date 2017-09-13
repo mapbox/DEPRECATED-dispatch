@@ -38,6 +38,7 @@ module.exports.sns = {
       },
       slack: {
         message: 'testSlackMessage',
+        prompt: 'testSlackPrompt',
         actions: {
           yes: 'testYesAction',
           no: 'testNoAction'
@@ -59,12 +60,30 @@ module.exports.sns = {
       },
       slack: {
         message: 'testSlackMessage',
+        prompt: 'testSlackPrompt',
         actions: {
           yes: 'testYesAction',
           'yes_response': 'yes response',
           no: 'testNoAction',
           'no_response': 'no response'
         }
+      }
+    },
+    url: 'https://github.com/testOwner/testRepo/issues/7',
+    requestId: 123
+  },
+  successNoPrompt: {
+    type: 'self_service',
+    users: ['@testUser'],
+    'callback_id': 'testCallbackId',
+    number: 7,
+    body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      },
+      slack: {
+        message: 'testSlackMessage'
       }
     },
     url: 'https://github.com/testOwner/testRepo/issues/7',
@@ -84,8 +103,18 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        text: 'https://github.com/testOwner/testRepo/issues/7',
-        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        fallback: 'Could not load GitHub issue.',
+        'callback_id': 'testCallbackId',
+        'attachment_type': 'default',
+        text: 'https://github.com/testOwner/testRepo/issues/7'
+      }
+    ]
+  },
+  prompt: {
+    text: 'testSlackPrompt',
+    attachments: [
+      {
+        fallback: 'You are unable to address this alert via Slack, refer to the GitHub issue.',
         'callback_id': 'testCallbackId',
         'attachment_type': 'default',
         actions: [
@@ -106,12 +135,11 @@ module.exports.slack = {
       }
     ]
   },
-  messageWithResponseText: {
-    text: 'testSlackMessage',
+  promptWithResponseText: {
+    text: 'testSlackPrompt',
     attachments: [
       {
-        text: 'https://github.com/testOwner/testRepo/issues/7',
-        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        fallback: 'You are unable to address this alert via Slack, refer to the GitHub issue.',
         'callback_id': 'testCallbackId',
         'attachment_type': 'default',
         actions: [
@@ -136,7 +164,7 @@ module.exports.slack = {
     text: 'testSlackMessage',
     attachments: [
       {
-        fallback: 'You are unable to ack this alert via Slack, refer to the GitHub issue.',
+        fallback: 'Could not load GitHub issue.',
         'callback_id': 'testCallbackId',
         'attachment_type': 'default'
       }
@@ -153,6 +181,12 @@ module.exports.slack = {
     alert: true,
     destination: '@testUser',
     message: 'testSlackMessage',
+    url: 'https://github.com/testOwner/testRepo/issues/7'
+  },
+  statusPrompt: {
+    alert: true,
+    destination: '@testUser',
+    message: 'testSlackMessage, Prompt: testSlackMessage',
     url: 'https://github.com/testOwner/testRepo/issues/7'
   },
   statusBroadcast: [
@@ -182,7 +216,21 @@ module.exports.slack = {
     message:
      { type: 'message',
        user: 'U6GHXJQ1Z',
-       text: 'Two factor authentication has been disabled...',
+       text: 'testSlackMessage',
+       'bot_id': 'B6G0UU6HW',
+       attachments: [ [Object] ],
+       ts: '1501777340.256863' },
+    scopes: [ 'identify', 'bot:basic' ],
+    acceptedScopes: [ 'chat:write:user', 'client' ]
+  },
+  successPrompt: {
+    ok: true,
+    channel: 'D6G0UU7MW',
+    ts: '1501777340.256863',
+    message:
+     { type: 'message',
+       user: 'U6GHXJQ1Z',
+       text: 'testSlackPrompt',
        'bot_id': 'B6G0UU6HW',
        attachments: [ [Object] ],
        ts: '1501777340.256863' },
@@ -239,7 +287,7 @@ module.exports.clients = {
           message: {
             type: 'message',
             user: 'U6GHXJQ1Z',
-            text: 'Two factor authentication has been disabled...',
+            text: 'testSlackMessage',
             'bot_id': 'B6G0UU6HW',
             attachments: [ [Object] ],
             ts: '1501777340.256863'

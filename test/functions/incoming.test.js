@@ -36,6 +36,9 @@ tape('[incoming] self-service', (assert) => {
   nock('https://slack.com:443', {'encodedQueryParams':true})
     .post('/api/chat.postMessage')
     .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
 
   incoming(incomingFixtures.selfServiceEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
@@ -59,6 +62,15 @@ tape('[incoming] broadcast', (assert) => {
     .reply(201, githubFixtures.broadcastIssue);
 
   // slack calls for [ 'testUser1', 'testUser2', 'testUser3' ]
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443', {'encodedQueryParams':true})
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
   nock('https://slack.com:443', {'encodedQueryParams':true})
     .post('/api/chat.postMessage')
     .reply(200, slackFixtures.slack.success);
