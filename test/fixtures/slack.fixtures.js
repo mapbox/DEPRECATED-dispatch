@@ -24,7 +24,8 @@ module.exports.sns = {
     body: {},
     requestId: 123
   },
-  malformedError: '123 sns message parsing error',
+  malformedError: '123 sns message parsing error: TypeError: Cannot read property \'slack\' of undefined',
+  malformedMessageError: '123 sns message parsing error: TypeError: Cannot read property \'message\' of undefined',
   malformedNoIssueError: 'No GitHub issue number found in message body',
   success: {
     type: 'self_service',
@@ -186,7 +187,7 @@ module.exports.slack = {
   statusPrompt: {
     alert: true,
     destination: '@testUser',
-    message: 'testSlackMessage, Prompt: testSlackMessage',
+    message: 'testSlackMessage, Prompt: testSlackPrompt',
     url: 'https://github.com/testOwner/testRepo/issues/7'
   },
   statusBroadcast: [
@@ -252,12 +253,82 @@ module.exports.clients = {
     slackAPIUrl:'test-url',
     chat: {
       postMessage: function(username, message, options, callback) {
-        return callback('error', {
-          ok: false,
-          error: 'no_text',
-          scopes: [ 'identify', 'bot:basic' ],
-          acceptedScopes: [ 'chat:write:user', 'client' ]
-        });
+        if (username == '@testUser') {
+          return callback('error', {
+            ok: false,
+            error: 'no_text',
+            scopes: [ 'identify', 'bot:basic' ],
+            acceptedScopes: [ 'chat:write:user', 'client' ]
+          });
+        } else {
+          return callback(null, {
+            ok: true,
+            channel: 'D6G0UU7MW',
+            ts: '1501777340.256863',
+            message: {
+              type: 'message',
+              user: 'U6GHXJQ1Z',
+              text: 'testSlackMessage',
+              'bot_id': 'B6G0UU6HW',
+              attachments: [ [Object] ],
+              ts: '1501777340.256863'
+            },
+            scopes: [ 'identify', 'bot:basic' ],
+            acceptedScopes: [ 'chat:write:user', 'client' ]
+          });
+        }
+      }
+    }
+  },
+  promptError: {
+    _token:'test-token',
+    slackAPIUrl:'test-url',
+    chat: {
+      postMessage: function(username, message, options, callback) {
+        if (username == '@testUser') {
+
+          if (message.attachments.actions) {
+            console.log('asdfasdf');
+            return callback('error', {
+              ok: false,
+              error: 'no_text',
+              scopes: [ 'identify', 'bot:basic' ],
+              acceptedScopes: [ 'chat:write:user', 'client' ]
+            });
+          } else {
+            return callback(null, {
+              ok: true,
+              channel: 'D6G0UU7MW',
+              ts: '1501777340.256863',
+              message: {
+                type: 'message',
+                user: 'U6GHXJQ1Z',
+                text: 'testSlackMessage',
+                'bot_id': 'B6G0UU6HW',
+                attachments: [ [Object] ],
+                ts: '1501777340.256863'
+              },
+              scopes: [ 'identify', 'bot:basic' ],
+              acceptedScopes: [ 'chat:write:user', 'client' ]
+            });
+          }
+        } else {
+          return callback(null, {
+            ok: true,
+            channel: 'D6G0UU7MW',
+            ts: '1501777340.256863',
+            message: {
+              type: 'message',
+              user: 'U6GHXJQ1Z',
+              text: 'testSlackMessage',
+              'bot_id': 'B6G0UU6HW',
+              attachments: [ [Object] ],
+              ts: '1501777340.256863'
+            },
+            scopes: [ 'identify', 'bot:basic' ],
+            acceptedScopes: [ 'chat:write:user', 'client' ]
+          });
+        }
       }
     }
   },
