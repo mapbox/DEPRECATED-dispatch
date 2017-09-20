@@ -280,53 +280,24 @@ module.exports.clients = {
       }
     }
   },
-  promptError: {
+  everythingErrors: {
     _token:'test-token',
     slackAPIUrl:'test-url',
     chat: {
       postMessage: function(username, message, options, callback) {
         if (username == '@testUser') {
-
-          if (message.attachments.actions) {
-            console.log('asdfasdf');
-            return callback('error', {
-              ok: false,
-              error: 'no_text',
-              scopes: [ 'identify', 'bot:basic' ],
-              acceptedScopes: [ 'chat:write:user', 'client' ]
-            });
-          } else {
-            return callback(null, {
-              ok: true,
-              channel: 'D6G0UU7MW',
-              ts: '1501777340.256863',
-              message: {
-                type: 'message',
-                user: 'U6GHXJQ1Z',
-                text: 'testSlackMessage',
-                'bot_id': 'B6G0UU6HW',
-                attachments: [ [Object] ],
-                ts: '1501777340.256863'
-              },
-              scopes: [ 'identify', 'bot:basic' ],
-              acceptedScopes: [ 'chat:write:user', 'client' ]
-            });
-          }
-        } else {
-          return callback(null, {
-            ok: true,
-            channel: 'D6G0UU7MW',
-            ts: '1501777340.256863',
-            message: {
-              type: 'message',
-              user: 'U6GHXJQ1Z',
-              text: 'testSlackMessage',
-              'bot_id': 'B6G0UU6HW',
-              attachments: [ [Object] ],
-              ts: '1501777340.256863'
-            },
+          return callback('error', {
+            ok: false,
+            error: 'no_text',
             scopes: [ 'identify', 'bot:basic' ],
             acceptedScopes: [ 'chat:write:user', 'client' ]
+          });
+        } else {
+          return callback('error', {
+            ok: false,
+            error: 'channel_not_found',
+            scopes: [ 'identify', 'bot:basic' ],
+            acceptedScopes: [ 'chat:write:bot', 'post' ]
           });
         }
       }

@@ -83,6 +83,24 @@ test('[slack] [postAlert] username success', (t) => {
   });
 });
 
+test('[slack] [postAlert] username fails, channel post success', (t) => {
+  file.postAlert(fixtures.slack.username, fixtures.slack.message, fixtures.clients.error, 'test-channel', 123, (err, res) => {
+    t.equal(err, 'badSlack', '-- should return custom error');
+    t.equal(res.ok, true, '-- should be true');
+    t.deepEqual(res, fixtures.slack.success, '-- should pass through response object');
+    t.end();
+  });
+});
+
+test('[slack] [postAlert] username fails, channel post fails', (t) => {
+  file.postAlert(fixtures.slack.username, fixtures.slack.message, fixtures.clients.noChannel, 'test-channel', 123, (err, res) => {
+    t.equal(err, 'badSlack', '-- should return custom error');
+    t.equal(res.ok, false, '-- should be true');
+    t.deepEqual(res, fixtures.slack.noChannel, '-- should pass through response object');
+    t.end();
+  });
+});
+
 test('[slack] [alertToSlack] ingestSNS error', (t) => {
   const stub = sinon.stub(file, 'ingestSNS').yields(fixtures.sns.malformedError);
   file.alertToSlack({number: 7, requestId: 123}, fixtures.slack.username, fixtures.clients.empty, 'test-channel', (err, status) => {
