@@ -51,7 +51,7 @@ module.exports.fn = function(event, context, callback) {
               message.number = res.number;
               message.requestId = requestId;
               console.log(`${requestId} issue ${res.number} created for ${message.body.github.title}`);
-              slack.alertToSlack(message, user.slack, client, (err, status) => {
+              slack.alertToSlack(message, user.slack, client, slackChannel, (err, status) => {
                 if (err) return callback(err);
                 return callback(null, status);
               });
@@ -79,7 +79,7 @@ module.exports.fn = function(event, context, callback) {
               let q = queue(1);
               message.users.forEach((user) => {
                 user = checkUser(user);
-                q.defer(slack.alertToSlack, message, user.slack, client);
+                q.defer(slack.alertToSlack, message, user.slack, client, slackChannel);
               });
               q.awaitAll(function(err, status) {
                 if (err) return callback(err);
