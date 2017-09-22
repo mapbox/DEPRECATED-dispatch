@@ -12,6 +12,7 @@ If action responses are not passed, the response will default to the return valu
 {
     type: 'self-service', // required
     requestId: 'STRING_VALUE', // optional, id for logging
+    retrigger: 'BOOLEAN', // optional, if set to false, Dispatch will not send a message if an issue has already been reported
     users: [ // see complete users array specification below
         {
             slack: 'STRING_VALUE', // required, Slack handle
@@ -55,6 +56,7 @@ Broadcast messages accept one or more users.
 {
     type: 'broadcast', // required
     requestId: 'STRING_VALUE', // optional, id for logging
+    retrigger: 'BOOLEAN', // optional, if set to false, Dispatch will not send a message if an issue has already been reported
     users: [ // see complete users array specification below
         {
             slack: 'STRING_VALUE' // required, Slack handle

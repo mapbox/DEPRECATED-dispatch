@@ -29,6 +29,7 @@ module.exports.fn = function(event, context, callback) {
       let msgType = message.type;
       const client = new WebClient(slackBotToken);
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
+      if (!message.retrigger) { message.retrigger = true; }
 
       if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
@@ -38,6 +39,7 @@ module.exports.fn = function(event, context, callback) {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
+          retrigger: message.retrigger,
           title: message.body.github.title,
           body: message.body.github.body + '\n\n @' + user.github
         };
@@ -64,6 +66,7 @@ module.exports.fn = function(event, context, callback) {
           owner: githubOwner,
           repo: githubRepo,
           token: githubToken,
+          retrigger: message.retrigger,
           title: message.body.github.title,
           body: message.body.github.body + '\n\n' + userArray.toString()
         };

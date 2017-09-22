@@ -90,7 +90,7 @@ tape('[github] Pagination works', function(assert) {
     .catch(err => { console.log(err); });
 });
 
-tape('[github] Does not create issue because one exists', function(assert) {
+tape('[github] Does not create issue because one exists. Retrigger is on.', function(assert) {
   let issue = issuesFixtures.issue1();
 
   let optionsExists = {
@@ -98,12 +98,38 @@ tape('[github] Does not create issue because one exists', function(assert) {
     owner: 'testOwner',
     repo: 'testRepo',
     title: 'testTitle',
+    retrigger: true,
     body: 'testBody'
   };
 
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
     .query({state: 'open', access_token: 'FakeApiToken'})
+    .reply(200, issue);
+
+  githubRequests.createIssue(optionsExists)
+    .then(res => {
+      assert.deepEqual(res, {status: 'exists', issue: 7}, 'Does not create issue');
+      assert.end();
+    })
+    .catch(err => { console.log(err); });
+});
+
+tape('[github] Does not create issue because one exists. Retrigger is off.', function(assert) {
+  let issue = issuesFixtures.closedIssue();
+
+  let optionsExists = {
+    token: 'FakeApiToken',
+    owner: 'testOwner',
+    repo: 'testRepo',
+    title: 'testTitle',
+    retrigger: false,
+    body: 'testBody'
+  };
+
+  nock('https://api.github.com')
+    .get('/repos/testOwner/testRepo/issues')
+    .query({state: 'all', access_token: 'FakeApiToken'})
     .reply(200, issue);
 
   githubRequests.createIssue(optionsExists)
