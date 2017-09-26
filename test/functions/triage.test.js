@@ -38,8 +38,14 @@ tape('[triage] Escalates to PagerDuty if not ok', function(t) {
         'title': '6cf9397c71e2: user kara responded \'no\' for self-service issue 7',
         'service': {
           'id':'XXXXXXX',
-          'type': 'service_reference' },
-        'incident_key': '6cf9397c71e2' }
+          'type': 'service_reference'
+        },
+        'incident_key': '6cf9397c71e2',
+        'body': {
+          'type': 'incident_body',
+          'details': '6cf9397c71e2: user kara responded \'no\' for self-service issue 7\n\n https:\/\/github.com\/testOwner\/testRepo\/issues\/7'
+        }
+      }
     })
     .reply(201, pdIncident);
 
