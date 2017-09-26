@@ -16,7 +16,7 @@ It can be used to both dynamically route incoming alarms to either PagerDuty or 
 
 ## Architecture
 
-`dispatch` uses the [lambda-cfn](github.com/mapbox/lambda-cfn) framework, and is composed of two separate AWS Lambda functions:
+`dispatch` uses the [lambda-cfn](github.com/mapbox/lambda-cfn) framework and is composed of two separate AWS Lambda functions:
 
 - **Incoming**: receives the SNS notification and handles the initial alarm routing and GitHub issue creation.
 - **Triage**: uses API Gateway to respond to Slack interactive messages, either closing the corresponding GitHub issue or escalating the issue to PagerDuty.
