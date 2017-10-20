@@ -27,7 +27,7 @@ module.exports.broadcastIssue = {
   created_at: '2017-08-02T23:36:11Z',
   updated_at: '2017-08-02T23:36:11Z',
   closed_at: null,
-  body: 'testGithubBody\n\n @mapbox/security-team'
+  body: 'testGithubBody\n\n @mapbox/security'
 };
 
 const dataDump = {

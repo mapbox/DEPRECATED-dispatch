@@ -125,4 +125,4 @@ If the Slack handle does not contain an `@` symbol, it will be automatically add
 
 If a Slack or GitHub handle is not passed in the `users` array, Dispatch will attempt to use sane defaults:
 - Slack: defaults to the channel set by the `SlackChannel` stack parameter
-- GitHub: defaults to `@mapbox/security-team`
+- GitHub: defaults to `@mapbox/security`

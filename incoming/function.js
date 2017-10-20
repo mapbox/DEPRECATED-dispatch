@@ -110,7 +110,7 @@ module.exports.fn = function(event, context, callback) {
 
     function checkUser(user) {
       if (!user.github) {
-        user.github = 'mapbox/security-team';
+        user.github = 'mapbox/security';
       }
       if (!user.slack) {
         user.slack = `#${slackChannel}`;
