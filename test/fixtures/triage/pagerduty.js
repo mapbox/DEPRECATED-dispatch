@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.incident = {
     "incident": {
       "incident_number": 123512,
