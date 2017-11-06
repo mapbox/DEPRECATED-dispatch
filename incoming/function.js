@@ -29,7 +29,7 @@ module.exports.fn = function(event, context, callback) {
       let msgType = message.type;
       const client = new WebClient(slackBotToken);
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
-      if (typeof message.retrigger == 'undefined') { message.retrigger = true; }
+      if (typeof message.retrigger === 'undefined') { message.retrigger = true; }
 
       if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
