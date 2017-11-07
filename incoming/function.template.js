@@ -38,6 +38,10 @@ module.exports = lambdaCfn.build({
     SlackChannel: {
       Type: 'String',
       Description: 'Slack channel for dispatch-bot'
+    },
+    KmsKey: {
+      Type: 'String',
+      Description: 'Cloudformation-kms stack name or KMS key ARN'
     }
   },
   statements: [
@@ -47,7 +51,9 @@ module.exports = lambdaCfn.build({
         'kms:Decrypt'
       ],
       Resource: {
-        'Fn::ImportValue': 'cloudformation-kms-production'
+        'Fn::ImportValue': {
+          'Ref': 'KmsKey'
+        }
       }
     }
   ],
