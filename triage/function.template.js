@@ -29,6 +29,10 @@ module.exports = lambdaCfn.build({
     GithubToken: {
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
+    },
+    KmsKey: {
+      Type: 'String',
+      Description: 'Cloudformation-kms stack name or KMS key ARN'
     }
   },
   statements: [
@@ -38,7 +42,9 @@ module.exports = lambdaCfn.build({
         'kms:Decrypt'
       ],
       Resource: {
-        'Fn::ImportValue': 'cloudformation-kms-production'
+        'Fn::ImportValue': {
+          'Ref': 'KmsKey'
+        }
       }
     }
   ],
