@@ -50,7 +50,7 @@ module.exports.fn = function(event, context, callback) {
       let log;
 
       console.log(`${res.requestId}: found payload response '${response}'`);
-      if (response == 'yes') {
+      if (response === 'yes') {
         console.log(`${res.requestId}: closing GitHub issue ${res.github}`);
         const github = require('../lib/github.js');
         const closeIssue = github.closeIssue({
@@ -86,7 +86,7 @@ module.exports.fn = function(event, context, callback) {
             // if get a failure to close here, return the failure to the user
             return callback(null, log);
           });
-      } else if (response == 'no') {
+      } else if (response === 'no') {
         const createIncident = require('../lib/pagerduty.js').createIncident;
         const pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
         const pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
