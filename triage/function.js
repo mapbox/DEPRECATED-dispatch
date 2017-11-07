@@ -1,11 +1,15 @@
-var qs = require('querystring');
-var decrypt = require('../lib/utils').decrypt;
-var decode = require('../lib/utils').decode;
+'use strict';
+
+const qs = require('querystring');
+const decrypt = require('../lib/utils').decrypt;
+const decode = require('../lib/utils').decode;
 
 module.exports.fn = function(event, context, callback) {
 
+  let payload;
+
   try {
-    var payload = JSON.parse(qs.parse(event.postBody).payload);
+    payload = JSON.parse(qs.parse(event.postBody).payload);
   } catch (err) {
     console.log(`error: payload parsing ${event.postBody}`);
     return callback(`error: payload parsing ${event.postBody}`);
@@ -40,16 +44,16 @@ module.exports.fn = function(event, context, callback) {
       const githubToken = process.env.GithubToken;
       const githubOwner = process.env.GithubOwner;
       const githubRepo = process.env.GithubRepo;
-      var response = payload.actions[0].name;
-      var responseText = payload.actions[0].value;
-      var responseObject;
-      var log;
+      const response = payload.actions[0].name;
+      let responseText = payload.actions[0].value;
+      let responseObject;
+      let log;
 
       console.log(`${res.requestId}: found payload response '${response}'`);
       if (response == 'yes') {
         console.log(`${res.requestId}: closing GitHub issue ${res.github}`);
-        var github = require('../lib/github.js');
-        var closeIssue = github.closeIssue({
+        const github = require('../lib/github.js');
+        const closeIssue = github.closeIssue({
           token: githubToken,
           number: res.github,
           owner: githubOwner,
@@ -83,10 +87,10 @@ module.exports.fn = function(event, context, callback) {
             return callback(null, log);
           });
       } else if (response == 'no') {
-        var createIncident = require('../lib/pagerduty.js').createIncident;
-        var pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
-        var pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
-        var options = {
+        const createIncident = require('../lib/pagerduty.js').createIncident;
+        const pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
+        const pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
+        const options = {
           accessToken: pagerDutyApiKey,
           title: pagerDutyTitle,
           serviceId: (res.pagerDutyServiceId ? res.pagerDutyServiceId : pagerDutyServiceId),
@@ -95,7 +99,7 @@ module.exports.fn = function(event, context, callback) {
           body: pagerDutyBody
         };
         console.log(`${res.requestId}: creating PagerDuty incident`);
-        var incident = createIncident(options);
+        const incident = createIncident(options);
         incident
           .then(value => { // eslint-disable-line no-unused-vars
             log = `${res.requestId}: Created PagerDuty incident successfully`;

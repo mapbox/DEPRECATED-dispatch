@@ -18,7 +18,6 @@ const pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
 
 const context = {};
 
-
 tape('[incoming] self-service', (assert) => {
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
