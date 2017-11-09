@@ -21,7 +21,7 @@ module.exports = lambdaCfn.build({
     },
     GithubDefaultUser: {
       Type: 'String',
-      Description: 'Default GitHub user to be tagged in dispatch issues'
+      Description: 'Default GitHub user or team to be tagged in dispatch issues'
     },
     GithubOwner: {
       Type: 'String',
