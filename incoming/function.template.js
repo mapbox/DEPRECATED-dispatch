@@ -11,25 +11,33 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: '[secure] PagerDuty API key'
     },
-    PagerDutyServiceId: {
-      Type: 'String',
-      Description: 'PagerDuty service ID'
-    },
     PagerDutyFromAddress: {
       Type: 'String',
       Description: 'PagerDuty account email address'
     },
+    PagerDutyServiceId: {
+      Type: 'String',
+      Description: 'PagerDuty service ID'
+    },
+    GithubDefaultUser: {
+      Type: 'String',
+      Description: 'Default GitHub user to be tagged in dispatch issues'
+    },
     GithubOwner: {
       Type: 'String',
-      Description: 'Owner of the Github repo'
+      Description: 'Owner of GitHub repo'
     },
     GithubRepo: {
       Type: 'String',
-      Description: 'Github repo'
+      Description: 'Default GitHub repo for dispatch issues'
     },
     GithubToken: {
       Type: 'String',
       Description: '[secure] GitHub OAuth token'
+    },
+    KmsKey: {
+      Type: 'String',
+      Description: 'cloudformation-kms stack name or KMS key ARN'
     },
     SlackBotToken: {
       Type: 'String',
@@ -37,11 +45,7 @@ module.exports = lambdaCfn.build({
     },
     SlackChannel: {
       Type: 'String',
-      Description: 'Slack channel for dispatch-bot'
-    },
-    KmsKey: {
-      Type: 'String',
-      Description: 'Cloudformation-kms stack name or KMS key ARN'
+      Description: 'Default Slack channel for dispatch-bot'
     }
   },
   statements: [

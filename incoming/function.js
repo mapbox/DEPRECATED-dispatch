@@ -11,10 +11,10 @@ const crypto = require('crypto');
 module.exports.fn = function(event, context, callback) {
   decrypt(process.env, function(err) {
     if (err) throw err;
+
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
-    const pagerDutyServiceId = process.env.PagerDutyServiceId;
     const pagerDutyFromAddress = process.env.PagerDutyFromAddress;
-    const githubRepo = process.env.GithubRepo;
+    const pagerDutyServiceId = process.env.PagerDutyServiceId;
     const githubOwner = process.env.GithubOwner;
     const githubToken = process.env.GithubToken;
     const slackBotToken = process.env.SlackBotToken;
@@ -27,9 +27,12 @@ module.exports.fn = function(event, context, callback) {
     } else {
       let message = JSON.parse(event.Records[0].Sns.Message);
       let msgType = message.type;
+
       const client = new WebClient(slackBotToken);
+      const githubRepo = message.githubRepo ? message.githubRepo : process.env.GithubRepo;
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
-      if (typeof message.retrigger === 'undefined') { message.retrigger = true; }
+
+      if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
 
       if (!msgType) {
         return callback(null, 'unhandled response, no priority found in message');
@@ -107,17 +110,17 @@ module.exports.fn = function(event, context, callback) {
           .catch(error => { callback(error, `${requestId} error handled`); });
       }
     };
-
-    function checkUser(user) {
-      if (!user.github) {
-        user.github = 'mapbox/security';
-      }
-      if (!user.slack) {
-        user.slack = `#${slackChannel}`;
-      } else {
-        if (!(user.slack.indexOf('@') > -1)) user.slack = `@${user.slack}`;
-      }
-      return user;
-    };
   });
+
+  function checkUser(user) {
+    if (!user.github) {
+      user.github = process.env.GithubDefaultUser;
+    }
+    if (!user.slack) {
+      user.slack = `#${slackChannel}`;
+    } else {
+      if (!(user.slack.indexOf('@') > -1)) user.slack = `@${user.slack}`;
+    }
+    return user;
+  };
 };
