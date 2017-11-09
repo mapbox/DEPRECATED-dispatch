@@ -4,14 +4,14 @@
 
 ![Dispatch logo](https://github.com/mapbox/dispatch/blob/master/assets/dispatch-large.png)
 
-Dispatch is an alarm routing tool for security and platform incident response teams. It dynamically routes alarms to PagerDuty or Slack based on incident severity, urgency, or type. It also supports emergency broadcast style alerts via Slack. Dispatch sends interactive Slack direct messages that empower users to self-triage their own security alarms. Dispatch uses GitHub repositories to maintain an audit log of all alarms, avoiding the need to maintain a separate database to store state. It also supports escalating alarms from Slack to PagerDuty.
+Dispatch is an alarm routing tool for security and platform incident response teams. It dynamically routes alarms to PagerDuty or Slack based on incident severity, urgency, or type. Dispatch sends interactive Slack direct messages that empower users to self-triage their own security alarms. It also supports emergency broadcast style alerts via Slack as well as escalating alarms from Slack to PagerDuty. For each alarm Dispatch creates a GitHub issue for auditing and logging purposes, avoiding the need to maintain a separate database to store state.
 
-To use Dispatch, have your applications and monitoring systems send SNS messages following the [Dispatch message specification](MESSAGE-SPEC.md) to your Dispatch SNS topic.
+To use Dispatch, have your applications and monitoring systems send [AWS Simple Notification Service](https://aws.amazon.com/sns/) (SNS) messages following the [Dispatch message specification](MESSAGE-SPEC.md) to your Dispatch SNS topic.
 
 ## Dispatch alert types
 
-- **Broadcast alerts** are one-to-many, sending the same message via Slack to all users listed in the Dispatch message.
-- **Self-service alerts** first message the user with an interactive Slack message, prompting the user to positively or negatively confirm the alarm. The user’s interaction is tracked by a dedicated GitHub issue, providing an the audit trail for the alarm. If a user positively confirms the message, Dispatch closes the corresponding GitHub issue. If a user negatively confirms the message, Dispatch escalates the alarm to PagerDuty.
+- **Self-service alerts** send interactive Slack messages to users, prompting them to answer yes or no. The user's response is tracked via a GitHub issue for audit purposes. If a user responds yes, it closes the issue. If a user response no, Dispatch escalates the alarm to PagerDuty.
+- **Broadcast alerts** are non-interactive messages delivered via Slack to multiple users. These alerts create a single GitHub issue for audit purposes with a list of users that received the message.
 - **High priority alerts** are sent directly to PagerDuty.
 
 ## Architecture
@@ -39,7 +39,7 @@ To set up Dispatch for your organization, you'll need to do the following:
 
 1. Configure GitHub
 1. Configure PagerDuty
-1. Configure the Dispatch Slack bot
+1. Configure the Dispatch Slack app and bot
 1. Configure AWS Key Management Service (KMS)
 1. Deploy the dispatch-incoming AWS Lambda function
 1. Deploy the dispatch-triage AWS Lambda function
@@ -125,6 +125,7 @@ git clone git@github.com:mapbox/dispatch.git
 cd dispatch/incoming
 lambda-cfn create <environment-name> -k
 ```
+
 For example, if you run `lambda-cfn create dev -k` this will create a CloudFormation stack named `dispatch-incoming-dev`.
 
 When deploying or updating dispatch-incoming you'll need to provide values for the following CloudFormation parameters:
@@ -139,15 +140,13 @@ When deploying or updating dispatch-incoming you'll need to provide values for t
 * `SlackBotToken` = [sensitive] Bot user OAuth access token from your Dispatch Slack app (begins with `xoxb-`)
 * `KmsKey` = cloudformation-kms stack name or AWS KMS key ARN to encrypt sensitive parameter values
 
-For `CodeS3Bucket`, `CodeS3Prefix`, `GitSha`, and `ServiceAlarmEmail` parameters please see the [lambda-cfn documentation for these parameters](https://github.com/mapbox/lambda-cfn#providing-parameter-values).
+For `CodeS3Bucket`, `CodeS3Prefix`, `GitSha`, and `ServiceAlarmEmail` please see the [lambda-cfn documentation for these parameters](https://github.com/mapbox/lambda-cfn#providing-parameter-values).
 
 ### 6. Deploy the dispatch-triage AWS Lambda function
 
 Similar to deploying dispatch-incoming, switch to the `triage` directory then deploy dispatch-triage using `lambda-cfn create -k <environment name>`.
 
 You'll need to provide the same parameter values from deploying dispatch-incoming, except for the Slack related parameters.
-
-Once the deploy is finished, run `lambda-cfn info <environment name>` then scroll down to the `Outputs` section of the CloudFormation template. We'll use the `triageWebhookAPIEndpoint` URL in the next step to update our Slack app.
 
 ### 7. Update the Dispatch Slack app with the dispatch-triage API Gateway URL
 
@@ -157,7 +156,7 @@ Once the deploy is finished, run `lambda-cfn info <environment name>` then scrol
 1. Click on **Enable Interactive Components**.
 1. Paste the URL for `triageWebhookAPIEndpoint` under **Request URL** and click on **Save changes**.
 
-You're done setting up Dispatch! You can now test and verify your installation, see the Testing section.
+You're done setting up Dispatch! You can now test and verify your installation, [see the Testing section](https://github.com/mapbox/dispatch/blob/master/README.md#testing).
 
 ## Testing
 
@@ -170,7 +169,7 @@ We've provided examples for each Dispatch alert type - self-service, high priori
 
 ### Self-service example
 
-This will send a Slack direct message from your Dispatch bot and create a GitHub issue in your Dispatch repo for a user. If the user clicks yes it will close the GitHub issue. If the user clicks know it will trigger a PagerDuty incident.
+This will send a Slack direct message from your Dispatch bot and create a GitHub issue in your Dispatch repo for a user. If the user clicks yes it will close the GitHub issue. If the user clicks no it will trigger a PagerDuty incident.
 
 Replace `$SNS_ARN` and `$USER` with your SNS topic ARN and your GitHub and Slack usernames.
 
@@ -181,11 +180,11 @@ aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
 
 ### Broadcast example
 
-Broadcast alerts are self-service alerts sent to multiple users. Replace `$SNS_ARN` with your SNS topic ARN and provide GitHub and Slack usernames for `$USER1` and `$USER2`.
+Broadcast alerts send non-interactive Slack messages to multiple users. They create a single GitHub issue of the broadcast for audit purposes, but do not create a GitHub issue for each user. Replace `$SNS_ARN` with your SNS topic ARN and provide GitHub and Slack usernames for `$USER1` and `$USER2`.
 
 ```
 aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
---message "{\"type\":\"broadcast\",\"users\":[{\"slack\": \"$USER1\",\"github\":\"$USER1\"},{\"slack\": \"$USER2\",\"github\":\"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\",\"prompt\":\"testSlackPrompt\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
+--message "{\"type\":\"broadcast\",\"users\":[{\"slack\": \"$USER1\",\"github\":\"$USER1\"},{\"slack\": \"$USER2\",\"github\":\"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\"}}}"
 ```
 
 ### High priority example
@@ -210,7 +209,7 @@ npm install
 
 ### Tests
 
-Dispatch uses eslint for linting and tape for tests. It mocks HTTP requests with sinon and nock. Tests run on Travis CI after every commit.
+Dispatch uses [eslint](https://github.com/eslint/eslint) for linting and [tape](https://github.com/substack/tape) for tests. It mocks HTTP requests with [sinon](https://github.com/sinonjs/sinon) and [nock](https://github.com/node-nock/nock). Tests run on Travis CI after every commit.
 
 * `npm test` will run eslint then tape.
 * `npm lint` will only run eslint.
