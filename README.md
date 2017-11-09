@@ -52,9 +52,9 @@ To configure GitHub for Dispatch, you'll need to do the following:
 1. Create or select a default GitHub repository for Dispatch GitHub issues
 1. Select or create a failover default GitHub user or team
 1. Create a machine account or select an existing user account to run Dispatch
-1. Generate a GitHub personal access token with `repo` scope with the account from step 2
+1. Generate a GitHub personal access token with `repo` scope with the account from Step #2
 
-Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the default GitHub repository via the `GithubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup. Dispatch will create all issues in the same default GitHub repository, but you can send different alarms to different GitHub repos by declaring the `githubRepo` property in the SNS message.
+Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the default GitHub repository via the `GithubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup. Dispatch will default to creating issues in this repository; however, you can also specify a different destination repository using the `githubRepo` property in the SNS message specification. This allows different alarms to be routed to different GitHub repos.
 
 When deploying Dispatch you'll also need to provide a GitHub personal access token with a full `repo` scope via the `GithubToken` CloudFormation parameter. For least privilege we recommend that you use a dedicated GitHub account that only has write access to your Dispatch alerts repository. Dispatch will use the account associated with the access token to create GitHub issues.
 
