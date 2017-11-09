@@ -49,13 +49,16 @@ To set up Dispatch for your organization, you'll need to do the following:
 
 To configure GitHub for Dispatch, you'll need to do the following:
 
-1. Create or select a GitHub repository for Dispatch GitHub issues
+1. Create or select a default GitHub repository for Dispatch GitHub issues
+1. Select or create a failover default GitHub user or team
 1. Create a machine account or select an existing user account to run Dispatch
 1. Generate a GitHub personal access token with `repo` scope with the account from step 2
 
-Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the GitHub repository via the `GithubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup.
+Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the default GitHub repository via the `GithubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup. Dispatch will create all issues in the same default GitHub repository, but you can send different alarms to different GitHub repos by declaring the `githubRepo` property in the SNS message.
 
 When deploying Dispatch you'll also need to provide a GitHub personal access token with a full `repo` scope via the `GithubToken` CloudFormation parameter. For least privilege we recommend that you use a dedicated GitHub account that only has write access to your Dispatch alerts repository. Dispatch will use the account associated with the access token to create GitHub issues.
+
+If Dispatch doesn't receive the GitHub handle for the user in the SNS message, then it will fallback to tagging a default GitHub user or GitHub team. Provide this via the `GithubDefaultUser` CloudFormation parameter.
 
 It's on our road map to evaluate and possibly switch to [GitHub apps](https://developer.github.com/apps/) instead of personal access tokens.
 
@@ -130,15 +133,16 @@ For example, if you run `lambda-cfn create dev -k` this will create a CloudForma
 
 When deploying or updating dispatch-incoming you'll need to provide values for the following CloudFormation parameters:
 
-* `GithubOwner` = your GitHub organization's name
-* `GithubRepo` = GitHub repository for Dispatch issues
+* `GithubOwner` = Your GitHub organization's name
+* `GithubDefaultUser` = Default GitHub user or team when a user's GitHub handle is missing
+* `GithubRepo` = Default GitHub repository for Dispatch issues
 * `GithubToken` = [sensitive] GitHub personal access token for Dispatch machine account
-* `PagerDutyServiceId` = the ID of your Dispatch PagerDuty service, obtained from the service URL in PagerDuty
-* `PagerDutyFromAddress` = email address of a valid PagerDuty user in your team, [required by the PagerDuty API](https://v2.developer.pagerduty.com/docs/incident-creation-api)
+* `PagerDutyServiceId` = The ID of your Dispatch PagerDuty service, obtained from the service URL in PagerDuty
+* `PagerDutyFromAddress` = Email address of a valid PagerDuty user in your team, [required by the PagerDuty API](https://v2.developer.pagerduty.com/docs/incident-creation-api)
 * `PagerDutyApiKey` = [sensitive] PagerDuty API key
 * `SlackChannel` = Fallback Slack channel for when Dispatch direct messages fail
 * `SlackBotToken` = [sensitive] Bot user OAuth access token from your Dispatch Slack app (begins with `xoxb-`)
-* `KmsKey` = cloudformation-kms stack name or AWS KMS key ARN to encrypt sensitive parameter values
+* `KmsKey` = Cloudformation-kms stack name or AWS KMS key ARN to encrypt sensitive parameter values
 
 For `CodeS3Bucket`, `CodeS3Prefix`, `GitSha`, and `ServiceAlarmEmail` please see the [lambda-cfn documentation for these parameters](https://github.com/mapbox/lambda-cfn#providing-parameter-values).
 
