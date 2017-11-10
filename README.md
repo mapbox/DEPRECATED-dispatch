@@ -1,10 +1,8 @@
 [![Build Status](https://travis-ci.com/mapbox/dispatch.svg?token=s7DU2T5bv9A6JyGJHzqV&branch=announce-only)](https://travis-ci.com/mapbox/dispatch)
 
-# Dispatch
-
 ![Dispatch logo](https://github.com/mapbox/dispatch/blob/master/assets/dispatch-large.png)
 
-Dispatch is an alarm routing tool for security and platform incident response teams. It dynamically routes alarms to PagerDuty or Slack based on incident severity, urgency, or type. Dispatch sends interactive Slack direct messages that empower users to self-triage their own security alarms. It also supports emergency broadcast style alerts via Slack as well as escalating alarms from Slack to PagerDuty. For each alarm Dispatch creates a GitHub issue for auditing and logging purposes, avoiding the need to maintain a separate database to store state.
+**Dispatch** is an alarm routing tool for security and platform incident response teams. It dynamically routes alarms to [PagerDuty](https://www.pagerduty.com/) or [Slack](https://slack.com/) based on incident severity, urgency, or type. Dispatch sends interactive Slack direct messages that empower users to self-triage their own security alarms. It also supports emergency broadcast style alerts via Slack, as well as escalating alarms from Slack to PagerDuty. For each alarm, Dispatch creates a GitHub issue for auditing and logging purposes, avoiding the need to maintain a separate database to store state.
 
 To use Dispatch, have your applications and monitoring systems send [AWS Simple Notification Service](https://aws.amazon.com/sns/) (SNS) messages following the [Dispatch message specification](MESSAGE-SPEC.md) to your Dispatch SNS topic.
 
@@ -16,10 +14,10 @@ To use Dispatch, have your applications and monitoring systems send [AWS Simple 
 
 ## Architecture
 
-Dispatch consists of two separate AWS Lambda functions that leverage the [lambda-cfn](github.com/mapbox/lambda-cfn) framework:
+Dispatch consists of two separate [AWS Lambda functions](https://aws.amazon.com/lambda/) that leverage the [lambda-cfn](github.com/mapbox/lambda-cfn) framework:
 
 - **dispatch-incoming**: receives SNS notifications and creates PagerDuty alarms or GitHub issues.
-- **dispatch-triage**: uses API Gateway to respond to Slack interactive messages, either closing the corresponding GitHub issue or escalating the issue to PagerDuty.
+- **dispatch-triage**: uses [API Gateway](https://aws.amazon.com/api-gateway/) to respond to Slack interactive messages, either closing the corresponding GitHub issue or escalating the issue to PagerDuty.
 
 ## Prerequisites
 
@@ -154,7 +152,7 @@ You'll need to provide the same parameter values from deploying dispatch-incomin
 
 ### 7. Update the Dispatch Slack app with the dispatch-triage API Gateway URL
 
-1. After deploying dispatch-triage, from the `triage` directory run `lambda-cfn info <environment name>` then scroll down to the `Outputs` section of the CloudFormation template. 
+1. After deploying dispatch-triage, from the `triage` directory run `lambda-cfn info <environment name>` then scroll down to the `Outputs` section of the CloudFormation template.
 1. Copy the value for `triageWebhookAPIEndpoint`. It should be an AWS API Gateway URL.
 1. [Visit your Slack Apps](https://api.slack.com/apps), then click on **Interactive Components** under the **Features** section.
 1. Click on **Enable Interactive Components**.
@@ -218,6 +216,10 @@ Dispatch uses [eslint](https://github.com/eslint/eslint) for linting and [tape](
 * `npm test` will run eslint then tape.
 * `npm lint` will only run eslint.
 * `npm unit-test` will only run tape tests.
+
+## Feature Roadmap
+
+The planned features and development roadmap for Dispatch can be found in the [Dispatch Roadmap](https://github.com/mapbox/dispatch/projects/1) GitHub project.
 
 ## Contributing
 

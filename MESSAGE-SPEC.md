@@ -15,6 +15,9 @@ Self-service Dispatch messages do the following for a single user:
 1. Create a GitHub issue and tag the user's GitHub handle.
 2. Send an interactive Slack direct message to the user, which prompts them to respond yes or no.
 
+If a GitHub username is not provided or could not be found, Dispatch will fall back to the `GithubDefaultUser` parameter.
+If a Slack username is not provided or could not be found, Dispatch will fall back to the `SlackChannel` parameter.
+
 The self-service message on Slack includes a link to the associated GitHub issue. The dispatch-triage AWS Lambda function handles the yes or no response from the user in Slack, either closing the GitHub issue or escalating the issue to PagerDuty.
 
 ### Message specification
@@ -23,6 +26,7 @@ The self-service message on Slack includes a link to the associated GitHub issue
 {
   type: 'self-service', // required
   requestId: 'STRING_VALUE', // optional, id for logging
+  githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [ // required
     {
@@ -78,6 +82,7 @@ Unlike self-service alarms, broadcast Slack DMs do not include a link to their a
 {
   type: 'broadcast', // required
   requestId: 'STRING_VALUE', // optional, id for logging
+  githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [
     {
@@ -130,15 +135,11 @@ Dispatch automatically adds the `@` symbol to Slack handles if it is missing. Do
 users: [
   {
     slack: 'user1SlackHandle',
-    github: 'user1GitHubHandle',
-    google: 'user1GoogleHandle', // ignored
-    okta: 'user1OktaHandle' // ignored
+    github: 'user1GitHubHandle'
   },
   {
     slack: 'user2SlackHandle',
-    github: 'user2GitHubHandle',
-    google: 'user2GoogleHandle', // ignored
-    okta: 'user2OktaHandle' // ignored
+    github: 'user2GitHubHandle'
   },
   ...
 ]
