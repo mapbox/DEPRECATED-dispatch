@@ -17,6 +17,15 @@ module.exports.highPriorityEvent = {
   }]
 };
 
+module.exports.invalidJson = {
+  Records:
+  [{ EventSource: 'aws:sns',
+    Sns: {
+      Message: 'bad JSON'
+    }
+  }]
+};
+
 module.exports.selfServiceEvent = {
   Records:
   [

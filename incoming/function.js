@@ -25,7 +25,16 @@ module.exports.fn = function(event, context, callback) {
     } else if (event.Records.length > 1) {
       return callback('SNS message contains more than one record', null);
     } else {
-      let message = JSON.parse(event.Records[0].Sns.Message);
+
+      let message;
+
+      try {
+        message = JSON.parse(event.Records[0].Sns.Message);
+      } catch (err) {
+        console.log('Error - SNS message contains invalid JSON');
+        return callback('Error - SNS message contains invalid JSON');
+      }
+
       let msgType = message.type;
 
       const client = new WebClient(slackBotToken);
