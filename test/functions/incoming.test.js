@@ -117,6 +117,13 @@ tape('[incoming] malformed SNS message error', (assert) => {
   });
 });
 
+tape('[incoming] invalid JSON in SNS message', (assert) => {
+  incoming(incomingFixtures.invalidJson, context, (err) => {
+    assert.deepEqual(err, 'Error - SNS message contains invalid JSON', '-- should pass through error message');
+    assert.end();
+  });
+});
+
 tape('[incoming] > 1 record in SNS message error', (assert) => {
   const badRecord = { Records: [ 'record1', 'record2'] };
   incoming(badRecord, context, (err) => {
