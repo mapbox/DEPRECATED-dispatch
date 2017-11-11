@@ -14,7 +14,6 @@ module.exports.fn = function(event, context, callback) {
     try {
       payload = JSON.parse(qs.parse(event.postBody).payload);
     } catch (err) {
-      console.log(`error: payload parsing ${event.postBody}`);
       return callback(`error: payload parsing ${event.postBody}`);
     }
 
@@ -33,14 +32,7 @@ module.exports.fn = function(event, context, callback) {
     decode(payload.callback_id, (err, res) => {
       if (err) return callback(err);
       if (!res.github) {
-        console.log(`${res.requestId}: Slack callback_id missing github issue`);
         return callback(`${res.requestId}: Slack callback_id missing github issue`);
-      }
-      console.log(`${res.requestId}: callback_id decoded issue ${res.github}`);
-
-      if (err) {
-        console.log(`${res.requestId}: decrypt error ${err}`);
-        return callback('error: ' + err);
       }
 
       const pagerDutyApiKey = process.env.PagerDutyApiKey;
@@ -52,13 +44,8 @@ module.exports.fn = function(event, context, callback) {
       const response = payload.actions[0].name;
       let responseText = payload.actions[0].value;
       let responseObject;
-      let log;
-
-      console.log(`${res.requestId}: found payload response '${response}'`);
 
       if (response === 'yes') {
-
-        console.log(`${res.requestId}: closing GitHub issue ${res.github}`);
         const github = require('../lib/github.js');
         const closeIssue = github.closeIssue({
           token: githubToken,
@@ -69,14 +56,13 @@ module.exports.fn = function(event, context, callback) {
 
         closeIssue
           .then(value => { // eslint-disable-line no-unused-vars
-            log =`${res.requestId}: closed GitHub issue ${res.github}`;
-            console.log(log);
+            console.log(`${res.requestId}: closed GitHub issue ${res.github}`);
             // this callback text is displayed to the slack user
             responseObject = {
               attachments: [
                 {
                   'attachment_type': 'default',
-                  fallback: `Could not load Slack response, ${log}`,
+                  fallback: `Could not load Slack response, ${res.requestId}: closed GitHub issue ${res.github}`,
                   text: responseText,
                   color: '#008E00',
                   footer: 'Dispatch alert acknowledged',
@@ -88,10 +74,7 @@ module.exports.fn = function(event, context, callback) {
             return callback(null, responseObject);
           })
           .catch(error => {
-            log = `${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`;
-            console.log(log);
-            // if get a failure to close here, return the failure to the user
-            return callback(null, log);
+            return callback(null, `${res.requestId}: error: failed to close GitHub issue ${res.github}, ${error}`);
           });
 
       } else if (response === 'no') {
@@ -107,18 +90,16 @@ module.exports.fn = function(event, context, callback) {
           from: pagerDutyFromAddress,
           body: pagerDutyBody
         };
-        console.log(`${res.requestId}: creating PagerDuty incident`);
         const incident = createIncident(options);
 
         incident
           .then(value => { // eslint-disable-line no-unused-vars
-            log = `${res.requestId}: Created PagerDuty incident successfully`;
-            console.log(log);
+            console.log(`${res.requestId}: Created PagerDuty incident successfully`);
             responseObject = {
               attachments: [
                 {
                   'attachment_type': 'default',
-                  fallback: `Could not load Slack response, ${log}`,
+                  fallback: `Could not load Slack response, ${res.requestId}: Created PagerDuty incident successfully`,
                   text: responseText,
                   color: '#CC0000',
                   footer: 'Dispatch alert escalated',
@@ -131,18 +112,12 @@ module.exports.fn = function(event, context, callback) {
           })
           .catch(error => {
             if (error.errorMessage && /matching dedup key already exists/.test(error.errorMessage)) {
-              log = `${res.requestId}: found matching PagerDuty incident, skipping`;
-              console.log(log);
-              return callback(null, responseText ? responseText : log);
+              return callback(null, responseText ? responseText : `${res.requestId}: found matching PagerDuty incident, skipping`);
             }
-            log = `${res.requestId}: error: failed to create PagerDuty incident, ${error}`;
-            console.log(log);
-            return callback(log);
+            return callback(`${res.requestId}: error: failed to create PagerDuty incident, ${error}`);
           });
       } else {
-        log = `${res.requestId}: error: unhandled payload response`;
-        console.log(log);
-        return callback(log);
+        return callback(`${res.requestId}: error: unhandled payload response`);
       }
     });
 
