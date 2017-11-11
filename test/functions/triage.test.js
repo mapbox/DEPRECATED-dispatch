@@ -10,9 +10,11 @@ process.env.PagerDutyFromAddress = 'null@foo.bar';
 process.env.GithubRepo = 'testRepo';
 process.env.GithubOwner = 'testOwner';
 process.env.GithubToken = 'FakeApiToken';
+process.env.SlackVerificationToken = 'fakeSlackToken';
 
-var okResponseEvent = require('../../test/fixtures/triage/ok');
-var notOkResponseEvent = require('../../test/fixtures/triage/notok');
+const okResponseEvent = require('../../test/fixtures/triage/ok');
+const notOkResponseEvent = require('../../test/fixtures/triage/notok');
+const badTokenResponseEvent = require('../../test/fixtures/triage/badtoken');
 
 tape('[triage] Closes Github issue if ok', function(t) {
 
@@ -23,6 +25,20 @@ tape('[triage] Closes Github issue if ok', function(t) {
 
   triage(okResponseEvent, null, function(err) {
     t.error(err, 'Github issue closed successfully');
+    t.end();
+  });
+
+});
+
+tape('[triage] Fails on incorrect Slack verification token', function(t) {
+
+  nock('https://api.github.com:443', {'encodedQueryParams':true})
+    .patch('/repos/testOwner/testRepo/issues/7', {'state':'closed'})
+    .query({'access_token':'FakeApiToken'})
+    .reply(200, {});
+
+  triage(badTokenResponseEvent, null, function(err) {
+    t.equal(err, 'error: incorrect Slack verification token');
     t.end();
   });
 

@@ -30,6 +30,10 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
     },
+    SlackVerificationToken: {
+      Type: 'String',
+      Description: '[secure] Slack verification token for Dispatch Slack app'
+    },
     KmsKey: {
       Type: 'String',
       Description: 'Cloudformation-kms stack name or KMS key ARN'
