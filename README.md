@@ -69,6 +69,7 @@ You'll need to create a new PagerDuty service or use an existing one for Dispatc
 You'll need to create a custom Slack app and bot user in your Slack workspace for Dispatch. It's on our road map to eventually publish an installable Slack app in the public Slack App Directory to make this process easier.
 
 1. Visit https://api.slack.com/apps/, click **Create an App**. Provide a name, select your Slack workspace, then click **Create App**.
+1. Scroll down to **App Credentials** and save the value for **Verification Token** somewhere safe and secure. You'll need this value later when deploying dispatch-triage for the `SlackVerificationToken` parameter.
 1. Scroll down to **Display Information** and upload the Dispatch Slack App icon as well as provide a description for your users. We recommend "Security alarm routing bot - https://github.com/mapbox/dispatch" but feel free to use your own!
 1. Click on **Bot Users** under the Features section, then create a **Bot User** named Dispatch and check **Always Show My Bot as Online**.
 1. Click on **OAuth & Permissions** under the Features section, then scroll down to the **Scopes** section. Add the `chat:write:bot` scope. You should already see the `bot` scope added from step 2, but if not then add it.
@@ -148,7 +149,7 @@ For `CodeS3Bucket`, `CodeS3Prefix`, `GitSha`, and `ServiceAlarmEmail` please see
 
 Similar to deploying dispatch-incoming, switch to the `triage` directory then deploy dispatch-triage using `lambda-cfn create -k <environment name>`.
 
-You'll need to provide the same parameter values from deploying dispatch-incoming, except for the Slack related parameters.
+You'll need to provide most of the same parameter values from deploying dispatch-incoming. Notably, you'll need to provide the Slack verification token for your Dispatch app (step #2 of configuring Slack) for the `SlackVerificationToken` CloudFormation parameter.
 
 ### 7. Update the Dispatch Slack app with the dispatch-triage API Gateway URL
 
