@@ -70,7 +70,7 @@ You'll need to create a custom Slack app and bot user in your Slack workspace fo
 
 1. Visit https://api.slack.com/apps/, click **Create an App**. Provide a name, select your Slack workspace, then click **Create App**.
 1. Scroll down to **App Credentials** and save the value for **Verification Token** somewhere safe and secure. You'll need this value later when deploying dispatch-triage for the `SlackVerificationToken` parameter.
-1. Scroll down to **Display Information** and upload the Dispatch Slack App icon as well as provide a description for your users. We recommend "Security alarm routing bot - https://github.com/mapbox/dispatch" but feel free to use your own!
+1. Scroll down to **Display Information** and [upload the Dispatch Slack App icon](https://github.com/mapbox/dispatch/blob/master/assets/dispatch-slack-app.jpg) as well as provide a description for your users. We recommend "Security alarm routing bot - https://github.com/mapbox/dispatch" but feel free to use your own!
 1. Click on **Bot Users** under the Features section, then create a **Bot User** named Dispatch and check **Always Show My Bot as Online**.
 1. Click on **OAuth & Permissions** under the Features section, then scroll down to the **Scopes** section. Add the `chat:write:bot` scope. You should already see the `bot` scope added from step 2, but if not then add it.
 1. On the same page, scroll to the top and click on **Install App to Workspace** then **Authorize**.
