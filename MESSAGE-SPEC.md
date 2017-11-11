@@ -135,11 +135,15 @@ Dispatch automatically adds the `@` symbol to Slack handles if it is missing. Do
 users: [
   {
     slack: 'user1SlackHandle',
-    github: 'user1GitHubHandle'
+    github: 'user1GitHubHandle',
+    google: 'user1GoogleHandle', // ignored
+    okta: 'user1OktaHandle' // ignored
   },
   {
     slack: 'user2SlackHandle',
-    github: 'user2GitHubHandle'
+    github: 'user2GitHubHandle',
+    google: 'user2GoogleHandle', // ignored
+    okta: 'user2OktaHandle' // ignored
   },
   ...
 ]
