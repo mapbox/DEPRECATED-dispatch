@@ -6,33 +6,38 @@ const decode = require('../lib/utils').decode;
 
 module.exports.fn = function(event, context, callback) {
 
-  let payload;
+  decrypt(process.env, function(err) {
+    if (err) throw err;
 
-  try {
-    payload = JSON.parse(qs.parse(event.postBody).payload);
-  } catch (err) {
-    console.log(`error: payload parsing ${event.postBody}`);
-    return callback(`error: payload parsing ${event.postBody}`);
-  }
+    let payload;
 
-  // assume there was just one action
-  // TODO proper format/error handling
-  if (payload.actions.length > 1) {
-    console.log(`Found ${payload.actions.length} actions in payload`);
-    console.log(`Payload actions: ${JSON.stringify(payload.actions)}`);
-  }
-
-  // validate callback decode for minimum info
-  decode(payload.callback_id, (err, res) => {
-    if (err) return callback(err);
-    if (!res.github) {
-      console.log(`${res.requestId}: Slack callback_id missing github issue`);
-      return callback(`${res.requestId}: Slack callback_id missing github issue`);
+    try {
+      payload = JSON.parse(qs.parse(event.postBody).payload);
+    } catch (err) {
+      console.log(`error: payload parsing ${event.postBody}`);
+      return callback(`error: payload parsing ${event.postBody}`);
     }
-    console.log(`${res.requestId}: callback_id decoded issue ${res.github}`);
 
-    // decrypt the environment
-    decrypt(process.env, function(err) {
+    if (payload.token !== process.env.SlackVerificationToken) {
+      return callback('error: incorrect Slack verification token');
+    }
+
+    // assume there was just one action
+    // TODO proper format/error handling
+    if (payload.actions.length > 1) {
+      console.log(`Found ${payload.actions.length} actions in payload`);
+      console.log(`Payload actions: ${JSON.stringify(payload.actions)}`);
+    }
+
+    // validate callback decode for minimum info
+    decode(payload.callback_id, (err, res) => {
+      if (err) return callback(err);
+      if (!res.github) {
+        console.log(`${res.requestId}: Slack callback_id missing github issue`);
+        return callback(`${res.requestId}: Slack callback_id missing github issue`);
+      }
+      console.log(`${res.requestId}: callback_id decoded issue ${res.github}`);
+
       if (err) {
         console.log(`${res.requestId}: decrypt error ${err}`);
         return callback('error: ' + err);
@@ -50,7 +55,9 @@ module.exports.fn = function(event, context, callback) {
       let log;
 
       console.log(`${res.requestId}: found payload response '${response}'`);
+
       if (response === 'yes') {
+
         console.log(`${res.requestId}: closing GitHub issue ${res.github}`);
         const github = require('../lib/github.js');
         const closeIssue = github.closeIssue({
@@ -86,7 +93,9 @@ module.exports.fn = function(event, context, callback) {
             // if get a failure to close here, return the failure to the user
             return callback(null, log);
           });
+
       } else if (response === 'no') {
+
         const createIncident = require('../lib/pagerduty.js').createIncident;
         const pagerDutyTitle = `${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
         const pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${githubOwner}/${githubRepo}/issues/${res.github}`;
@@ -100,6 +109,7 @@ module.exports.fn = function(event, context, callback) {
         };
         console.log(`${res.requestId}: creating PagerDuty incident`);
         const incident = createIncident(options);
+
         incident
           .then(value => { // eslint-disable-line no-unused-vars
             log = `${res.requestId}: Created PagerDuty incident successfully`;
@@ -135,5 +145,7 @@ module.exports.fn = function(event, context, callback) {
         return callback(log);
       }
     });
+
   });
+
 };
