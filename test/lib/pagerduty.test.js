@@ -1,57 +1,58 @@
 'use strict';
 
-const pd = require('../../lib/pagerduty.js');
+/* eslint-disable no-unused-vars */
+
 const tape = require('tape');
 const nock = require('nock');
+
+const pagerduty = require('../../lib/pagerduty.js');
 const fixtures = require('../fixtures/pagerduty.fixtures.js');
 
-/* eslint-disable no-unused-vars,camelcase */
-
-tape('[pagerduty] Creates incident', function(assert) {
+tape('[pagerduty] [createIncident] creates incident', (assert) => {
   let options = {
-    accessToken: 'FakeApiToken',
-    title: 'testTitle',
+    accessToken: 'testPagerDutyApiKey',
+    title: 'testIncidentTitle',
     serviceId: 'testServiceId',
     incidentKey: 'testIncidentKey',
     from: 'null@foo.bar'
   };
 
-  nock('https://api.pagerduty.com:443', {'encodedQueryParams':true})
+  nock('https://api.pagerduty.com:443', { 'encodedQueryParams': true })
     .post('/incidents', {
       incident: {
-        type:'incident',
-        title:'testTitle',
+        type: 'incident',
+        title: 'testIncidentTitle',
         service: {
-          id:'testServiceId',
-          type:'service_reference'
+          id: 'testServiceId',
+          type: 'service_reference'
         },
-        incident_key:'testIncidentKey' }
+        incident_key: 'testIncidentKey' }
     })
     .reply(201, fixtures.incident);
 
-  pd.createIncident(options)
+  pagerduty.createIncident(options)
     .then(res => {
-      assert.deepEqual(res.body, fixtures.incident, 'Incident was created.');
+      assert.deepEqual(res.body, fixtures.incident, '-- incident should be created');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
-tape('[pagerduty] Creates a PD incident from high priority with body', function(assert) {
+tape('[pagerduty] [createIncident] creates incident with body', function(assert) {
   let options = {
-    accessToken: 'FakeApiToken',
-    title: 'testTitle',
+    accessToken: 'testPagerDutyApiKey',
+    title: 'testIncidentTitle',
     body: 'testBody',
     serviceId: 'testServiceId',
     incidentKey: 'testIncidentKey',
     from: 'null@foo.bar'
   };
 
-  nock('https://api.pagerduty.com:443', {'encodedQueryParams':true})
+  nock('https://api.pagerduty.com:443', { 'encodedQueryParams': true })
     .post('/incidents', {
       incident: {
         type: 'incident',
-        title: 'testTitle',
+        title: 'testIncidentTitle',
         service: {
           id: 'testServiceId',
           type: 'service_reference'
@@ -65,9 +66,9 @@ tape('[pagerduty] Creates a PD incident from high priority with body', function(
     })
     .reply(201, fixtures.incidentWithBody);
 
-  pd.createIncident(options)
+  pagerduty.createIncident(options)
     .then(res => {
-      assert.deepEqual(res.body, fixtures.incidentWithBody, 'Incident with body was created.');
+      assert.deepEqual(res.body, fixtures.incidentWithBody, '-- incident with body should be created');
       assert.end();
     })
     .catch(err => { console.log(err); });

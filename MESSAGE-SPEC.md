@@ -115,7 +115,7 @@ High priority dispatch messages open a PagerDuty incident.
 
 ``` javascript
 {
-  type: 'high', // required
+  type: 'high-priority', // required
   requestId: 'STRING_VALUE', // optional, id for logging
   body: {
     pagerduty: {

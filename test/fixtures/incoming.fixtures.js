@@ -1,44 +1,17 @@
 'use strict';
 
-module.exports.highPriorityEvent = {
-  Records:
-  [{ EventSource: 'aws:sns',
-    Sns: {
-      Message: JSON.stringify({
-        type: 'high',
-        body: {
-          pagerduty: {
-            title: 'testPagerDutyTitle'
-          }
-        },
-        requestId: 123
-      })
-    }
-  }]
-};
-
-module.exports.invalidJson = {
-  Records:
-  [{ EventSource: 'aws:sns',
-    Sns: {
-      Message: 'bad JSON'
-    }
-  }]
-};
-
-module.exports.selfServiceEvent = {
+module.exports.missingPriorityEvent = {
   Records:
   [
     { EventSource: 'aws:sns',
       Sns: {
         Message: JSON.stringify(
           {
-            type: 'self-service',
-            users: [ { github: 'testUser', slack: 'testUser' }],
+            users: [ { github: 'testGitHubUser', slack: 'testSlackUser' }],
             body: {
               github: {
-                title: 'testGithubTitle',
-                body: 'testGithubBody'
+                title: 'testGitHubTitle',
+                body: 'testGitHubBody'
               },
               slack: {
                 message: 'testSlackMessage',
@@ -65,19 +38,22 @@ module.exports.broadcastEvent = {
             type: 'broadcast',
             users: [
               {
-                slack: 'testUser1'
+                slack: 'testSlackUser1'
               },
               {
-                slack: 'testUser2'
+                slack: 'testSlackUser2'
               },
               {
-                slack: 'testUser3'
+                slack: 'testSlackUser3'
               }
             ],
             body: {
               github: {
                 title: 'testGithubTitle',
                 body: 'testGithubBody'
+              },
+              pagerduty: {
+                title: 'testPagerDutyTitle'
               },
               slack: {
                 message: 'testSlackMessage'
@@ -90,8 +66,95 @@ module.exports.broadcastEvent = {
   ]
 };
 
+module.exports.highPriorityEvent = {
+  Records:
+  [{ EventSource: 'aws:sns',
+    Sns: {
+      Message: JSON.stringify({
+        type: 'high-priority',
+        body: {
+          pagerduty: {
+            title: 'testPagerDutyTitle'
+          }
+        },
+        requestId: 'testRequestId'
+      })
+    }
+  }]
+};
 
-module.exports.multipleRecords = {
+module.exports.unrecognizedEvent = {
+  Records:
+  [{ EventSource: 'aws:sns',
+    Sns: {
+      Message: JSON.stringify({
+        type: 'unrecognized',
+        body: {
+          pagerduty: {
+            title: 'testPagerDutyTitle'
+          }
+        },
+        requestId: 'testRequestId'
+      })
+    }
+  }]
+};
+
+module.exports.selfServiceEvent = {
+  Records:
+  [
+    { EventSource: 'aws:sns',
+      Sns: {
+        Message: JSON.stringify(
+          {
+            type: 'self-service',
+            users: [ { github: 'testGitHubUser', slack: 'testSlackUser' }],
+            body: {
+              github: {
+                title: 'testGitHubTitle',
+                body: 'testGitHubBody'
+              },
+              pagerduty: {
+                title: 'testPagerDutyTitle'
+              },
+              slack: {
+                message: 'testSlackMessage',
+                actions: {
+                  yes: 'testYesAction',
+                  no: 'testNoAction'
+                }
+              }
+            }
+          }
+        )
+      }
+    }
+  ]
+};
+
+module.exports.userMissingGitHub = {
+  slack: '@testSlackUsername'
+};
+
+module.exports.userDefautGitHub = {
+  slack: '@testSlackUsername',
+  github: 'testGitHubDefaultUser'
+};
+
+module.exports.userMissingSlack = {
+  github: 'testGitHubUsername'
+};
+
+module.exports.userDefautSlack = {
+  github: 'testGitHubUsername',
+  slack: '#testSlackDefaultChannel'
+};
+
+module.exports.malformedSNS = {
+  Records: 'garbage'
+};
+
+module.exports.multipleRecordSNS = {
   Records:
   [
     { EventSource: 'aws:sns',
@@ -159,4 +222,13 @@ module.exports.multipleRecords = {
       }
     }
   ]
+};
+
+module.exports.invalidJsonSNS = {
+  Records:
+  [{ EventSource: 'aws:sns',
+    Sns: {
+      Message: 'garbage JSON'
+    }
+  }]
 };

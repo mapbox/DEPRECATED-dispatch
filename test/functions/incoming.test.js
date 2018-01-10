@@ -1,133 +1,176 @@
 'use strict';
 
-process.env.PagerDutyApiKey = 'FakeApiToken';
-process.env.PagerDutyServiceId = 'XXXXXXX';
-process.env.PagerDutyFromAddress = 'null@foo.bar';
-process.env.GithubRepo = 'testRepo';
-process.env.GithubOwner = 'testOwner';
-process.env.GithubToken = 'FakeApiToken';
-process.env.SlackChannel = 'testChannel';
-
-const tape = require('tape');
+const test = require('tape');
 const nock = require('nock');
-const incoming = require('../../incoming/function.js').fn;
+
+const incoming = require('../../incoming/function.js');
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
 const githubFixtures = require('../fixtures/github.fixtures.js');
+const pagerDutyFixtures = require('../fixtures/pagerduty.fixtures.js');
 const slackFixtures = require('../../test/fixtures/slack.fixtures.js');
-const pdIncident = require('../fixtures/pagerduty.fixtures.js').incident;
+
+process.env.PagerDutyApiKey = 'testPagerDutyApiKey';
+process.env.PagerDutyFromAddress = 'testPagerDutyFromAddress';
+process.env.PagerDutyServiceId = 'testPagerDutyServiceId';
+process.env.GitHubDefaultUser = 'testGitHubDefaultUser';
+process.env.GitHubOwner = 'testGitHubOwner';
+process.env.GitHubRepo = 'testGitHubRepo';
+process.env.GitHubToken = 'testGitHubToken';
+process.env.SlackBotToken = 'testSlackBotToken';
+process.env.SlackDefaultChannel = 'testSlackDefaultChannel';
 
 const context = {};
+const requestId = 'testRequestId';
+const gitHubDefaultUser = process.env.GitHubDefaultUser;
+const slackDefaultChannel = process.env.SlackDefaultChannel;
 
-tape('[incoming] self-service', (assert) => {
-  nock('https://api.github.com')
-    .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', 'access_token': 'FakeApiToken'})
-    .reply(200, []);
+test('[incoming] [checkUser] missing GitHub username', (assert) => {
+  let user = incoming.checkUser(incomingFixtures.userMissingGitHub, gitHubDefaultUser, slackDefaultChannel);
+  assert.deepEqual(user, incomingFixtures.userDefautGitHub, '-- should replace missing GitHub username with testGitHubDefaultUser');
+  assert.end();
+});
 
-  nock('https://api.github.com', {encodedQueryParams:true})
-    .post('/repos/testOwner/testRepo/issues', {
-      title: 'testGithubTitle',
-      body: 'testGithubBody\n\n @testUser'
-    })
-    .query({'access_token':'FakeApiToken'})
-    .reply(201, githubFixtures.issue1);
+test('[incoming] [checkUser] missing Slack username', (assert) => {
+  let user = incoming.checkUser(incomingFixtures.userMissingSlack, gitHubDefaultUser, slackDefaultChannel);
+  assert.deepEqual(user, incomingFixtures.userDefautSlack, '-- should replace missing Slack username with testSlackDefaultChannel');
+  assert.end();
+});
 
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-
-  incoming(incomingFixtures.selfServiceEvent, context, (err, res) => {
-    assert.ifError(err, '-- should not error');
-    assert.deepEqual(res, slackFixtures.slack.status, '-- Github issue and Slack alert should be created');
+test('[incoming] [lambda] missing message priority', (assert) => {
+  incoming.lambda(incomingFixtures.missingPriorityEvent, context, (err) => {
+    assert.deepEqual(err, 'Error - No valid priority found in SNS message', '-- should return error message');
     assert.end();
   });
 });
 
-tape('[incoming] broadcast', (assert) => {
-  nock('https://api.github.com')
-    .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'}) // eslint-disable-line camelcase
-    .reply(200, []);
-
-  nock('https://api.github.com', {encodedQueryParams: true})
-    .post('/repos/testOwner/testRepo/issues', {
-      title: 'testGithubTitle',
-      body: 'testGithubBody\n\ntestUser1,testUser2,testUser3'
-    })
-    .query({'access_token':'FakeApiToken'})
-    .reply(201, githubFixtures.broadcastIssue);
-
-  // slack calls for [ 'testUser1', 'testUser2', 'testUser3' ]
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-  nock('https://slack.com:443', {'encodedQueryParams':true})
-    .post('/api/chat.postMessage')
-    .reply(200, slackFixtures.slack.success);
-
-  incoming(incomingFixtures.broadcastEvent, context, (err, res) => {
-    assert.ifError(err, '-- should not error');
-    assert.deepEqual(res, slackFixtures.slack.statusBroadcast, '-- Github issue and Slack alert should be created');
+test('[incoming] [lambda] [checkEvent] malformed SNS message error', (assert) => {
+  incoming.lambda(incomingFixtures.malformedSNS, context, (err) => {
+    assert.equal(err, 'Error - SNS message malformed', '-- should return error message');
     assert.end();
   });
 });
 
-tape('[incoming] Creates a PD incident from high priority', (assert) => {
-  nock('https://api.pagerduty.com:443', {encodedQueryParams: true})
+test('[incoming] [lambda] [checkEvent] > 1 record in SNS message error', (assert) => {
+  incoming.lambda(incomingFixtures.multipleRecordSNS, context, (err) => {
+    assert.equal(err, 'Error - SNS message contains more than one record', '-- should return error message');
+    assert.end();
+  });
+});
+
+test('[incoming] [lambda] [checkEvent] invalid JSON in SNS message', (assert) => {
+  incoming.lambda(incomingFixtures.invalidJsonSNS, context, (err) => {
+    assert.equal(err, 'Error - SNS message contains invalid JSON', '-- should return error message');
+    assert.end();
+  });
+});
+
+test('[incoming] [lambda] self-service event', (assert) => {
+  nock('https://api.github.com')
+    .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ state: 'open', access_token: process.env.GitHubToken })
+    .reply(200, []);
+
+  nock('https://api.github.com')
+    .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ access_token: process.env.GitHubToken })
+    .reply(201, githubFixtures.selfServiceIssue);
+
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+
+  incoming.lambda(incomingFixtures.selfServiceEvent, context, (err, status) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(status, slackFixtures.slack.statusIncomingSelfService, '-- GitHub issue and Slack alert should be created');
+    assert.end();
+  });
+});
+
+test('[incoming] [lambda] broadcast event', (assert) => {
+  nock('https://api.github.com')
+    .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ state: 'open', access_token: process.env.GitHubToken })
+    .reply(200, []);
+
+  nock('https://api.github.com')
+    .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ access_token: process.env.GitHubToken })
+    .reply(201, githubFixtures.selfServiceIssue);
+
+  // slack calls for [ 'testSlackUser1', 'testSlackUser2', 'testSlackUser3' ]
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+  nock('https://slack.com:443')
+    .post('/api/chat.postMessage')
+    .reply(200, slackFixtures.slack.success);
+
+  incoming.lambda(incomingFixtures.broadcastEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, slackFixtures.slack.statusBroadcast, '-- Github issue and Slack alerts should be created');
+    assert.end();
+  });
+});
+
+test('[incoming] [lambda] high-priority event', (assert) => {
+  let pagerDutyStatus = `dispatch ${requestId} - PagerDuty incident triggered`;
+
+  nock('https://api.pagerduty.com:443', { encodedQueryParams: true })
     .post('/incidents', {
       incident: {
         type: 'incident',
         title: 'testPagerDutyTitle',
         service: {
-          id: 'XXXXXXX',
+          id: 'testPagerDutyServiceId',
           type: 'service_reference'
         },
-        incident_key: 'testPagerDutyTitle' // eslint-disable-line camelcase
+        incident_key: 'testPagerDutyTitle'
       }
     })
-    .reply(201, pdIncident);
+    .reply(201, pagerDutyFixtures.incident);
 
-  incoming(incomingFixtures.highPriorityEvent, context, (err, res) => {
+  incoming.lambda(incomingFixtures.highPriorityEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
-    assert.deepEqual(res, '123 pagerduty incident triggered', '-- PD incident should be triggered');
+    assert.deepEqual(res, pagerDutyStatus, '-- PagerDuty incident should be triggered');
     assert.end();
   });
 });
 
-tape('[incoming] malformed SNS message error', (assert) => {
-  const badRecord = { Records: 'record1' };
-  incoming(badRecord, context, (err) => {
-    assert.deepEqual(err, 'SNS message malformed', '-- should pass through error message');
-    assert.end();
-  });
-});
+test('[incoming] [lambda] unrecognized event fallback', (assert) => {
+  let pagerDutyStatus = `dispatch ${requestId} - no recongnized message priority, defaulted to PagerDuty alert`;
 
-tape('[incoming] invalid JSON in SNS message', (assert) => {
-  incoming(incomingFixtures.invalidJson, context, (err) => {
-    assert.deepEqual(err, 'Error - SNS message contains invalid JSON', '-- should pass through error message');
-    assert.end();
-  });
-});
+  nock('https://api.pagerduty.com:443', { encodedQueryParams: true })
+    .post('/incidents', {
+      incident: {
+        type: 'incident',
+        title: 'testPagerDutyTitle',
+        service: {
+          id: 'testPagerDutyServiceId',
+          type: 'service_reference'
+        },
+        incident_key: 'testPagerDutyTitle'
+      }
+    })
+    .reply(201, pagerDutyFixtures.incident);
 
-tape('[incoming] > 1 record in SNS message error', (assert) => {
-  const badRecord = { Records: [ 'record1', 'record2'] };
-  incoming(badRecord, context, (err) => {
-    assert.deepEqual(err, 'SNS message contains more than one record', '-- should pass through error message');
+  incoming.lambda(incomingFixtures.unrecognizedEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, pagerDutyStatus, '-- PagerDuty incident should be triggered');
     assert.end();
   });
 });

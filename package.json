@@ -1,7 +1,7 @@
 {
   "name": "@mapbox/dispatch",
-  "version": "1.0.0",
-  "description": "Security monitoring tool",
+  "version": "1.1.0",
+  "description": "Alert routing tool",
   "main": "index.js",
   "engines": {
     "node": "6.10.3"
