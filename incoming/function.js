@@ -14,7 +14,6 @@ module.exports.fn = function(event, context, callback) {
 
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
     const pagerDutyFromAddress = process.env.PagerDutyFromAddress;
-    const pagerDutyServiceId = process.env.PagerDutyServiceId;
     const githubOwner = process.env.GithubOwner;
     const githubToken = process.env.GithubToken;
     const slackBotToken = process.env.SlackBotToken;
@@ -39,6 +38,7 @@ module.exports.fn = function(event, context, callback) {
 
       const client = new WebClient(slackBotToken);
       const githubRepo = message.githubRepo ? message.githubRepo : process.env.GithubRepo;
+      const pagerDutyServiceId = message.pagerDutyServiceId ? message.pagerDutyServiceId : process.env.PagerDutyServiceId;
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
 
       if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
