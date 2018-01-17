@@ -27,6 +27,7 @@ The self-service message on Slack includes a link to the associated GitHub issue
   type: 'self-service', // required
   requestId: 'STRING_VALUE', // optional, id for logging
   githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
+  pagerDutyServiceId: 'STRING_VALUE', // optional, specify Pager Duty Service ID
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [ // required
     {
@@ -83,6 +84,7 @@ Unlike self-service alarms, broadcast Slack DMs do not include a link to their a
   type: 'broadcast', // required
   requestId: 'STRING_VALUE', // optional, id for logging
   githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
+  pagerDutyServiceId: 'STRING_VALUE', // optional, specify Pager Duty Service ID
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [
     {
