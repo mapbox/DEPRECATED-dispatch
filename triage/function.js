@@ -7,6 +7,13 @@ const utils = require('../lib/utils.js');
 
 const triage = {};
 
+/**
+ * Lambda function body, triggered by SNS event
+ *
+ * @param {object} event - SNS event object, contains message
+ * @param {object} context - object containing lambda function runtime information
+ * @param {function} callback - function called when lambda run is complete
+ */
 triage.lambda = function(event, context, callback) {
   utils.decrypt(process.env, (err) => {
     if (err) throw err;
@@ -119,6 +126,13 @@ triage.lambda = function(event, context, callback) {
   });
 };
 
+/**
+ * Ingest and validate SNS event object
+ *
+ * @param {object} event - SNS event object, contains message
+ * @param {string} slackVerificationToken
+ * @param {function} callback
+ */
 triage.checkEvent = function(event, slackVerificationToken, callback) {
   try {
     let payload = JSON.parse(querystring.parse(event.postBody).payload);

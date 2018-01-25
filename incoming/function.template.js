@@ -19,19 +19,19 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: 'PagerDuty service ID'
     },
-    GithubDefaultUser: {
+    GitHubDefaultUser: {
       Type: 'String',
       Description: 'Default GitHub user or team to be tagged in dispatch issues'
     },
-    GithubOwner: {
+    GitHubOwner: {
       Type: 'String',
       Description: 'Owner of GitHub repo'
     },
-    GithubRepo: {
+    GitHubRepo: {
       Type: 'String',
       Description: 'Default GitHub repo for dispatch issues'
     },
-    GithubToken: {
+    GitHubToken: {
       Type: 'String',
       Description: '[secure] GitHub OAuth token'
     },

@@ -18,15 +18,15 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: 'PagerDuty account email address'
     },
-    GithubOwner: {
+    GitHubOwner: {
       Type: 'String',
       Description: 'Owner of Github repo'
     },
-    GithubRepo: {
+    GitHubRepo: {
       Type: 'String',
       Description: 'Github repository'
     },
-    GithubToken: {
+    GitHubToken: {
       Type: 'String',
       Description: '[secure] GitHub OAuth Token'
     },

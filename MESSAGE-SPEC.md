@@ -15,19 +15,19 @@ Self-service Dispatch messages do the following for a single user:
 1. Create a GitHub issue and tag the user's GitHub handle.
 2. Send an interactive Slack direct message to the user, which prompts them to respond yes or no.
 
-If a GitHub username is not provided or could not be found, Dispatch will fall back to the `GithubDefaultUser` parameter.
+If a GitHub username is not provided or could not be found, Dispatch will fall back to the `GitHubDefaultUser` parameter.
 If a Slack username is not provided or could not be found, Dispatch will fall back to the `SlackChannel` parameter.
 
 The self-service message on Slack includes a link to the associated GitHub issue. The dispatch-triage AWS Lambda function handles the yes or no response from the user in Slack, either closing the GitHub issue or escalating the issue to PagerDuty.
 
-### Message specification
+### Message specification for `self-service`
 
 ``` javascript
 {
   type: 'self-service', // required
   requestId: 'STRING_VALUE', // optional, id for logging
   githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
-  pagerDutyServiceId: 'STRING_VALUE', // optional, specify Pager Duty Service ID
+  pagerDutyServiceId: 'STRING_VALUE', // optional, specify PagerDuty Service ID
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [ // required
     {
@@ -54,11 +54,11 @@ The self-service message on Slack includes a link to the associated GitHub issue
 }
 ```
 
-### Use `yes_response` and `no_response`
+#### Use `yes_response` and `no_response`
 
-Though `body.slack.actions.yes_response` and `body.slack.actions.no_response` are not required, we recommend you use them in your self service messages so that your users have friendly experiences with Dispatch. If you omit these properties then your users will receive default return values from the dispatch-triage AWS Lambda function.
+Though `body.slack.actions.yes_response` and `body.slack.actions.no_response` are not required, we recommend you use them in your self service messages so that your users have a friendly experience with Dispatch. If you omit these properties then your users will receive default return values from the `dispatch-triage` AWS Lambda function.
 
-### Slack message vs. prompt
+#### Slack message vs. prompt
 
 To help explain the difference between `body.slack.message` and `body.slack.prompt`, see this Dispatch self-service alarm in Slack:
 
@@ -77,7 +77,7 @@ Broadcast messages do not currently support interactive Slack messages. Though t
 
 Unlike self-service alarms, broadcast Slack DMs do not include a link to their associated GitHub issue. If you need to provide a link to a GitHub issue for educational or training purposes you should include it in the Slack message via `body.slack.message`.
 
-### Message specification
+### Message specification for `broadcast`
 
 ``` javascript
 {
@@ -110,7 +110,7 @@ Unlike self-service alarms, broadcast Slack DMs do not include a link to their a
 
 High priority dispatch messages open a PagerDuty incident.
 
-### Message specification
+### Message specification for `high-priority`
 
 
 ``` javascript
@@ -131,7 +131,7 @@ High priority dispatch messages open a PagerDuty incident.
 
 Dispatch only processes Slack and GitHub handles in the `users` array. It ignores handles or usernames for other services. This allows you to connect Dispatch to a central API or username mappings file without having to scrub or remove other data.
 
-Dispatch automatically adds the `@` symbol to Slack handles if it is missing. Do not add the `@` symbol to GitHub handles.
+Dispatch automatically adds the `@` symbol to Slack handles if it is missing (and the `#` to channels). Do not add the `@` symbol to GitHub handles.
 
 ``` javascript
 users: [
@@ -151,7 +151,7 @@ users: [
 ]
 ```
 
-If a Slack or GitHub handle is missing from the `users` array, then Dispatch will failover to either a Slack channel or GitHub user/team for visibility. These values are set via CloudFormation parameters when deploying dispatch-incoming and dispatch-triage via [lambda-cfn](https://github.com/mapbox/lambda-cfn).
+If a Slack or GitHub handle is missing from the `users` array, then Dispatch will fallback to either a Slack channel or GitHub user/team for visibility. These values are set via CloudFormation parameters when deploying `dispatch-incoming` and `dispatch-triage` via [lambda-cfn](https://github.com/mapbox/lambda-cfn).
 
-* Slack = `SlackChanel`
-* GitHub = `GithubDefaultUser`
+* Slack = `SlackChannel`
+* GitHub = `GitHubDefaultUser`

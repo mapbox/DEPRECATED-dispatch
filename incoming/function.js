@@ -16,7 +16,7 @@ const incoming = {};
  *
  * @param {object} event - SNS event object, contains message
  * @param {object} context - object containing lambda function runtime information
- * @param {function} callback - function called when lambda function is complete
+ * @param {function} callback - function called when lambda run is complete
  */
 incoming.lambda = function(event, context, callback) {
   utils.decrypt(process.env, (err) => {
@@ -27,9 +27,6 @@ incoming.lambda = function(event, context, callback) {
     const gitHubToken = process.env.GitHubToken;
     const pagerDutyApiKey = process.env.PagerDutyApiKey;
     const pagerDutyFromAddress = process.env.PagerDutyFromAddress;
-    const pagerDutyServiceId = process.env.PagerDutyServiceId;
-    const githubOwner = process.env.GithubOwner;
-    const githubToken = process.env.GithubToken;
     const slackBotToken = process.env.SlackBotToken;
     const slackDefaultChannel = process.env.SlackDefaultChannel;
 
@@ -39,6 +36,7 @@ incoming.lambda = function(event, context, callback) {
       if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
 
       const gitHubRepo = message.gitHubRepo ? message.gitHubRepo : process.env.GitHubRepo;
+      const pagerDutyServiceId = message.pagerDutyServiceId ? message.pagerDutyServiceId : process.env.PagerDutyServiceId;
       const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
 
       // SELF-SERVICE
@@ -48,15 +46,12 @@ incoming.lambda = function(event, context, callback) {
         incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
           if (err) return callback(err, res);
 
-<<<<<<< dec5af4304323dcc7a57e2401c418d5ae552ade2
-      const client = new WebClient(slackBotToken);
-      const githubRepo = message.githubRepo ? message.githubRepo : process.env.GithubRepo;
-      const pagerDutyServiceId = message.pagerDutyServiceId ? message.pagerDutyServiceId : process.env.PagerDutyServiceId;
-      const requestId = message.requestId ? message.requestId : crypto.randomBytes(6).toString('hex');
-=======
           // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
-          if (res && res.status === 'exists') return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
->>>>>>> refactor incoming and triage, all /lib functions, tests
+          let isGithubIssueExists = res && res.status === 'exists';
+
+          if (isGithubIssueExists) {
+            return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
+          }
 
           incoming.callSlack(user, message, requestId, slackDefaultChannel, slackBotToken, res, (err, status) => {
             if (err) return callback(err, status);
@@ -129,9 +124,18 @@ incoming.checkEvent = function(event, callback) {
  * @param {string} slackDefaultChannel - default Slack channel, substitute if user.slack is missing
  */
 incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel) {
-  if (user.slack && !(user.slack.indexOf('@') > -1)) user.slack = `@${user.slack}`;
-  if (!user.github) user.github = gitHubDefaultUser;
-  if (!user.slack) user.slack = `#${slackDefaultChannel}`;
+  if (user.slack && !(user.slack.indexOf('@') > -1)) {
+    // user has Slack ID
+    user.slack = `@${user.slack}`;
+  }
+  if (!user.slack) {
+    // missing Slack ID, fallback to default channel
+    user.slack = `#${slackDefaultChannel}`;
+  }
+  if (!user.github) {
+    // missing GitHub handle, fallback to default user/team
+    user.github = gitHubDefaultUser;
+  }
 
   return user;
 };
