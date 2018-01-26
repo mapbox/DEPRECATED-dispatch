@@ -38,7 +38,7 @@ test('[incoming] [checkUser] missing Slack username', (assert) => {
 
 test('[incoming] [lambda] missing message priority', (assert) => {
   incoming.lambda(incomingFixtures.missingPriorityEvent, context, (err) => {
-    assert.deepEqual(err, 'Error - No valid priority found in SNS message', '-- should return error message');
+    assert.deepEqual(err, 'Error - No dispatch message priority found in SNS message', '-- should return error message');
     assert.end();
   });
 });
@@ -152,7 +152,7 @@ test('[incoming] [lambda] high-priority event', (assert) => {
 });
 
 test('[incoming] [lambda] unrecognized event fallback', (assert) => {
-  let pagerDutyStatus = `dispatch ${requestId} - no recongnized message priority, defaulted to PagerDuty alert`;
+  let pagerDutyStatus = `dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`;
 
   nock('https://api.pagerduty.com:443', { encodedQueryParams: true })
     .post('/incidents', {

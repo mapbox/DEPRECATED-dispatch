@@ -25,10 +25,10 @@ The self-service message on Slack includes a link to the associated GitHub issue
 ``` javascript
 {
   type: 'self-service', // required
-  requestId: 'STRING_VALUE', // optional, id for logging
+  requestId: 'STRING_VALUE', // optional, ID for logging - if not passed, a 6 character random hex requestId will be generated and used
   githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
-  pagerDutyServiceId: 'STRING_VALUE', // optional, specify PagerDuty Service ID
-  retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
+  pagerDutyServiceId: 'STRING_VALUE', // optional, overrides the default PagerDuty service in dispatch-incoming
+  retrigger: 'BOOLEAN', // optional, defaults to true if not specified - if false Dispatch will not resend a message for a preexisting issue
   users: [ // required
     {
       slack: 'STRING_VALUE', // required, Slack handle

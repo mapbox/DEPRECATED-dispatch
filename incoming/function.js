@@ -32,7 +32,7 @@ incoming.lambda = function(event, context, callback) {
 
     incoming.checkEvent(event, (err, message) => {
       if (err) return callback(err);
-      if (!message.type) return callback('Error - No valid priority found in SNS message');
+      if (!message.type) return callback('Error - No dispatch message priority found in SNS message');
       if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
 
       const gitHubRepo = message.gitHubRepo ? message.gitHubRepo : process.env.GitHubRepo;
@@ -89,7 +89,7 @@ incoming.lambda = function(event, context, callback) {
       else {
         incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, status) => {
           if (err) return callback(err, status);
-          return callback(null, `dispatch ${requestId} - no recongnized message priority, defaulted to PagerDuty alert`);
+          return callback(null, `dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`);
         });
       }
     });
@@ -159,6 +159,7 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   };
 
   if (message.users.length > 1) {
+    // if broadcast to >1 users, compile list of Slack IDs that were sent the message
     let userArray = message.users.map(function(obj) { return obj.slack; });
     options.body = `${message.body.github.body} \n\n ${userArray.toString()}`;
   } else {
