@@ -16,34 +16,34 @@ process.env.SlackVerificationToken = 'testSlackVerificationToken';
 
 const context = {};
 
-test('[triage] [lambda] [checkEvent] JSON parsing error', (assert) => {
-  triage.lambda(triageFixtures.invalidJSON, context, (err) => {
+test('[triage] [fn] [checkEvent] JSON parsing error', (assert) => {
+  triage.fn(triageFixtures.invalidJSON, context, (err) => {
     assert.equal(err, 'Error - parsing dispatch triage event payload', '-- should return error message');
     assert.end();
   });
 });
 
-test('[triage] [lambda] [checkEvent] invalid Slack verification token', (assert) => {
-  triage.lambda(triageFixtures.badToken, context, (err) => {
+test('[triage] [fn] [checkEvent] invalid Slack verification token', (assert) => {
+  triage.fn(triageFixtures.badToken, context, (err) => {
     assert.equal(err, 'Error - incorrect Slack verification token', '-- should return error message');
     assert.end();
   });
 });
 
-test('[triage] [lambda] [checkEvent] >1 payload actions', (assert) => {
-  triage.lambda(triageFixtures.extraAction, context, (err) => {
+test('[triage] [fn] [checkEvent] >1 payload actions', (assert) => {
+  triage.fn(triageFixtures.extraAction, context, (err) => {
     assert.equal(err, 'Error - found 2 actions in payload, expected 1', '-- should return error message');
     assert.end();
   });
 });
 
-test('[triage] [lambda] response OK, closes GitHub issue', (assert) => {
+test('[triage] [fn] response OK, closes GitHub issue', (assert) => {
   nock('https://api.github.com:443', { 'encodedQueryParams':true })
     .patch('/repos/testGitHubOwner/testGitHubRepo/issues/7', { 'state': 'closed' })
     .query({ access_token: 'testGitHubToken' })
     .reply(200, {});
 
-  triage.lambda(triageFixtures.ok, context, (err, res) => {
+  triage.fn(triageFixtures.ok, context, (err, res) => {
     // replace dynamic timestamp for tape deepEqual
     res.attachments[0].ts = 'testTimeStamp';
     assert.ifError(err, '-- should not error');
@@ -52,20 +52,20 @@ test('[triage] [lambda] response OK, closes GitHub issue', (assert) => {
   });
 });
 
-test('[triage] [lambda] response OK, error closing GitHub issue', (assert) => {
+test('[triage] [fn] response OK, error closing GitHub issue', (assert) => {
   nock('https://api.github.com:443', { 'encodedQueryParams':true })
     .patch('/repos/testGitHubOwner/testGitHubRepo/issues/7', { 'state': 'closed' })
     .query({ access_token: 'testGitHubToken' })
     .reply(404, 'Bad request');
 
-  triage.lambda(triageFixtures.ok, context, (err, res) => {
+  triage.fn(triageFixtures.ok, context, (err, res) => {
     assert.equal(err, null, '-- err should be null, logged to Slack instead');
     assert.deepEqual(res, triageFixtures.responses.okError, '-- should return responseError for Slack');
     assert.end();
   });
 });
 
-test('[triage] [lambda] response NOT OK, escalates to PagerDuty', (assert) => {
+test('[triage] [fn] response NOT OK, escalates to PagerDuty', (assert) => {
   nock('https://api.pagerduty.com:443', { 'encodedQueryParams': true })
     .post('/incidents', {
       incident: {
@@ -84,7 +84,7 @@ test('[triage] [lambda] response NOT OK, escalates to PagerDuty', (assert) => {
     })
     .reply(201, triageFixtures.incident);
 
-  triage.lambda(triageFixtures.notOk, context, (err, res) => {
+  triage.fn(triageFixtures.notOk, context, (err, res) => {
     // replace dynamic timestamp for tape deepEqual
     res.attachments[0].ts = 'testTimeStamp';
     assert.equal(err, null, '-- err should be null, logged to Slack instead');
@@ -95,7 +95,7 @@ test('[triage] [lambda] response NOT OK, escalates to PagerDuty', (assert) => {
 
 // NOTE: Missing test for duplicate PagerDuty issue error
 
-test('[triage] [lambda] response NOT OK, error escalating to PagerDuty', (assert) => {
+test('[triage] [fn] response NOT OK, error escalating to PagerDuty', (assert) => {
   nock('https://api.pagerduty.com:443', { 'encodedQueryParams': true })
     .post('/incidents', {
       incident: {
@@ -120,7 +120,7 @@ test('[triage] [lambda] response NOT OK, error escalating to PagerDuty', (assert
       }
     });
 
-  triage.lambda(triageFixtures.notOk, context, (err, res) => {
+  triage.fn(triageFixtures.notOk, context, (err, res) => {
     assert.equal(err, null, '-- err should be null, logged to Slack instead');
     assert.deepEqual(res, triageFixtures.responses.notOkError, '-- should return responseError for Slack');
     assert.end();

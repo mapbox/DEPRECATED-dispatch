@@ -52,6 +52,16 @@ module.exports.selfServiceIssue = {
   updated_at: '2017-08-02T23:36:11Z'
 };
 
+module.exports.noIssueFound = {
+  message: '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/issues/#list-issues-for-a-repository"}',
+  code: 404,
+  status: 'Not Found',
+  headers: {
+    'content-type': 'application/json; charset=utf-8',
+    status: '404 Not Found'
+  }
+};
+
 const dataDump = {
   url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
   repository_url: 'https://api.github.com/repos/testOwner/testRepo',

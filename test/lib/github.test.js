@@ -13,7 +13,7 @@ test('[github] [authenticate] Receive auth object from request', function(assert
     token: token
   };
   let ghAuth = github.authenticate(token);
-  assert.same(ghAuth.auth, auth, '-- Function returns expected auth object');
+  assert.same(ghAuth.auth, auth, '-- function returns expected auth object');
   assert.end();
 });
 
@@ -33,15 +33,14 @@ test('[github] [checkForIssue] Finds requested issue', function(assert) {
 
   github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, '-- Response is an array');
-      assert.deepEqual(res, issue, '-- Found issue');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, issue, '-- found issue');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
 test('[github] [checkForIssue] Does not find a match to the requested issue', function(assert) {
-  let issue = githubFixtures.issue1();
   let retrigger = true;
   let options = {
     owner: 'testOwner',
@@ -52,12 +51,18 @@ test('[github] [checkForIssue] Does not find a match to the requested issue', fu
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
     .query({ state: 'open', access_token: token })
-    .reply(200, issue);
+    .reply(function(uri, requestBody) { // eslint-disable-line no-unused-vars
+      return [
+        githubFixtures.noIssueFound.code,
+        githubFixtures.noIssueFound.message,
+        githubFixtures.noIssueFound.headers
+      ];
+    });
 
   github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, '-- Response is an array');
-      assert.deepEqual(res, [], '-- Returns empty array');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, [], '-- returns empty array');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -79,8 +84,8 @@ test('[github] [checkForIssue] Pagination works', function(assert) {
 
   github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, '-- Response is an array');
-      assert.deepEqual(res, issues, '-- Returns all 150 issues');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, issues, '-- returns all 150 issues');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -103,7 +108,7 @@ test('[github] [createIssue] Does not create issue because one exists. Retrigger
 
   github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- Does not create issue');
+      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -126,7 +131,7 @@ test('[github] [createIssue] Does not create issue because one exists. Retrigger
 
   github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- Does not create issue');
+      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -154,7 +159,7 @@ test('[github] [createIssue] No existing issue, creates new issue', function(ass
 
   github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res.number, issue.number, '-- Issue is created');
+      assert.deepEqual(res.number, issue.number, '-- issue is created');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -175,7 +180,7 @@ test('[github] [closeIssue] Closes issue', function(assert) {
 
   github.closeIssue(options, token)
     .then(res => {
-      assert.deepEqual(res.data, closedIssue, '-- Issue is closed');
+      assert.deepEqual(res.data, closedIssue, '-- issue is closed');
       assert.end();
     })
     .catch(err => { console.log(err); });

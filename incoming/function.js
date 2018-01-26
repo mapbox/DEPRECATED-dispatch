@@ -18,7 +18,7 @@ const incoming = {};
  * @param {object} context - object containing lambda function runtime information
  * @param {function} callback - function called when lambda run is complete
  */
-incoming.lambda = function(event, context, callback) {
+incoming.fn = function(event, context, callback) {
   utils.decrypt(process.env, (err) => {
     if (err) throw err;
 
@@ -167,8 +167,11 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   }
 
   github.createIssue(options, message.retrigger, gitHubToken)
-    .then(res => { return callback(null, res); })
-    .catch(err => { callback(err, `dispatch ${requestId} - GitHub error handled`); });
+    .then(res => {
+      return callback(null, res);
+    }).catch(err => {
+      callback(err, `dispatch ${requestId} - GitHub error handled`);
+    });
 };
 
 /**

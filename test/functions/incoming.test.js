@@ -36,35 +36,35 @@ test('[incoming] [checkUser] missing Slack username', (assert) => {
   assert.end();
 });
 
-test('[incoming] [lambda] missing message priority', (assert) => {
-  incoming.lambda(incomingFixtures.missingPriorityEvent, context, (err) => {
+test('[incoming] [fn] missing message priority', (assert) => {
+  incoming.fn(incomingFixtures.missingPriorityEvent, context, (err) => {
     assert.deepEqual(err, 'Error - No dispatch message priority found in SNS message', '-- should return error message');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] [checkEvent] malformed SNS message error', (assert) => {
-  incoming.lambda(incomingFixtures.malformedSNS, context, (err) => {
+test('[incoming] [fn] [checkEvent] malformed SNS message error', (assert) => {
+  incoming.fn(incomingFixtures.malformedSNS, context, (err) => {
     assert.equal(err, 'Error - SNS message malformed', '-- should return error message');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] [checkEvent] > 1 record in SNS message error', (assert) => {
-  incoming.lambda(incomingFixtures.multipleRecordSNS, context, (err) => {
+test('[incoming] [fn] [checkEvent] > 1 record in SNS message error', (assert) => {
+  incoming.fn(incomingFixtures.multipleRecordSNS, context, (err) => {
     assert.equal(err, 'Error - SNS message contains more than one record', '-- should return error message');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] [checkEvent] invalid JSON in SNS message', (assert) => {
-  incoming.lambda(incomingFixtures.invalidJsonSNS, context, (err) => {
+test('[incoming] [fn] [checkEvent] invalid JSON in SNS message', (assert) => {
+  incoming.fn(incomingFixtures.invalidJsonSNS, context, (err) => {
     assert.equal(err, 'Error - SNS message contains invalid JSON', '-- should return error message');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] self-service event', (assert) => {
+test('[incoming] [fn] self-service event', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
     .query({ state: 'open', access_token: process.env.GitHubToken })
@@ -82,14 +82,14 @@ test('[incoming] [lambda] self-service event', (assert) => {
     .post('/api/chat.postMessage')
     .reply(200, slackFixtures.slack.success);
 
-  incoming.lambda(incomingFixtures.selfServiceEvent, context, (err, status) => {
+  incoming.fn(incomingFixtures.selfServiceEvent, context, (err, status) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(status, slackFixtures.slack.statusIncomingSelfService, '-- GitHub issue and Slack alert should be created');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] broadcast event', (assert) => {
+test('[incoming] [fn] broadcast event', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
     .query({ state: 'open', access_token: process.env.GitHubToken })
@@ -120,14 +120,14 @@ test('[incoming] [lambda] broadcast event', (assert) => {
     .post('/api/chat.postMessage')
     .reply(200, slackFixtures.slack.success);
 
-  incoming.lambda(incomingFixtures.broadcastEvent, context, (err, res) => {
+  incoming.fn(incomingFixtures.broadcastEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, slackFixtures.slack.statusBroadcast, '-- Github issue and Slack alerts should be created');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] high-priority event', (assert) => {
+test('[incoming] [fn] high-priority event', (assert) => {
   let pagerDutyStatus = `dispatch ${requestId} - PagerDuty incident triggered`;
 
   nock('https://api.pagerduty.com:443', { encodedQueryParams: true })
@@ -144,14 +144,14 @@ test('[incoming] [lambda] high-priority event', (assert) => {
     })
     .reply(201, pagerDutyFixtures.incident);
 
-  incoming.lambda(incomingFixtures.highPriorityEvent, context, (err, res) => {
+  incoming.fn(incomingFixtures.highPriorityEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, pagerDutyStatus, '-- PagerDuty incident should be triggered');
     assert.end();
   });
 });
 
-test('[incoming] [lambda] unrecognized event fallback', (assert) => {
+test('[incoming] [fn] unrecognized event fallback', (assert) => {
   let pagerDutyStatus = `dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`;
 
   nock('https://api.pagerduty.com:443', { encodedQueryParams: true })
@@ -168,7 +168,7 @@ test('[incoming] [lambda] unrecognized event fallback', (assert) => {
     })
     .reply(201, pagerDutyFixtures.incident);
 
-  incoming.lambda(incomingFixtures.unrecognizedEvent, context, (err, res) => {
+  incoming.fn(incomingFixtures.unrecognizedEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, pagerDutyStatus, '-- PagerDuty incident should be triggered');
     assert.end();

@@ -14,7 +14,7 @@ const triage = {};
  * @param {object} context - object containing lambda function runtime information
  * @param {function} callback - function called when lambda run is complete
  */
-triage.lambda = function(event, context, callback) {
+triage.fn = function(event, context, callback) {
   utils.decrypt(process.env, (err) => {
     if (err) throw err;
 
