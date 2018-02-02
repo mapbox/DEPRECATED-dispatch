@@ -50,6 +50,7 @@ incoming.fn = function(event, context, callback) {
           let isGithubIssueExists = res && res.status === 'exists';
 
           if (isGithubIssueExists) {
+            console.log(`dispatch ${requestId} - issue ${res.issue} already exists`);
             return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
           }
 
@@ -65,14 +66,22 @@ incoming.fn = function(event, context, callback) {
         incoming.callGitHub(gitHubDefaultUser, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
           if (err) return callback(err, res);
 
+          // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
+          let isGithubIssueExists = res && res.status === 'exists';
+
+          if (isGithubIssueExists) {
+            console.log(`dispatch ${requestId} - issue ${res.issue} already exists`);
+            return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
+          }
+
           let q = queue(1);
           message.users.forEach((user) => {
             user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel);
-            q.defer(incoming.callSlack, user, message, requestId, slackBotToken, slackDefaultChannel, res);
+            q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
           });
 
           q.awaitAll(function(err, status) {
-            if (err) return callback(err, `dispatch ${requestId} - error handled`);
+            if (err) return callback(err, status);
             return callback(null, status);
           });
         });
@@ -88,6 +97,7 @@ incoming.fn = function(event, context, callback) {
 
       else {
         incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, status) => {
+          console.log(`dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`);
           if (err) return callback(err, status);
           return callback(null, `dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`);
         });
