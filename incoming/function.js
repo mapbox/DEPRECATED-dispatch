@@ -30,9 +30,30 @@ incoming.fn = function(event, context, callback) {
     const slackBotToken = process.env.SlackBotToken;
     const slackDefaultChannel = process.env.SlackDefaultChannel;
 
+    const lambdaFailure = 'Lambda failure';
+    const lambdaSuccess = 'Lambda success';
+
     incoming.checkEvent(event, (err, message) => {
-      if (err) return callback(err);
-      if (!message.type) return callback('Error - No dispatch message priority found in SNS message');
+      if (err) {
+        console.log({
+          severity: 'error',
+          requestId: null,
+          service: 'lambda',
+          message: err
+        });
+        return callback(lambdaFailure);
+      }
+
+      if (!message.type) {
+        console.log({
+          severity: 'error',
+          requestId: null,
+          service: 'lambda',
+          message: 'SNS message missing priority'
+        });
+        return callback(lambdaFailure);
+      }
+
       if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
 
       const gitHubRepo = message.gitHubRepo ? message.gitHubRepo : process.env.GitHubRepo;
@@ -44,19 +65,40 @@ incoming.fn = function(event, context, callback) {
         let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel);
 
         incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
-          if (err) return callback(err, res);
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'github',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
 
           // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
           let isGithubIssueExists = res && res.status === 'exists';
 
           if (isGithubIssueExists) {
-            console.log(`dispatch ${requestId} - issue ${res.issue} already exists`);
-            return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
+            console.log({
+              severity: 'notice',
+              requestId: requestId,
+              service: 'github',
+              message: `issue ${res.issue} already exists`
+            });
+            return callback(null, lambdaSuccess);
           }
 
-          incoming.callSlack(user, message, requestId, slackDefaultChannel, slackBotToken, res, (err, status) => {
-            if (err) return callback(err, status);
-            return callback(null, status);
+          incoming.callSlack(user, message, requestId, slackDefaultChannel, slackBotToken, res, (err, status) => { // eslint-disable-line no-unused-vars
+            if (err) {
+              console.log({
+                severity: 'error',
+                requestId: requestId,
+                service: 'slack',
+                message: err
+              });
+              return callback(lambdaFailure);
+            }
+            return callback(null, lambdaSuccess);
           });
         });
       }
@@ -64,14 +106,27 @@ incoming.fn = function(event, context, callback) {
       // BROADCAST
       else if (message.type === 'broadcast') {
         incoming.callGitHub(gitHubDefaultUser, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
-          if (err) return callback(err, res);
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'github',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
 
           // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
           let isGithubIssueExists = res && res.status === 'exists';
 
           if (isGithubIssueExists) {
-            console.log(`dispatch ${requestId} - issue ${res.issue} already exists`);
-            return callback(null, `dispatch ${requestId} - issue ${res.issue} already exists`);
+            console.log({
+              severity: 'notice',
+              requestId: requestId,
+              service: 'github',
+              message: `issue ${res.issue} already exists`
+            });
+            return callback(null, lambdaSuccess);
           }
 
           let q = queue(1);
@@ -80,26 +135,57 @@ incoming.fn = function(event, context, callback) {
             q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
           });
 
-          q.awaitAll(function(err, status) {
-            if (err) return callback(err, status);
-            return callback(null, status);
+          q.awaitAll(function(err, status) { // eslint-disable-line no-unused-vars
+            if (err) {
+              console.log({
+                severity: 'error',
+                requestId: requestId,
+                service: 'slack',
+                message: err
+              });
+              return callback(lambdaFailure);
+            }
+            return callback(null, lambdaSuccess);
           });
         });
       }
 
       // HIGH-PRIORITY
       else if (message.type === 'high-priority'){
-        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, status) => {
-          if (err) return callback(err, status);
-          return callback(null, status);
+        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => { // eslint-disable-line no-unused-vars
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'pagerduty',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
+          return callback(null, lambdaSuccess);
         });
       }
 
       else {
-        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, status) => {
-          console.log(`dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`);
-          if (err) return callback(err, status);
-          return callback(null, `dispatch ${requestId} - no recognized message priority, defaulted to PagerDuty alert`);
+        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => { // eslint-disable-line no-unused-vars
+          // log that fallback was invoked
+          console.log({
+            severity: 'warning',
+            requestId: requestId,
+            service: 'lambda',
+            message: 'no recognized message priority fallback to PagerDuty alert'
+          });
+
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'pagerduty',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
+          return callback(null, lambdaSuccess);
         });
       }
     });
@@ -113,14 +199,14 @@ incoming.fn = function(event, context, callback) {
  * @param {function} callback
  */
 incoming.checkEvent = function(event, callback) {
-  if (event.Records === undefined || !Array.isArray(event.Records)) return callback('Error - SNS message malformed');
-  if (event.Records.length > 1) return callback('Error - SNS message contains more than one record');
+  if (event.Records === undefined || !Array.isArray(event.Records)) return callback('SNS message malformed');
+  if (event.Records.length > 1) return callback('SNS message contains more than one record');
   else {
     let message;
     try {
       message = JSON.parse(event.Records[0].Sns.Message);
     } catch (err) {
-      return callback('Error - SNS message contains invalid JSON');
+      return callback('SNS message contains invalid JSON');
     }
     return callback(null, message);
   }
@@ -180,7 +266,7 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     .then(res => {
       return callback(null, res);
     }).catch(err => {
-      callback(err, `dispatch ${requestId} - GitHub error handled`);
+      callback(err);
     });
 };
 
@@ -229,7 +315,7 @@ incoming.callSlack = function(user, message, requestId, slackDefaultChannel, sla
   message.requestId = requestId;
 
   slack.alertToSlack(message, user.slack, client, slackDefaultChannel, (err, status) => {
-    if (err) return callback(err, `dispatch ${requestId} - Slack error handled`);
+    if (err) return callback(err);
     return callback(null, status);
   });
 };

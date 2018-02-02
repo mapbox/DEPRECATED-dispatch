@@ -25,7 +25,7 @@ module.exports.responses = {
     attachments: [
       {
         attachment_type: 'default',
-        fallback: 'Could not load Slack response, 8c3d7c6f550496d96822de4390060807: closed GitHub issue 7',
+        fallback: 'Could not load Slack response, 8c3d7c6f550496d96822de4390060807: closed GitHub issue testGitHubRepo/7',
         text: 'Yes',
         color: '#008E00',
         footer: 'Dispatch alert acknowledged',
@@ -34,7 +34,7 @@ module.exports.responses = {
       }
     ]
   },
-  okError: 'Error - dispatch 8c3d7c6f550496d96822de4390060807 failed to close GitHub issue 7, Bad request',
+  okError: 'Error: dispatch 8c3d7c6f550496d96822de4390060807 failed to close GitHub issue testGitHubRepo/7, Bad request',
   notOk: {
     attachments: [
       {
@@ -48,15 +48,15 @@ module.exports.responses = {
       }
     ]
   },
-  notOkError: 'Error - dispatch 6cf9397c71e2 failed to create PagerDuty incident'
+  notOkError: 'Error: dispatch 6cf9397c71e2 failed to create PagerDuty incident'
 };
 
 module.exports.incident = {
   'incident': {
     'incident_number': 123512,
-    'title': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue 7',
-    'body': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue 7\n\n https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
-    'description': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue 7',
+    'title': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue testGitHubRepo/7',
+    'body': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue testGitHubRepo/7\n\n https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+    'description': 'dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue testGitHubRepo/7',
     'created_at': '2017-08-04T22:37:22Z',
     'status': 'triggered',
     'pending_actions': [{
@@ -124,7 +124,7 @@ module.exports.incident = {
     'urgency': 'high',
     'id': 'XXXXXXX',
     'type': 'incident',
-    'summary': '[#63201] dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue 7',
+    'summary': '[#63201] dispatch 6cf9397c71e2: user kara responded \'no\' for self-service issue testGitHubRepo/7',
     'self': 'https://api.pagerduty.com/incidents/XXXXXXX',
     'html_url': 'https://mapbox.pagerduty.com/incidents/XXXXXXX'
   }

@@ -7,9 +7,8 @@ const slack = require('../../lib/slack.js');
 const fixtures = require('../../test/fixtures/slack.fixtures.js');
 
 test('[slack] [formatMessage] SNS parsing error', (assert) => {
-  slack.formatMessage(fixtures.sns.malformed, (err, status) => {
+  slack.formatMessage(fixtures.sns.malformed, (err) => {
     assert.equal(err instanceof TypeError, true, '-- should return TypeError');
-    assert.equal(status, fixtures.sns.malformedStatus, '-- should return status');
     assert.end();
   });
 });
@@ -49,7 +48,7 @@ test('[slack] [postAlert] missing message body error', (assert) => {
 
 test('[slack] [postAlert] destination user error, fallback channel success', (assert) => {
   slack.postAlert(fixtures.slack.username, fixtures.slack.message, fixtures.clients.errorUser, fixtures.slack.channel, fixtures.sns.requestId, (err, res) => {
-    assert.equal(err, fixtures.slack.errorCustomMessage, '-- passes custom error on Slack failure');
+    assert.ifError(err, '-- should not error');
     assert.deepEqual(res, fixtures.slack.successFallback, '-- should pass through response object');
     assert.equal(res.ok, true, '-- res.ok should be true');
     assert.equal(res.channel, fixtures.slack.channelId, '-- destination error for user should post to fallback channel');
@@ -59,7 +58,7 @@ test('[slack] [postAlert] destination user error, fallback channel success', (as
 
 test('[slack] [postAlert] destination user error, fallback channel error', (assert) => {
   slack.postAlert(fixtures.slack.username, fixtures.slack.message, fixtures.clients.errorChannel, fixtures.slack.channel, fixtures.sns.requestId, (err, res) => {
-    assert.equal(err, fixtures.slack.errorCustomMessage, '-- passes custom error on Slack failure');
+    assert.equal(err, fixtures.slack.errorNoChannel.error, '-- passes custom error on Slack failure');
     assert.deepEqual(res, fixtures.slack.errorNoChannel, '-- should pass through response object');
     assert.equal(res.ok, false, '-- res.ok should be false');
     assert.end();
@@ -84,11 +83,10 @@ test('[slack] [alertToSlack] encode error', (assert) => {
 
 test('[slack] [alertToSlack] formatMessage error', (assert) => {
   let formatMessageStub = sinon.stub(slack, 'formatMessage') // eslint-disable-line no-unused-vars
-    .yields(new TypeError('testError'), fixtures.sns.malformedStatus);
+    .yields(new TypeError('testError'));
 
-  slack.alertToSlack(fixtures.sns.malformed, fixtures.slack.username, fixtures.clients.empty, fixtures.slack.channel, (err, status) => {
+  slack.alertToSlack(fixtures.sns.malformed, fixtures.slack.username, fixtures.clients.empty, fixtures.slack.channel, (err) => {
     assert.equal(err instanceof TypeError, true, '-- should return TypeError');
-    assert.deepEqual(status, fixtures.sns.malformedStatus, '-- should return status');
     assert.end();
   });
 
@@ -99,11 +97,10 @@ test('[slack] [alertToSlack] postAlert error', (assert) => {
   let formatMessageStub = sinon.stub(slack, 'formatMessage') // eslint-disable-line no-unused-vars
     .yields(null, fixtures.slack.message);
   let postAlertStub = sinon.stub(slack, 'postAlert') // eslint-disable-line no-unused-vars
-    .yields(fixtures.slack.errorCustomMessage, fixtures.slack.successFallback);
+    .yields(fixtures.slack.errorNoChannel.error, fixtures.slack.errorNoChannel);
 
-  slack.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.errorUser, fixtures.slack.channel, (err, status) => {
-    assert.equal(err, fixtures.slack.errorAlertToSlack, '-- should return custom Slack error');
-    assert.deepEqual(status, fixtures.slack.successFallback, '-- should return status');
+  slack.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.errorUser, fixtures.slack.channel, (err) => {
+    assert.equal(err, fixtures.slack.errorNoChannel, '-- should return error');
     assert.end();
   });
 
@@ -136,11 +133,10 @@ test('[slack] [alertToSlack] postAlert message success, prompt error', (assert) 
   postAlertStub.withArgs(fixtures.slack.username, fixtures.slack.message, fixtures.clients.success, fixtures.slack.channel, fixtures.sns.requestId)
     .yields(null, fixtures.slack.success);
   postAlertStub.withArgs(fixtures.slack.username, fixtures.slack.prompt, fixtures.clients.success, fixtures.slack.channel, fixtures.sns.requestId)
-    .yields(fixtures.slack.errorCustomMessage, fixtures.slack.errorNoChannel);
+    .yields(fixtures.slack.errorNoChannel.error, fixtures.slack.errorNoChannel);
 
-  slack.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.success, fixtures.slack.channel, (err, status) => {
-    assert.equal(err, fixtures.slack.errorAlertToSlack, '-- should return custom Slack error');
-    assert.deepEqual(status, fixtures.slack.errorNoChannel, '-- should return status');
+  slack.alertToSlack(fixtures.sns.success, fixtures.slack.username, fixtures.clients.success, fixtures.slack.channel, (err) => {
+    assert.equal(err, fixtures.slack.errorNoChannel.error, '-- should return error');
     assert.end();
   });
 

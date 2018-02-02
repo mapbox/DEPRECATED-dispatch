@@ -26,13 +26,40 @@ triage.fn = function(event, context, callback) {
     const pagerDutyServiceId = process.env.PagerDutyServiceId;
     const slackVerificationToken = process.env.SlackVerificationToken;
 
+    const lambdaFailure = 'Lambda failure';
+
     triage.checkEvent(event, slackVerificationToken, (err, payload) => {
-      if (err) return callback(err);
+      if (err) {
+        console.log({
+          severity: 'error',
+          requestId: null,
+          service: 'lambda',
+          message: err
+        });
+        return callback(lambdaFailure);
+      }
 
       // validate callback decode for minimum info
       utils.decode(payload.callback_id, (err, res) => {
-        if (err) return callback(err);
-        if (!res.github) return callback(`Error - dispatch ${res.requestId} Slack callback_id missing GitHub issue`);
+        if (err) {
+          console.log({
+            severity: 'error',
+            requestId: null,
+            service: 'lambda',
+            message: err
+          });
+          return callback(lambdaFailure);
+        }
+        // check for GitHub issue for continued Slack functionality
+        if (!res.github) {
+          console.log({
+            severity: 'error',
+            requestId: res.requestId,
+            service: 'lambda',
+            message: 'input missing GitHub issue for Slack callback_id'
+          });
+          return callback(lambdaFailure);
+        }
 
         const response = payload.actions[0].name;
 
@@ -40,6 +67,7 @@ triage.fn = function(event, context, callback) {
         let responseObject;
         let responseError;
 
+        // RESPONSE YES
         if (response === 'yes') {
           let options = {
             token: gitHubToken,
@@ -50,7 +78,7 @@ triage.fn = function(event, context, callback) {
 
           let attachment = {
             attachment_type: 'default',
-            fallback: `Could not load Slack response, ${res.requestId}: closed GitHub issue ${res.github}`,
+            fallback: `Could not load Slack response, ${res.requestId}: closed GitHub issue ${gitHubRepo}/${res.github}`,
             text: responseText,
             color: '#008E00',
             footer: 'Dispatch alert acknowledged',
@@ -61,20 +89,35 @@ triage.fn = function(event, context, callback) {
           github.closeIssue(options, gitHubToken)
             .then(value => { // eslint-disable-line no-unused-vars
               // log success, return responseObject to Slack via callback
-              console.log(`dispatch ${res.requestId} - closed GitHub issue ${res.github}`);
+              console.log({
+                severity: 'notice',
+                requestId: res.requestId,
+                service: 'github',
+                message: `GitHub issue ${gitHubRepo}/${res.github} was successfully closed`
+              });
+
               responseObject = { attachments: [ attachment ] };
+
               return callback(null, responseObject);
             })
             .catch(error => {
               // log error, return responseError to Slack via callback
-              responseError = `Error - dispatch ${res.requestId} failed to close GitHub issue ${res.github}, ${error}`;
-              console.log(responseError);
+              console.log({
+                severity: 'error',
+                requestId: res.requestId,
+                service: 'github',
+                message: `failed to close GitHub issue ${gitHubRepo}/${res.github}, ${error}`
+              });
+
+              responseError = `Error: dispatch ${res.requestId} failed to close GitHub issue ${gitHubRepo}/${res.github}, ${error}`;
+
               return callback(null, responseError);
             });
         }
 
+        // RESPONSE NO
         else if (response === 'no') {
-          const pagerDutyTitle = `dispatch ${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${res.github}`;
+          const pagerDutyTitle = `dispatch ${res.requestId}: user ${payload.user.name} responded '${response}' for self-service issue ${gitHubRepo}/${res.github}`;
           const pagerDutyBody = `${pagerDutyTitle}\n\n https://github.com/${gitHubOwner}/${gitHubRepo}/issues/${res.github}`;
 
           let options = {
@@ -99,27 +142,54 @@ triage.fn = function(event, context, callback) {
           const incident = pagerduty.createIncident(options);
 
           incident
-            .then(value => { // eslint-disable-line no-unused-vars
+            .then(value => {
               // log success, return responseObject to Slack via callback
-              console.log(`dispatch ${res.requestId} - created PagerDuty incident successfully`);
+              console.log({
+                severity: 'notice',
+                requestId: res.requestId,
+                service: 'pagerduty',
+                message: `created PagerDuty incident ${value.body.incident.incident_key} successfully`
+              });
+
               responseObject = { attachments: [ attachment ] };
+
               return callback(null, responseObject);
             })
             .catch(error => {
               // check for existing PagerDuty incident
               if (error.errorMessage && /matching dedup key already exists/.test(error.errorMessage)) {
-                responseError = responseText ? responseText : `dispatch ${res.requestId} - found existing PagerDuty incident, will not create duplicate`;
+                console.log({
+                  severity: 'notice',
+                  requestId: res.requestId,
+                  service: 'pagerduty',
+                  message: `found existing PagerDuty incident, will not create duplicate`
+                });
+
+                responseError = responseText ? responseText : `dispatch ${res.requestId} - found existing PagerDuty incident ${value.incident.incident_key}, will not create duplicate`;
               } else {
-                responseError = `Error - dispatch ${res.requestId} failed to create PagerDuty incident`;
+                console.log({
+                  severity: 'error',
+                  requestId: res.requestId,
+                  service: 'pagerduty',
+                  message: 'failed to create PagerDuty incident'
+                });
+
+                responseError = `Error: dispatch ${res.requestId} failed to create PagerDuty incident`;
               }
-              // log error, return responseError to Slack via callback
-              console.log(responseError);
+
               return callback(null, responseError);
             });
         }
 
         else {
-          return callback(`Error - dispatch ${res.requestId} unhandled payload response`);
+          console.log({
+            severity: 'error',
+            requestId: res.requestId,
+            service: 'lambda',
+            message: 'unhandled payload response'
+          });
+
+          return callback(`Error: dispatch ${res.requestId} unhandled payload response`);
         }
       });
     });
@@ -137,12 +207,12 @@ triage.checkEvent = function(event, slackVerificationToken, callback) {
   try {
     let payload = JSON.parse(querystring.parse(event.postBody).payload);
 
-    if (payload.token !== slackVerificationToken) return callback('Error - incorrect Slack verification token');
-    if (payload.actions.length > 1) return callback(`Error - found ${payload.actions.length} actions in payload, expected 1`);
+    if (payload.token !== slackVerificationToken) return callback('incorrect Slack verification token');
+    if (payload.actions.length > 1) return callback(`found ${payload.actions.length} actions in payload, expected 1`);
 
     return callback(null, payload);
   } catch (err) {
-    return callback('Error - parsing dispatch triage event payload');
+    return callback('failed to parse dispatch triage event payload');
   }
 };
 

@@ -117,8 +117,6 @@ module.exports.sns = {
 module.exports.slack = {
   channel: '#testSlackDefaultChannel',
   channelId: 'D6G0UU7MW',
-  errorCustomMessage: 'slackAlertRoutingError',
-  errorAlertToSlack: 'Error - dispatch testRequestId failed to send message to @testSlackUser, see Slack and Lambda logs for details',
   errorNoChannel: {
     ok: false,
     error: 'channel_not_found',
@@ -149,7 +147,7 @@ module.exports.slack = {
   missingMessage: {
     requestId: 'testRequestId'
   },
-  missingMessageError: 'Error - dispatch testRequestId missing Slack message body',
+  missingMessageError: 'missing Slack message body',
   prompt: {
     text: 'testSlackPrompt',
     attachments: [
@@ -297,7 +295,7 @@ module.exports.clients = {
     chat: {
       postMessage: function(username, message, options, callback) {
         if (username == '@testSlackUser') {
-          return callback('error', {
+          return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
@@ -329,14 +327,14 @@ module.exports.clients = {
     chat: {
       postMessage: function(username, message, options, callback) {
         if (username == '@testSlackUser') {
-          return callback('error', {
+          return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
             acceptedScopes: [ 'chat:write:user', 'client' ]
           });
         } else {
-          return callback('error', {
+          return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
