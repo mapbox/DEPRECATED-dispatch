@@ -88,7 +88,7 @@ incoming.fn = function(event, context, callback) {
             return callback(null, lambdaSuccess);
           }
 
-          incoming.callSlack(user, message, requestId, slackDefaultChannel, slackBotToken, res, (err, status) => { // eslint-disable-line no-unused-vars
+          incoming.callSlack(user, message, requestId, slackDefaultChannel, slackBotToken, res, (err, status) => {
             if (err) {
               console.log({
                 severity: 'error',
@@ -98,6 +98,12 @@ incoming.fn = function(event, context, callback) {
               });
               return callback(lambdaFailure);
             }
+            console.log({
+              severity: 'info',
+              requestId: requestId,
+              service: 'lambda',
+              message: `self-service routing success - opened GitHub issue ${status.url}`
+            });
             return callback(null, lambdaSuccess);
           });
         });
@@ -135,7 +141,7 @@ incoming.fn = function(event, context, callback) {
             q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
           });
 
-          q.awaitAll(function(err, status) { // eslint-disable-line no-unused-vars
+          q.awaitAll(function(err, status) {
             if (err) {
               console.log({
                 severity: 'error',
@@ -145,6 +151,12 @@ incoming.fn = function(event, context, callback) {
               });
               return callback(lambdaFailure);
             }
+            console.log({
+              severity: 'info',
+              requestId: requestId,
+              service: 'lambda',
+              message: `broadcast routing success - opened GitHub issue ${status.url}`
+            });
             return callback(null, lambdaSuccess);
           });
         });
@@ -152,7 +164,7 @@ incoming.fn = function(event, context, callback) {
 
       // HIGH-PRIORITY
       else if (message.type === 'high-priority'){
-        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => { // eslint-disable-line no-unused-vars
+        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => {
           if (err) {
             console.log({
               severity: 'error',
@@ -162,12 +174,18 @@ incoming.fn = function(event, context, callback) {
             });
             return callback(lambdaFailure);
           }
+          console.log({
+            severity: 'info',
+            requestId: requestId,
+            service: 'lambda',
+            message: `high-priority routing success - ${res}`
+          });
           return callback(null, lambdaSuccess);
         });
       }
 
       else {
-        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => { // eslint-disable-line no-unused-vars
+        incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => {
           // log that fallback was invoked
           console.log({
             severity: 'warning',
@@ -185,6 +203,12 @@ incoming.fn = function(event, context, callback) {
             });
             return callback(lambdaFailure);
           }
+          console.log({
+            severity: 'info',
+            requestId: requestId,
+            service: 'lambda',
+            message: `fallback routing success - ${res}`
+          });
           return callback(null, lambdaSuccess);
         });
       }
@@ -294,8 +318,8 @@ incoming.callPagerDuty = function(message, requestId, pagerDutyApiKey, pagerDuty
   let incident = pagerduty.createIncident(options);
 
   incident
-    .then(value => { callback(null, `dispatch ${requestId} - PagerDuty incident triggered`); }) // eslint-disable-line no-unused-vars
-    .catch(error => { callback(error, `dispatch ${requestId} - PagerDuty error handled`); });
+    .then(value => { callback(null, `PagerDuty incident ${value.body.incident.incident_key} created`); })
+    .catch(error => { callback(error); });
 };
 
 /**
