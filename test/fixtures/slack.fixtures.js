@@ -3,39 +3,28 @@
 module.exports.sns = {
   broadcast: {
     type: 'broadcast',
-    users: ['@testUser1', '@testUser2', '@testUser3'],
-    'callback_id': 'testCallbackId',
-    number: 7,
+    users: ['@testSlackUser1', '@testSlackUser2', '@testSlackUser3'],
+    callback_id: 'testCallbackId',
     body: {
       github: {
-        title: 'testGithubTitle',
-        body: 'testGithubBody'
+        title: 'testGitHubTitle',
+        body: 'testGitHubBody'
       },
       slack: {
         message: 'testSlackMessage'
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7',
-    requestId: 123
-  },
-  malformed: {
-    type: 'self_service',
-    users: ['@testUser'],
-    body: {},
-    requestId: 123
-  },
-  malformedError: '123 sns message parsing error: TypeError: Cannot read property \'slack\' of undefined',
-  malformedMessageError: '123 sns message parsing error: TypeError: Cannot read property \'message\' of undefined',
-  malformedNoIssueError: 'No GitHub issue number found in message body',
-  success: {
-    type: 'self_service',
-    users: ['@testUser'],
-    'callback_id': 'testCallbackId',
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
     number: 7,
+    requestId: 'testRequestId'
+  },
+  encode: {
+    type: 'self-service',
+    users: ['@testSlackUser'],
     body: {
       github: {
-        title: 'testGithubTitle',
-        body: 'testGithubBody'
+        title: 'testGitHubTitle',
+        body: 'testGitHubBody'
       },
       slack: {
         message: 'testSlackMessage',
@@ -46,78 +35,126 @@ module.exports.sns = {
         }
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7',
-    requestId: 123
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+    requestId: 'testRequestId'
   },
-  successWithResponse: {
-    type: 'self_service',
-    users: ['@testUser'],
-    'callback_id': 'testCallbackId',
+  encodeError: 'Error - dispatch testRequestId message body missing GitHub issue number',
+  malformed: {
+    type: 'self-service',
+    users: ['@testSlackUser'],
+    body: {},
     number: 7,
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+    requestId: 'testRequestId'
+  },
+  malformedStatus: 'dispatch testRequestId - SNS message parsing error',
+  requestId: 'testRequestId',
+  success: {
+    type: 'self-service',
+    users: ['@testSlackUser'],
+    callback_id: 'testCallbackId',
     body: {
       github: {
-        title: 'testGithubTitle',
-        body: 'testGithubBody'
+        title: 'testGitHubTitle',
+        body: 'testGitHubBody'
       },
       slack: {
         message: 'testSlackMessage',
         prompt: 'testSlackPrompt',
         actions: {
           yes: 'testYesAction',
-          'yes_response': 'yes response',
-          no: 'testNoAction',
-          'no_response': 'no response'
+          no: 'testNoAction'
         }
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7',
-    requestId: 123
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+    number: 7,
+    requestId: 'testRequestId'
+  },
+  successWithResponse: {
+    type: 'self-service',
+    users: ['@testSlackUser'],
+    callback_id: 'testCallbackId',
+    body: {
+      github: {
+        title: 'testGitHubTitle',
+        body: 'testGitHubBody'
+      },
+      slack: {
+        message: 'testSlackMessage',
+        prompt: 'testSlackPrompt',
+        actions: {
+          yes: 'testYesAction',
+          yes_response: 'yes response',
+          no: 'testNoAction',
+          no_response: 'no response'
+        }
+      }
+    },
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+    number: 7,
+    requestId: 'testRequestId'
   },
   successNoPrompt: {
-    type: 'self_service',
-    users: ['@testUser'],
+    type: 'self-service',
+    users: ['@testSlackUser'],
     'callback_id': 'testCallbackId',
     number: 7,
     body: {
       github: {
-        title: 'testGithubTitle',
-        body: 'testGithubBody'
+        title: 'testGitHubTitle',
+        body: 'testGitHubBody'
       },
       slack: {
         message: 'testSlackMessage'
       }
     },
-    url: 'https://github.com/testOwner/testRepo/issues/7',
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
     requestId: 123
   }
 };
 
 module.exports.slack = {
-  channel: '#test-channel',
-  error: {
+  channel: '#testSlackDefaultChannel',
+  channelId: 'D6G0UU7MW',
+  errorNoChannel: {
     ok: false,
-    error: 'no_text',
+    error: 'channel_not_found',
     scopes: [ 'identify', 'bot:basic' ],
-    acceptedScopes: [ 'chat:write:user', 'client' ]
+    acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
   message: {
     text: 'testSlackMessage',
     attachments: [
       {
         fallback: 'Could not load GitHub issue.',
-        'callback_id': 'testCallbackId',
-        'attachment_type': 'default',
-        text: 'https://github.com/testOwner/testRepo/issues/7'
+        callback_id: 'testCallbackId',
+        attachment_type: 'default',
+        text: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
       }
     ]
   },
+  messageBroadcast: {
+    text: 'testSlackMessage',
+    attachments: [
+      {
+        fallback: 'Could not load GitHub issue.',
+        callback_id: 'testCallbackId',
+        attachment_type: 'default'
+      }
+    ]
+  },
+  missingMessage: {
+    requestId: 'testRequestId'
+  },
+  missingMessageError: 'missing Slack message body',
   prompt: {
     text: 'testSlackPrompt',
     attachments: [
       {
         fallback: 'You are unable to address this alert via Slack, refer to the GitHub issue.',
-        'callback_id': 'testCallbackId',
-        'attachment_type': 'default',
+        callback_id: 'testCallbackId',
+        attachment_type: 'default',
         actions: [
           {
             name: 'yes',
@@ -141,8 +178,8 @@ module.exports.slack = {
     attachments: [
       {
         fallback: 'You are unable to address this alert via Slack, refer to the GitHub issue.',
-        'callback_id': 'testCallbackId',
-        'attachment_type': 'default',
+        callback_id: 'testCallbackId',
+        attachment_type: 'default',
         actions: [
           {
             name: 'yes',
@@ -161,55 +198,44 @@ module.exports.slack = {
       }
     ]
   },
-  messageBroadcast: {
-    text: 'testSlackMessage',
-    attachments: [
-      {
-        fallback: 'Could not load GitHub issue.',
-        'callback_id': 'testCallbackId',
-        'attachment_type': 'default'
-      }
-    ]
-  },
-  missingMessageError: '123 missing Slack message body',
-  noChannel: {
-    ok: false,
-    error: 'channel_not_found',
-    scopes: [ 'identify', 'bot:basic' ],
-    acceptedScopes: [ 'chat:write:bot', 'post' ]
-  },
   status: {
     alert: true,
-    destination: '@testUser',
+    destination: '@testSlackUser',
     message: 'testSlackMessage',
-    url: 'https://github.com/testOwner/testRepo/issues/7'
-  },
-  statusPrompt: {
-    alert: true,
-    destination: '@testUser',
-    message: 'testSlackMessage, Prompt: testSlackPrompt',
-    url: 'https://github.com/testOwner/testRepo/issues/7'
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
   },
   statusBroadcast: [
     {
       alert: true,
-      destination: '@testUser1',
+      destination: '@testSlackUser1',
       message: 'testSlackMessage',
-      url: 'https://github.com/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testUser2',
+      destination: '@testSlackUser2',
       message: 'testSlackMessage',
-      url: 'https://github.com/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testUser3',
+      destination: '@testSlackUser3',
       message: 'testSlackMessage',
-      url: 'https://github.com/testOwner/testRepo/issues/7'
+      url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     }
   ],
+  statusIncomingSelfService: {
+    alert: true,
+    destination: '@testSlackUser',
+    message: 'testSlackMessage',
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
+  },
+  statusPrompt: {
+    alert: true,
+    destination: '@testSlackUser',
+    message: 'testSlackMessage, Prompt: testSlackPrompt',
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
+  },
   success: {
     ok: true,
     channel: 'D6G0UU7MW',
@@ -218,9 +244,24 @@ module.exports.slack = {
      { type: 'message',
        user: 'U6GHXJQ1Z',
        text: 'testSlackMessage',
-       'bot_id': 'B6G0UU6HW',
+       bot_id: 'B6G0UU6HW',
        attachments: [ [Object] ],
        ts: '1501777340.256863' },
+    scopes: [ 'identify', 'bot:basic' ],
+    acceptedScopes: [ 'chat:write:user', 'client' ]
+  },
+  successFallback: {
+    ok: true,
+    channel: 'D6G0UU7MW',
+    ts: '1501777340.256863',
+    message: {
+      type: 'message',
+      user: 'U6GHXJQ1Z',
+      text: 'testSlackMessage',
+      bot_id: 'B6G0UU6HW',
+      attachments: [ [Object] ],
+      ts: '1501777340.256863'
+    },
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
@@ -232,31 +273,31 @@ module.exports.slack = {
      { type: 'message',
        user: 'U6GHXJQ1Z',
        text: 'testSlackPrompt',
-       'bot_id': 'B6G0UU6HW',
+       bot_id: 'B6G0UU6HW',
        attachments: [ [Object] ],
        ts: '1501777340.256863' },
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  username: '@testUser',
-  usernameBroadcast: '@testUser1'
+  username: '@testSlackUser',
+  usernameBroadcast: '@testSlackUser1'
 };
 
 module.exports.clients = {
   empty: {
-    _token:'test-token',
-    slackAPIUrl:'test-url',
-    requestId: 123
+    _token:'testSlackBotToken',
+    slackAPIUrl:'testSlackApiUrl',
+    requestId: 'testRequestId'
   },
-  error: {
-    _token:'test-token',
-    slackAPIUrl:'test-url',
+  errorUser: {
+    _token:'testSlackBotToken',
+    slackAPIUrl:'testSlackApiUrl',
     chat: {
       postMessage: function(username, message, options, callback) {
-        if (username == '@testUser') {
-          return callback('error', {
+        if (username == '@testSlackUser') {
+          return callback('channel_not_found', {
             ok: false,
-            error: 'no_text',
+            error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
             acceptedScopes: [ 'chat:write:user', 'client' ]
           });
@@ -269,7 +310,7 @@ module.exports.clients = {
               type: 'message',
               user: 'U6GHXJQ1Z',
               text: 'testSlackMessage',
-              'bot_id': 'B6G0UU6HW',
+              bot_id: 'B6G0UU6HW',
               attachments: [ [Object] ],
               ts: '1501777340.256863'
             },
@@ -280,20 +321,20 @@ module.exports.clients = {
       }
     }
   },
-  everythingErrors: {
-    _token:'test-token',
-    slackAPIUrl:'test-url',
+  errorChannel: {
+    _token:'testSlackBotToken',
+    slackAPIUrl:'testSlackApiUrl',
     chat: {
       postMessage: function(username, message, options, callback) {
-        if (username == '@testUser') {
-          return callback('error', {
+        if (username == '@testSlackUser') {
+          return callback('channel_not_found', {
             ok: false,
-            error: 'no_text',
+            error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
             acceptedScopes: [ 'chat:write:user', 'client' ]
           });
         } else {
-          return callback('error', {
+          return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
             scopes: [ 'identify', 'bot:basic' ],
@@ -303,23 +344,9 @@ module.exports.clients = {
       }
     }
   },
-  noChannel: {
-    _token:'test-token',
-    slackAPIUrl:'test-url',
-    chat: {
-      postMessage: function(username, message, options, callback) {
-        return callback('error', {
-          ok: false,
-          error: 'channel_not_found',
-          scopes: [ 'identify', 'bot:basic' ],
-          acceptedScopes: [ 'chat:write:bot', 'post' ]
-        });
-      }
-    }
-  },
   success: {
-    _token:'test-token',
-    slackAPIUrl:'test-url',
+    _token:'testSlackBotToken',
+    slackAPIUrl:'testSlackApiUrl',
     chat: {
       postMessage: function(username, message, options, callback) {
         return callback(null, {
@@ -330,7 +357,7 @@ module.exports.clients = {
             type: 'message',
             user: 'U6GHXJQ1Z',
             text: 'testSlackMessage',
-            'bot_id': 'B6G0UU6HW',
+            bot_id: 'B6G0UU6HW',
             attachments: [ [Object] ],
             ts: '1501777340.256863'
           },

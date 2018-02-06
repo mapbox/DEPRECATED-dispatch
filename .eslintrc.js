@@ -18,7 +18,6 @@ module.exports = {
     'no-trailing-spaces': [2],
     'no-tabs': [2],
     'new-cap': [2],
-    'camelcase': [2],
     'block-spacing': ['error', 'always'],
     'no-multiple-empty-lines': [2],
     'semi': ['error', 'always']

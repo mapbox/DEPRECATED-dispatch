@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/mapbox/dispatch.svg?token=s7DU2T5bv9A6JyGJHzqV&branch=announce-only)](https://travis-ci.com/mapbox/dispatch)
+[![Build Status](https://travis-ci.org/mapbox/dispatch.svg?branch=master)](https://travis-ci.org/mapbox/dispatch)
 
 ![Dispatch logo](https://github.com/mapbox/dispatch/blob/master/assets/dispatch-large.png)
 
@@ -36,27 +36,27 @@ You'll also need a GitHub organization with private repositories, a PagerDuty ac
 To set up Dispatch for your organization, you'll need to do the following:
 
 1. Configure GitHub
-1. Configure PagerDuty
-1. Configure the Dispatch Slack app and bot
-1. Configure AWS Key Management Service (KMS)
-1. Deploy the dispatch-incoming AWS Lambda function
-1. Deploy the dispatch-triage AWS Lambda function
-1. Update the Dispatch Slack app with the dispatch-triage API Gateway URL
+2. Configure PagerDuty
+3. Configure the Dispatch Slack app and bot
+4. Configure AWS Key Management Service (KMS)
+5. Deploy the dispatch-incoming AWS Lambda function
+6. Deploy the dispatch-triage AWS Lambda function
+7. Update the Dispatch Slack app with the dispatch-triage API Gateway URL
 
 ### 1. Configure GitHub
 
 To configure GitHub for Dispatch, you'll need to do the following:
 
 1. Create or select a default GitHub repository for Dispatch GitHub issues
-1. Select or create a failover default GitHub user or team
-1. Create a machine account or select an existing user account to run Dispatch
-1. Generate a GitHub personal access token with `repo` scope with the account from Step #2
+2. Select or create a failover default GitHub user or team
+3. Create a machine account or select an existing user account to run Dispatch
+4. Generate a GitHub personal access token with `repo` scope with the account from Step #2
 
-Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the default GitHub repository via the `GithubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup. Dispatch will default to creating issues in this repository; however, you can also specify a different destination repository using the `githubRepo` property in the SNS message specification. This allows different alarms to be routed to different GitHub repos.
+Dispatch creates a new GitHub issue for each alarm, using the `title` and `body` from the Dispatch message specification to populate the issue. You can use an existing GitHub repository or create a new one. You'll provide the name of the default GitHub repository via the `GitHubRepo` CloudFormation parameter when deploying the `incoming` and `triage` functions via lambda-cfn in steps 3 and 4 of setup. Dispatch will default to creating issues in this repository; however, you can also specify a different destination repository using the `githubRepo` property in the SNS message specification. This allows different alarms to be routed to different GitHub repos.
 
-When deploying Dispatch you'll also need to provide a GitHub personal access token with a full `repo` scope via the `GithubToken` CloudFormation parameter. For least privilege we recommend that you use a dedicated GitHub account that only has write access to your Dispatch alerts repository. Dispatch will use the account associated with the access token to create GitHub issues.
+When deploying Dispatch you'll also need to provide a GitHub personal access token with a full `repo` scope via the `GitHubToken` CloudFormation parameter. For least privilege we recommend that you use a dedicated GitHub account that only has write access to your Dispatch alerts repository. Dispatch will use the account associated with the access token to create GitHub issues.
 
-If Dispatch doesn't receive the GitHub handle for the user in the SNS message, then it will fallback to tagging a default GitHub user or GitHub team. Provide this via the `GithubDefaultUser` CloudFormation parameter.
+If Dispatch doesn't receive the GitHub handle for the user in the SNS message, then it will fallback to tagging a default GitHub user or GitHub team. Provide this via the `GitHubDefaultUser` CloudFormation parameter.
 
 It's on our road map to evaluate and possibly switch to [GitHub apps](https://developer.github.com/apps/) instead of personal access tokens.
 
@@ -132,10 +132,10 @@ For example, if you run `lambda-cfn create dev -k` this will create a CloudForma
 
 When deploying or updating dispatch-incoming you'll need to provide values for the following CloudFormation parameters:
 
-* `GithubOwner` = Your GitHub organization's name
-* `GithubDefaultUser` = Default GitHub user or team when a user's GitHub handle is missing
-* `GithubRepo` = Default GitHub repository for Dispatch issues
-* `GithubToken` = [sensitive] GitHub personal access token for Dispatch machine account
+* `GitHubOwner` = Your GitHub organization's name
+* `GitHubDefaultUser` = Default GitHub user or team when a user's GitHub handle is missing
+* `GitHubRepo` = Default GitHub repository for Dispatch issues
+* `GitHubToken` = [sensitive] GitHub personal access token for Dispatch machine account
 * `PagerDutyServiceId` = The ID of your Dispatch PagerDuty service, obtained from the service URL in PagerDuty
 * `PagerDutyFromAddress` = Email address of a valid PagerDuty user in your team, [required by the PagerDuty API](https://v2.developer.pagerduty.com/docs/incident-creation-api)
 * `PagerDutyApiKey` = [sensitive] PagerDuty API key

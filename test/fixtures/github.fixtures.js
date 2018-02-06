@@ -1,21 +1,19 @@
 'use strict';
 
-/* eslint-disable camelcase */
-
 module.exports.issue1 = issue1;
 module.exports.manyIssues = manyIssues;
 module.exports.closedIssue = closedIssue;
 
 module.exports.broadcastIssue = {
-  url: 'https://api.github.com/repos/testOwner/testRepo/issues/7',
-  repository_url: 'https://api.github.com/repos/testOwner/testRepo',
-  labels_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/labels{/name}',
-  comments_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/comments',
-  events_url: 'https://api.github.com/repos/testOwner/testRepo/issues/7/events',
-  html_url: 'https://github.com/testOwner/testRepo/issues/7',
+  url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7',
+  repository_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo',
+  labels_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/labels{/name}',
+  comments_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/comments',
+  events_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/events',
+  html_url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
   id: 123,
   number: 7,
-  title: 'testGithubTitle',
+  title: 'testGitHubTitle',
   user: {},
   labels: [],
   state: 'open',
@@ -27,7 +25,41 @@ module.exports.broadcastIssue = {
   created_at: '2017-08-02T23:36:11Z',
   updated_at: '2017-08-02T23:36:11Z',
   closed_at: null,
-  body: 'testGithubBody\n\n @mapbox/security'
+  body: 'testGithubBody\n\n @testGitHubUser'
+};
+
+module.exports.selfServiceIssue = {
+  id: 123,
+  url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7',
+  repository_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo',
+  labels_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/labels{/name}',
+  comments_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/comments',
+  events_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/events',
+  html_url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+  number: 7,
+  state: 'open',
+  title: 'testGitHubTitle',
+  body: 'testGitHubBody\n\n @testGitHubUser',
+  user: {},
+  labels: [],
+  assignee: null,
+  assignees: [],
+  milestone: null,
+  locked: false,
+  comments: 0,
+  closed_at: null,
+  created_at: '2017-08-02T23:36:11Z',
+  updated_at: '2017-08-02T23:36:11Z'
+};
+
+module.exports.noIssueFound = {
+  message: '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/issues/#list-issues-for-a-repository"}',
+  code: 404,
+  status: 'Not Found',
+  headers: {
+    'content-type': 'application/json; charset=utf-8',
+    status: '404 Not Found'
+  }
 };
 
 const dataDump = {
@@ -44,9 +76,7 @@ const dataDump = {
   labels: [],
   state: 'open',
   locked: false,
-  assignee: {
-    'login': 'testUser'
-  },
+  assignee: null,
   assignees: [],
   milestone: null,
   comments: 0,
@@ -76,9 +106,7 @@ function closedIssue() {
     labels: [],
     state: 'closed',
     locked: false,
-    assignee: {
-      'login': 'testOwner'
-    },
+    assignee: null,
     assignees: [],
     milestone: null,
     comments: 0,

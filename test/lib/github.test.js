@@ -1,28 +1,26 @@
 'use strict';
 
-const tape = require('tape');
+const test = require('tape');
 const nock = require('nock');
-const githubRequests = require('../../lib/github.js');
-const issuesFixtures = require('../fixtures/github.fixtures.js');
+const github = require('../../lib/github.js');
+const githubFixtures = require('../fixtures/github.fixtures.js');
 
-/* eslint-disable camelcase */
-tape('[github] Receive auth object from request', function(assert) {
+const token = 'testToken';
+
+test('[github] [authenticate] Receive auth object from request', function(assert) {
   let auth = {
     type: 'oauth',
-    token: 'FakeApiToken'
+    token: token
   };
-
-  let ghAuth = githubRequests.authenticate('FakeApiToken');
-
-  assert.same(ghAuth.auth, auth, 'Function returns expected auth object');
+  let ghAuth = github.authenticate(token);
+  assert.same(ghAuth.auth, auth, '-- function returns expected auth object');
   assert.end();
 });
 
-tape('[github] Finds requested issue', function(assert) {
-  let issue = [ issuesFixtures.issue1()] ;
-
-  let optionsExists = {
-    token: 'FakeApiToken',
+test('[github] [checkForIssue] Finds requested issue', function(assert) {
+  let issue = [ githubFixtures.issue1() ];
+  let retrigger = true;
+  let options = {
     owner: 'testOwner',
     repo: 'testRepo',
     title: 'testTitle'
@@ -30,47 +28,50 @@ tape('[github] Finds requested issue', function(assert) {
 
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
+    .query({ state: 'open', access_token: token })
     .reply(200, issue);
 
-  githubRequests.checkForIssue(optionsExists)
+  github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, 'Response is an array');
-      assert.deepEqual(res, issue, 'Found issue');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, issue, '-- found issue');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
-tape('[github] Does not find a match to the requested issue', function(assert) {
-  let issue = issuesFixtures.issue1();
-
-  let optionsDoesntExist = {
-    token: 'FakeApiToken',
+test('[github] [checkForIssue] Does not find a match to the requested issue', function(assert) {
+  let retrigger = true;
+  let options = {
     owner: 'testOwner',
     repo: 'testRepo',
-    title: 'anotherTestTitle'
+    title: 'testTitleNotFound'
   };
 
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
-    .reply(200, issue);
+    .query({ state: 'open', access_token: token })
+    .reply(function(uri, requestBody) { // eslint-disable-line no-unused-vars
+      return [
+        githubFixtures.noIssueFound.code,
+        githubFixtures.noIssueFound.message,
+        githubFixtures.noIssueFound.headers
+      ];
+    });
 
-  githubRequests.checkForIssue(optionsDoesntExist)
+  github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, 'Response is an array');
-      assert.deepEqual(res, [], 'Returns empty array');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, [], '-- returns empty array');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
-tape('[github] Pagination works', function(assert) {
-  let issues = issuesFixtures.manyIssues(); // contains 150 issues
-
-  let optionsExist = {
-    token: 'FakeApiToken',
+test('[github] [checkForIssue] Pagination works', function(assert) {
+  let issues = githubFixtures.manyIssues(); // contains 150 issues
+  let retrigger = true;
+  let options = {
     owner: 'testOwner',
     repo: 'testRepo',
     title: 'testTitle'
@@ -78,118 +79,108 @@ tape('[github] Pagination works', function(assert) {
 
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
+    .query({ state: 'open', access_token: token })
     .reply(200, issues);
 
-  githubRequests.checkForIssue(optionsExist)
+  github.checkForIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(Array.isArray(res), true, 'Response is an array');
-      assert.deepEqual(res, issues, 'Returns all 150 issues');
+      assert.deepEqual(Array.isArray(res), true, '-- response is an array');
+      assert.deepEqual(res, issues, '-- returns all 150 issues');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
-tape('[github] Does not create issue because one exists. Retrigger is on.', function(assert) {
-  let issue = issuesFixtures.issue1();
-
-  let optionsExists = {
-    token: 'FakeApiToken',
-    owner: 'testOwner',
-    repo: 'testRepo',
-    title: 'testTitle',
-    retrigger: true,
-    body: 'testBody'
-  };
-
-  nock('https://api.github.com')
-    .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
-    .reply(200, issue);
-
-  githubRequests.createIssue(optionsExists)
-    .then(res => {
-      assert.deepEqual(res, {status: 'exists', issue: 7}, 'Does not create issue');
-      assert.end();
-    })
-    .catch(err => { console.log(err); });
-});
-
-tape('[github] Does not create issue because one exists. Retrigger is off.', function(assert) {
-  let issue = issuesFixtures.closedIssue();
-
-  let optionsExists = {
-    token: 'FakeApiToken',
-    owner: 'testOwner',
-    repo: 'testRepo',
-    title: 'testTitle',
-    retrigger: false,
-    body: 'testBody'
-  };
-
-  nock('https://api.github.com')
-    .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'all', access_token: 'FakeApiToken'})
-    .reply(200, issue);
-
-  githubRequests.createIssue(optionsExists)
-    .then(res => {
-      assert.deepEqual(res, {status: 'exists', issue: 7}, 'Does not create issue');
-      assert.end();
-    })
-    .catch(err => { console.log(err); });
-});
-
-tape('[github] Creates issue', function(assert) {
-  let noIssue = [];
-  let issue = issuesFixtures.issue1();
-
+test('[github] [createIssue] Does not create issue because one exists. Retrigger is on.', function(assert) {
+  let issue = githubFixtures.issue1();
+  let retrigger = true;
   let options = {
-    token: 'FakeApiToken',
     owner: 'testOwner',
     repo: 'testRepo',
     title: 'testTitle',
-    body: 'testBody',
-    user: 'testUser'
+    body: 'testBody'
   };
 
   nock('https://api.github.com')
     .get('/repos/testOwner/testRepo/issues')
-    .query({state: 'open', access_token: 'FakeApiToken'})
-    .reply(200, noIssue);
+    .query({ state: 'open', access_token: token })
+    .reply(200, issue);
 
-  nock('https://api.github.com:443', {'encodedQueryParams':true})
-    .post('/repos/testOwner/testRepo/issues', {'title':'testTitle','body':'testBody'})
-    .query({'access_token':'FakeApiToken'})
+  github.createIssue(options, retrigger, token)
+    .then(res => {
+      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
+      assert.end();
+    })
+    .catch(err => { console.log(err); });
+});
+
+test('[github] [createIssue] Does not create issue because one exists. Retrigger is off.', function(assert) {
+  let issue = githubFixtures.closedIssue();
+  let retrigger = false;
+  let options = {
+    owner: 'testOwner',
+    repo: 'testRepo',
+    title: 'testTitle',
+    body: 'testBody'
+  };
+
+  nock('https://api.github.com')
+    .get('/repos/testOwner/testRepo/issues')
+    .query({ state: 'all', access_token: token })
+    .reply(200, issue);
+
+  github.createIssue(options, retrigger, token)
+    .then(res => {
+      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
+      assert.end();
+    })
+    .catch(err => { console.log(err); });
+});
+
+test('[github] [createIssue] No existing issue, creates new issue', function(assert) {
+  let issue = githubFixtures.issue1();
+  let retrigger = true;
+  let options = {
+    owner: 'testOwner',
+    repo: 'testRepo',
+    title: 'testTitle',
+    body: 'testBody'
+  };
+
+  nock('https://api.github.com')
+    .get('/repos/testOwner/testRepo/issues')
+    .query({ state: 'open', access_token: token })
+    .reply(200, []);
+
+  nock('https://api.github.com', { encodedQueryParams: true })
+    .post('/repos/testOwner/testRepo/issues', { title: 'testTitle', body: 'testBody' })
+    .query({ access_token: token })
     .reply(201, issue);
 
-  githubRequests.createIssue(options)
+  github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res.number, issue.number, 'Issue created');
-      assert.equal(res.user, issue.assignee.login, 'Issue is assigned');
+      assert.deepEqual(res.number, issue.number, '-- issue is created');
       assert.end();
     })
     .catch(err => { console.log(err); });
 });
 
-tape('[github] Closes issue', function(assert) {
-  let closedIssue = issuesFixtures.closedIssue();
-
+test('[github] [closeIssue] Closes issue', function(assert) {
+  let closedIssue = githubFixtures.closedIssue();
   let options = {
-    token: 'FakeApiToken',
     owner: 'testOwner',
     repo: 'testRepo',
     number: '1'
   };
 
-  nock('https://api.github.com:443', {'encodedQueryParams':true})
-    .patch('/repos/testOwner/testRepo/issues/1', {'state':'closed'})
-    .query({'access_token':'FakeApiToken'})
+  nock('https://api.github.com', { encodedQueryParams: true })
+    .patch('/repos/testOwner/testRepo/issues/1', { state: 'closed' })
+    .query({ access_token: token })
     .reply(200, closedIssue);
 
-  githubRequests.closeIssue(options)
+  github.closeIssue(options, token)
     .then(res => {
-      assert.deepEqual(res.data, closedIssue, 'Issue is closed');
+      assert.deepEqual(res.data, closedIssue, '-- issue is closed');
       assert.end();
     })
     .catch(err => { console.log(err); });
