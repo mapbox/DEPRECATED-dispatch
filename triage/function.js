@@ -90,7 +90,7 @@ triage.fn = function(event, context, callback) {
             .then(value => { // eslint-disable-line no-unused-vars
               // log success, return responseObject to Slack via callback
               console.log({
-                severity: 'notice',
+                severity: 'info',
                 requestId: res.requestId,
                 service: 'github',
                 message: `GitHub issue ${gitHubRepo}/${res.github} was successfully closed`
@@ -145,7 +145,7 @@ triage.fn = function(event, context, callback) {
             .then(value => {
               // log success, return responseObject to Slack via callback
               console.log({
-                severity: 'notice',
+                severity: 'info',
                 requestId: res.requestId,
                 service: 'pagerduty',
                 message: `created PagerDuty incident ${value.body.incident.incident_key} successfully`
