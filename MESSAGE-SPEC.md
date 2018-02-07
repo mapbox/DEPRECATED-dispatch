@@ -31,7 +31,7 @@ The self-service message on Slack includes a link to the associated GitHub issue
   retrigger: 'BOOLEAN', // optional, defaults to true if not specified - if false Dispatch will not resend a message for a preexisting issue
   users: [ // required
     {
-      slack: 'STRING_VALUE', // required, Slack handle
+      slackId: 'STRING_VALUE', // required, Slack ID
       github: 'STRING_VALUE' // required, GitHub handle
     }
   ],
@@ -88,10 +88,10 @@ Unlike self-service alarms, broadcast Slack DMs do not include a link to their a
   retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
   users: [
     {
-      slack: 'STRING_VALUE' // required, Slack handle
+      slackId: 'STRING_VALUE' // required, Slack ID
     },
     {
-      slack: 'STRING_VALUE'  // required, Slack handle
+      slackId: 'STRING_VALUE' // required, Slack ID
     }
   ],
   body: {
@@ -129,20 +129,20 @@ High priority dispatch messages open a PagerDuty incident.
 
 ## Users array specification
 
-Dispatch only processes Slack and GitHub handles in the `users` array. It ignores handles or usernames for other services. This allows you to connect Dispatch to a central API or username mappings file without having to scrub or remove other data.
+Dispatch only processes Slack IDs and GitHub handles in the `users` array. It ignores handles or usernames for other services. This allows you to connect Dispatch to a central API or username mappings file without having to scrub or remove other data.
 
-Dispatch automatically adds the `@` symbol to Slack handles if it is missing (and the `#` to channels). Do not add the `@` symbol to GitHub handles.
+Dispatch automatically adds `#` to Slack channels. Do not add the `@` symbol to GitHub handles.
 
 ``` javascript
 users: [
   {
-    slack: 'user1SlackHandle',
+    slackId: 'user1SlackId',
     github: 'user1GitHubHandle',
     google: 'user1GoogleHandle', // ignored
     okta: 'user1OktaHandle' // ignored
   },
   {
-    slack: 'user2SlackHandle',
+    slackId: 'user2SlackId',
     github: 'user2GitHubHandle',
     google: 'user2GoogleHandle', // ignored
     okta: 'user2OktaHandle' // ignored
@@ -151,7 +151,7 @@ users: [
 ]
 ```
 
-If a Slack or GitHub handle is missing from the `users` array, then Dispatch will fallback to either a Slack channel or GitHub user/team for visibility. These values are set via CloudFormation parameters when deploying `dispatch-incoming` and `dispatch-triage` via [lambda-cfn](https://github.com/mapbox/lambda-cfn).
+If a Slack Id or GitHub handle is missing from the `users` array, then Dispatch will fallback to either a Slack channel or GitHub user/team for visibility. These values are set via CloudFormation parameters when deploying `dispatch-incoming` and `dispatch-triage` via [lambda-cfn](https://github.com/mapbox/lambda-cfn).
 
 * Slack = `SlackChannel`
 * GitHub = `GitHubDefaultUser`
