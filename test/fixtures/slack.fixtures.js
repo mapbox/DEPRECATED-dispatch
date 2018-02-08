@@ -3,7 +3,20 @@
 module.exports.sns = {
   broadcast: {
     type: 'broadcast',
-    users: ['@testSlackUser1', '@testSlackUser2', '@testSlackUser3'],
+    users: [
+      {
+        slack: 'testSlackUser1',
+        slackId: 'testSlackId1'
+      },
+      {
+        slack: 'testSlackUser2',
+        slackId: 'testSlackId2'
+      },
+      {
+        slack: 'testSlackUser3',
+        slackId: 'testSlackId3'
+      }
+    ],
     callback_id: 'testCallbackId',
     body: {
       github: {
@@ -20,7 +33,12 @@ module.exports.sns = {
   },
   encode: {
     type: 'self-service',
-    users: ['@testSlackUser'],
+    users: [
+      {
+        slack: 'testSlackUser',
+        slackId: 'testSlackId'
+      }
+    ],
     body: {
       github: {
         title: 'testGitHubTitle',
@@ -41,7 +59,12 @@ module.exports.sns = {
   encodeError: 'Error - dispatch testRequestId message body missing GitHub issue number',
   malformed: {
     type: 'self-service',
-    users: ['@testSlackUser'],
+    users: [
+      {
+        slack: 'testSlackUser',
+        slackId: 'testSlackId'
+      }
+    ],
     body: {},
     number: 7,
     url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
@@ -51,7 +74,12 @@ module.exports.sns = {
   requestId: 'testRequestId',
   success: {
     type: 'self-service',
-    users: ['@testSlackUser'],
+    users: [
+      {
+        slack: 'testSlackUser',
+        slackId: 'testSlackId'
+      }
+    ],
     callback_id: 'testCallbackId',
     body: {
       github: {
@@ -73,7 +101,12 @@ module.exports.sns = {
   },
   successWithResponse: {
     type: 'self-service',
-    users: ['@testSlackUser'],
+    users: [
+      {
+        slack: 'testSlackUser',
+        slackId: 'testSlackId'
+      }
+    ],
     callback_id: 'testCallbackId',
     body: {
       github: {
@@ -97,7 +130,12 @@ module.exports.sns = {
   },
   successNoPrompt: {
     type: 'self-service',
-    users: ['@testSlackUser'],
+    users: [
+      {
+        slack: 'testSlackUser',
+        slackId: 'testSlackId'
+      }
+    ],
     'callback_id': 'testCallbackId',
     number: 7,
     body: {
@@ -200,39 +238,39 @@ module.exports.slack = {
   },
   status: {
     alert: true,
-    destination: '@testSlackUser',
+    destination: 'testSlackId',
     message: 'testSlackMessage',
     url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
   },
   statusBroadcast: [
     {
       alert: true,
-      destination: '@testSlackUser1',
+      destination: 'testSlackId1',
       message: 'testSlackMessage',
       url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testSlackUser2',
+      destination: 'testSlackId2',
       message: 'testSlackMessage',
       url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     },
     {
       alert: true,
-      destination: '@testSlackUser3',
+      destination: 'testSlackId3',
       message: 'testSlackMessage',
       url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
     }
   ],
   statusIncomingSelfService: {
     alert: true,
-    destination: '@testSlackUser',
+    destination: 'testSlackId',
     message: 'testSlackMessage',
     url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
   },
   statusPrompt: {
     alert: true,
-    destination: '@testSlackUser',
+    destination: 'testSlackId',
     message: 'testSlackMessage, Prompt: testSlackPrompt',
     url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
   },
@@ -279,8 +317,7 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  username: '@testSlackUser',
-  usernameBroadcast: '@testSlackUser1'
+  slackId: 'testSlackId'
 };
 
 module.exports.clients = {
@@ -293,8 +330,8 @@ module.exports.clients = {
     _token:'testSlackBotToken',
     slackAPIUrl:'testSlackApiUrl',
     chat: {
-      postMessage: function(username, message, options, callback) {
-        if (username == '@testSlackUser') {
+      postMessage: function(destination, message, options, callback) {
+        if (destination == 'testSlackId') {
           return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
@@ -325,8 +362,8 @@ module.exports.clients = {
     _token:'testSlackBotToken',
     slackAPIUrl:'testSlackApiUrl',
     chat: {
-      postMessage: function(username, message, options, callback) {
-        if (username == '@testSlackUser') {
+      postMessage: function(destination, message, options, callback) {
+        if (destination == 'testSlackId') {
           return callback('channel_not_found', {
             ok: false,
             error: 'channel_not_found',
@@ -348,7 +385,7 @@ module.exports.clients = {
     _token:'testSlackBotToken',
     slackAPIUrl:'testSlackApiUrl',
     chat: {
-      postMessage: function(username, message, options, callback) {
+      postMessage: function(destination, message, options, callback) {
         return callback(null, {
           ok: true,
           channel: 'D6G0UU7MW',

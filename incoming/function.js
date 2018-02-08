@@ -244,11 +244,7 @@ incoming.checkEvent = function(event, callback) {
  * @param {string} slackDefaultChannel - default Slack channel, substitute if user.slack is missing
  */
 incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel) {
-  if (user.slack && !(user.slack.indexOf('@') > -1)) {
-    // user has Slack ID
-    user.slack = `@${user.slack}`;
-  }
-  if (!user.slack) {
+  if (!user.slackId) {
     // missing Slack ID, fallback to default channel
     user.slack = `#${slackDefaultChannel}`;
   }
@@ -281,7 +277,7 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   if (message.users.length > 1) {
     // if broadcast to >1 users, compile list of Slack IDs that were sent the message
     let userArray = message.users.map(function(obj) { return obj.slack; });
-    options.body = `${message.body.github.body} \n\n ${userArray.toString()}`;
+    options.body = `${message.body.github.body} \n\n \`\`\`\n${userArray.toString()}\n\`\`\``;
   } else {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
@@ -338,7 +334,7 @@ incoming.callSlack = function(user, message, requestId, slackDefaultChannel, sla
   message.number = resGitHub.number;
   message.requestId = requestId;
 
-  slack.alertToSlack(message, user.slack, client, slackDefaultChannel, (err, status) => {
+  slack.alertToSlack(message, user.slackId, client, slackDefaultChannel, (err, status) => {
     if (err) return callback(err);
     return callback(null, status);
   });
