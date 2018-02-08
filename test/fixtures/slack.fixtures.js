@@ -161,6 +161,7 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:bot', 'post' ]
   },
+  errorNoChannelFallback: 'channel_not_found for destination #testSlackDefaultChannel',
   message: {
     text: 'testSlackMessage',
     attachments: [

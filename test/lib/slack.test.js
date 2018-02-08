@@ -58,7 +58,7 @@ test('[slack] [postAlert] destination user error, fallback channel success', (as
 
 test('[slack] [postAlert] destination user error, fallback channel error', (assert) => {
   slack.postAlert(fixtures.slack.slackId, fixtures.slack.message, fixtures.clients.errorChannel, fixtures.slack.channel, fixtures.sns.requestId, (err, res) => {
-    assert.equal(err, fixtures.slack.errorNoChannel.error, '-- passes custom error on Slack failure');
+    assert.equal(err, fixtures.slack.errorNoChannelFallback, '-- passes custom error on Slack failure');
     assert.deepEqual(res, fixtures.slack.errorNoChannel, '-- should pass through response object');
     assert.equal(res.ok, false, '-- res.ok should be false');
     assert.end();
