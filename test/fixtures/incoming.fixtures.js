@@ -135,6 +135,41 @@ module.exports.selfServiceEvent = {
   ]
 };
 
+module.exports.callGitHubEvent = {
+  user: 'testGitHubDefaultUser',
+  requestId: 'testRequestId',
+  messageBroadcastError: {
+    type: 'broadcast',
+    users: [
+      {
+        slackId: 'testSlackDefaultChannel'
+      },
+      {
+        slack: 'testSlackUser2',
+        slackId: 'testSlackId2'
+      },
+      {
+        slack: 'testSlackUser3',
+        slackId: 'testSlackId3'
+      }
+    ],
+    body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      }
+    }
+  },
+  res: {
+    owner: 'testGitHubOwner',
+    repo: 'testGitHubRepo',
+    title: 'testGithubTitle',
+    body: 'testGithubBody \n\n ```\ntestSlackDefaultChannel,testSlackUser2,testSlackUser3\n```',
+    number: 7,
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
+  }
+};
+
 module.exports.userMissingGitHub = {
   slackId: 'testSlackId'
 };
@@ -150,7 +185,7 @@ module.exports.userMissingSlack = {
 
 module.exports.userDefautSlack = {
   github: 'testGitHubUsername',
-  slack: '#testSlackDefaultChannel'
+  slackId: '#testSlackDefaultChannel'
 };
 
 module.exports.malformedSNS = {

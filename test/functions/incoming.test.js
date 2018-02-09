@@ -38,6 +38,24 @@ test('[incoming] [checkUser] missing Slack username', (assert) => {
   assert.end();
 });
 
+test('[incoming] [callGitHub] missing Slack username, default to id', (assert) => {
+  nock('https://api.github.com')
+    .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ state: 'open', access_token: process.env.GitHubToken })
+    .reply(200, []);
+
+  nock('https://api.github.com')
+    .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ access_token: process.env.GitHubToken })
+    .reply(201, githubFixtures.broadcastIssue);
+
+  incoming.callGitHub(incomingFixtures.callGitHubEvent.user, incomingFixtures.callGitHubEvent.messageBroadcastError, incomingFixtures.callGitHubEvent.requestId, process.env.GitHubOwner, process.env.GitHubRepo, process.env.GitHubToken, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, incomingFixtures.callGitHubEvent.res, '-- Github issue should be created');
+    assert.end();
+  });
+});
+
 test('[incoming] [fn] missing message priority', (assert) => {
   incoming.fn(incomingFixtures.missingPriorityEvent, context, (err) => {
     assert.deepEqual(err, lambdaFailure, '-- should return error message');
@@ -100,7 +118,7 @@ test('[incoming] [fn] broadcast event', (assert) => {
   nock('https://api.github.com')
     .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
     .query({ access_token: process.env.GitHubToken })
-    .reply(201, githubFixtures.selfServiceIssue);
+    .reply(201, githubFixtures.broadcastIssue);
 
   // slack calls for [ 'testSlackUser1', 'testSlackUser2', 'testSlackUser3' ]
   nock('https://slack.com:443')
