@@ -178,7 +178,7 @@ Replace `$SNS_ARN` and `$USER` with your SNS topic ARN and your GitHub and Slack
 
 ```
 aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
---message "{\"type\":\"self-service\",\"users\":[{\"slack\": \"$USER\",\"github\":\"$USER\"}],\"body\":{\"github\":{\"title\":\"self-service title\",\"body\":\"self-service body\"},\"slack\":{\"message\":\"testSlackMessage\",\"prompt\":\"testSlackPrompt\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
+--message "{\"type\":\"self-service\",\"users\":[{\"slackId\": \"$USER\",\"github\":\"$USER\"}],\"body\":{\"github\":{\"title\":\"self-service title\",\"body\":\"self-service body\"},\"slack\":{\"message\":\"testSlackMessage\",\"prompt\":\"testSlackPrompt\",\"actions\":{\"yes\":\"testYesAction\",\"no\":\"testNoAction\"}}}}"
 ```
 
 ### Broadcast example
@@ -187,7 +187,7 @@ Broadcast alerts send non-interactive Slack messages to multiple users. They cre
 
 ```
 aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
---message "{\"type\":\"broadcast\",\"users\":[{\"slack\": \"$USER1\",\"github\":\"$USER1\"},{\"slack\": \"$USER2\",\"github\":\"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\"}}}"
+--message "{\"type\":\"broadcast\",\"users\":[{\"slackId\": \"$USER1\"},{\"slackId\": \"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\"}}}"
 ```
 
 ### High priority example

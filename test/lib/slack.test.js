@@ -75,7 +75,7 @@ test('[slack] [postAlert] destination user success', (assert) => {
 });
 
 test('[slack] [alertToSlack] encode error', (assert) => {
-  slack.alertToSlack(fixtures.sns.encode, fixtures.slack.slackId, fixtures.clients.empty, fixtures.slack.channel, (err) => {
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.encode, fixtures.clients.empty, fixtures.slack.channel, (err) => {
     assert.equal(err, fixtures.sns.encodeError, '-- should return error');
     assert.end();
   });
@@ -85,7 +85,7 @@ test('[slack] [alertToSlack] formatMessage error', (assert) => {
   let formatMessageStub = sinon.stub(slack, 'formatMessage') // eslint-disable-line no-unused-vars
     .yields(new TypeError('testError'));
 
-  slack.alertToSlack(fixtures.sns.malformed, fixtures.slack.slackId, fixtures.clients.empty, fixtures.slack.channel, (err) => {
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.malformed, fixtures.clients.empty, fixtures.slack.channel, (err) => {
     assert.equal(err instanceof TypeError, true, '-- should return TypeError');
     assert.end();
   });
@@ -97,10 +97,10 @@ test('[slack] [alertToSlack] postAlert error', (assert) => {
   let formatMessageStub = sinon.stub(slack, 'formatMessage') // eslint-disable-line no-unused-vars
     .yields(null, fixtures.slack.message);
   let postAlertStub = sinon.stub(slack, 'postAlert') // eslint-disable-line no-unused-vars
-    .yields(fixtures.slack.errorNoChannel.error, fixtures.slack.errorNoChannel);
+    .yields(fixtures.slack.errorNoChannelFallback, fixtures.slack.errorNoChannel);
 
-  slack.alertToSlack(fixtures.sns.success, fixtures.slack.slackId, fixtures.clients.errorUser, fixtures.slack.channel, (err) => {
-    assert.equal(err, fixtures.slack.errorNoChannel, '-- should return error');
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.success, fixtures.clients.errorUser, fixtures.slack.channel, (err) => {
+    assert.equal(err, fixtures.slack.errorNoChannelFallback, '-- should return error');
     assert.end();
   });
 
@@ -114,7 +114,7 @@ test('[slack] [alertToSlack] postAlert message success, no prompt', (assert) => 
   let postAlertStub = sinon.stub(slack, 'postAlert') // eslint-disable-line no-unused-vars
     .yields(null, fixtures.slack.success);
 
-  slack.alertToSlack(fixtures.sns.successNoPrompt, fixtures.slack.slackId, fixtures.clients.success, fixtures.slack.channel, (err, status) => {
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.successNoPrompt, fixtures.clients.success, fixtures.slack.channel, (err, status) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(status, fixtures.slack.status, '-- should return status');
     assert.equal(status.alert, true, '-- status.alert should be true');
@@ -135,7 +135,7 @@ test('[slack] [alertToSlack] postAlert message success, prompt error', (assert) 
   postAlertStub.withArgs(fixtures.slack.slackId, fixtures.slack.prompt, fixtures.clients.success, fixtures.slack.channel, fixtures.sns.requestId)
     .yields(fixtures.slack.errorNoChannel.error, fixtures.slack.errorNoChannel);
 
-  slack.alertToSlack(fixtures.sns.success, fixtures.slack.slackId, fixtures.clients.success, fixtures.slack.channel, (err) => {
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.success, fixtures.slack.channel, fixtures.clients.success, (err) => {
     assert.equal(err, fixtures.slack.errorNoChannel.error, '-- should return error');
     assert.end();
   });
@@ -154,7 +154,7 @@ test('[slack] [alertToSlack] postAlert message success, prompt success', (assert
   postAlertStub.withArgs(fixtures.slack.slackId, fixtures.slack.prompt, fixtures.clients.success)
     .yields(null, fixtures.slack.successPrompt);
 
-  slack.alertToSlack(fixtures.sns.success, fixtures.slack.slackId, fixtures.clients.success, fixtures.slack.channel, (err, status) => {
+  slack.alertToSlack(fixtures.slack.user, fixtures.sns.success, fixtures.slack.channel, fixtures.clients.success, (err, status) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(status, fixtures.slack.statusPrompt, '-- should return status');
     assert.equal(status.alert, true, '-- status.alert should be true');
