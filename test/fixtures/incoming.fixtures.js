@@ -7,7 +7,7 @@ module.exports.missingPriorityEvent = {
       Sns: {
         Message: JSON.stringify(
           {
-            users: [ { github: 'testGitHubUser', slack: 'testSlackUser' }],
+            users: [ { github: 'testGitHubUser', slack: 'testSlackUser', slackId: 'testSlackId' }],
             body: {
               github: {
                 title: 'testGitHubTitle',
@@ -38,13 +38,16 @@ module.exports.broadcastEvent = {
             type: 'broadcast',
             users: [
               {
-                slack: 'testSlackUser1'
+                slack: 'testSlackUser1',
+                slackId: 'testSlackId1'
               },
               {
-                slack: 'testSlackUser2'
+                slack: 'testSlackUser2',
+                slackId: 'testSlackId2'
               },
               {
-                slack: 'testSlackUser3'
+                slack: 'testSlackUser3',
+                slackId: 'testSlackId3'
               }
             ],
             body: {
@@ -108,7 +111,7 @@ module.exports.selfServiceEvent = {
         Message: JSON.stringify(
           {
             type: 'self-service',
-            users: [ { github: 'testGitHubUser', slack: 'testSlackUser' }],
+            users: [ { github: 'testGitHubUser', slack: 'testSlackUser', slackId: 'testSlackId' }],
             body: {
               github: {
                 title: 'testGitHubTitle',
@@ -132,12 +135,47 @@ module.exports.selfServiceEvent = {
   ]
 };
 
+module.exports.callGitHubEvent = {
+  user: 'testGitHubDefaultUser',
+  requestId: 'testRequestId',
+  messageBroadcastError: {
+    type: 'broadcast',
+    users: [
+      {
+        slackId: 'testSlackDefaultChannel'
+      },
+      {
+        slack: 'testSlackUser2',
+        slackId: 'testSlackId2'
+      },
+      {
+        slack: 'testSlackUser3',
+        slackId: 'testSlackId3'
+      }
+    ],
+    body: {
+      github: {
+        title: 'testGithubTitle',
+        body: 'testGithubBody'
+      }
+    }
+  },
+  res: {
+    owner: 'testGitHubOwner',
+    repo: 'testGitHubRepo',
+    title: 'testGithubTitle',
+    body: 'testGithubBody \n\n ```\ntestSlackDefaultChannel,testSlackUser2,testSlackUser3\n```',
+    number: 7,
+    url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7'
+  }
+};
+
 module.exports.userMissingGitHub = {
-  slack: '@testSlackUsername'
+  slackId: 'testSlackId'
 };
 
 module.exports.userDefautGitHub = {
-  slack: '@testSlackUsername',
+  slackId: 'testSlackId',
   github: 'testGitHubDefaultUser'
 };
 
@@ -147,7 +185,7 @@ module.exports.userMissingSlack = {
 
 module.exports.userDefautSlack = {
   github: 'testGitHubUsername',
-  slack: '#testSlackDefaultChannel'
+  slackId: '#testSlackDefaultChannel'
 };
 
 module.exports.malformedSNS = {

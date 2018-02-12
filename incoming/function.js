@@ -151,11 +151,12 @@ incoming.fn = function(event, context, callback) {
               });
               return callback(lambdaFailure);
             }
+
             console.log({
               severity: 'info',
               requestId: requestId,
               service: 'lambda',
-              message: `broadcast routing success - opened GitHub issue ${status.url}`
+              message: `broadcast routing success - opened GitHub issue ${status[0].url}`
             });
             return callback(null, lambdaSuccess);
           });
@@ -244,13 +245,9 @@ incoming.checkEvent = function(event, callback) {
  * @param {string} slackDefaultChannel - default Slack channel, substitute if user.slack is missing
  */
 incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel) {
-  if (user.slack && !(user.slack.indexOf('@') > -1)) {
-    // user has Slack ID
-    user.slack = `@${user.slack}`;
-  }
-  if (!user.slack) {
+  if (!user.slackId) {
     // missing Slack ID, fallback to default channel
-    user.slack = `#${slackDefaultChannel}`;
+    user.slackId = `#${slackDefaultChannel}`;
   }
   if (!user.github) {
     // missing GitHub handle, fallback to default user/team
@@ -278,11 +275,19 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     title: message.body.github.title
   };
 
-  if (message.users.length > 1) {
-    // if broadcast to >1 users, compile list of Slack IDs that were sent the message
-    let userArray = message.users.map(function(obj) { return obj.slack; });
-    options.body = `${message.body.github.body} \n\n ${userArray.toString()}`;
-  } else {
+  // BROADCAST
+  if (message.type === 'broadcast') {
+    // if broadcast to >1 users, compile list of recipient Slack display_names or IDs
+    let userArray = message.users.map(function(obj) {
+      if (obj.slack) return obj.slack;
+      else return obj.slackId;
+    });
+    // add recipient list wrapped in GitHub MD code tags
+    options.body = `${message.body.github.body} \n\n \`\`\`\n${userArray.toString()}\n\`\`\``;
+  }
+
+  // SELF-SERVICE
+  if (message.type === 'self-service') {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
 
@@ -325,9 +330,11 @@ incoming.callPagerDuty = function(message, requestId, pagerDutyApiKey, pagerDuty
 /**
  * Trigger lib/slack.js functionality, send Slack message for dispatch alert
  *
+ * @param {object} user - user object, contains Slack ID (destination)
  * @param {object} message - message object, contains Slack message body and interactive options
  * @param {string} requestId - unique ID per dispatch alert
  * @param {string} slackDefaultChannel - passed again as a fallback for issue with Slack username
+ * @param {object} resGitHub - response object from callGitHub
  * @param {string} slackBotToken
  * @param {function} callback
  */
@@ -338,7 +345,7 @@ incoming.callSlack = function(user, message, requestId, slackDefaultChannel, sla
   message.number = resGitHub.number;
   message.requestId = requestId;
 
-  slack.alertToSlack(message, user.slack, client, slackDefaultChannel, (err, status) => {
+  slack.alertToSlack(message, user.slackId, client, slackDefaultChannel, (err, status) => {
     if (err) return callback(err);
     return callback(null, status);
   });
