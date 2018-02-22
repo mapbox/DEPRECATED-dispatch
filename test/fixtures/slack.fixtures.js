@@ -318,7 +318,17 @@ module.exports.slack = {
     scopes: [ 'identify', 'bot:basic' ],
     acceptedScopes: [ 'chat:write:user', 'client' ]
   },
-  slackId: 'testSlackId'
+  slackId: 'testSlackId',
+  user: {
+    github: 'testGitHubUsername',
+    defaulted: false,
+    slackId: 'testSlackId'
+  },
+  userDefauted: {
+    github: 'testGitHubUsername',
+    defaulted: true,
+    slackId: '#testSlackDefaultChannel'
+  }
 };
 
 module.exports.clients = {

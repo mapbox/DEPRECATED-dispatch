@@ -43,9 +43,9 @@ module.exports = lambdaCfn.build({
       Type: 'String',
       Description: '[secure] Slack API bot token'
     },
-    SlackChannel: {
+    SlackDefaultChannel: {
       Type: 'String',
-      Description: 'Default Slack channel for dispatch-bot'
+      Description: 'Default Slack channel for dispatch, MUST INCLUDE #'
     }
   },
   statements: [

@@ -176,6 +176,7 @@ module.exports.userMissingGitHub = {
 
 module.exports.userDefautGitHub = {
   slackId: 'testSlackId',
+  defaulted: false,
   github: 'testGitHubDefaultUser'
 };
 
@@ -185,6 +186,7 @@ module.exports.userMissingSlack = {
 
 module.exports.userDefautSlack = {
   github: 'testGitHubUsername',
+  defaulted: true,
   slackId: '#testSlackDefaultChannel'
 };
 

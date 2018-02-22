@@ -17,7 +17,7 @@ process.env.GitHubOwner = 'testGitHubOwner';
 process.env.GitHubRepo = 'testGitHubRepo';
 process.env.GitHubToken = 'testGitHubToken';
 process.env.SlackBotToken = 'testSlackBotToken';
-process.env.SlackDefaultChannel = 'testSlackDefaultChannel';
+process.env.SlackDefaultChannel = '#testSlackDefaultChannel';
 
 const context = {};
 const gitHubDefaultUser = process.env.GitHubDefaultUser;
