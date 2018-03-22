@@ -156,7 +156,7 @@ incoming.fn = function(event, context, callback) {
               severity: 'info',
               requestId: requestId,
               service: 'lambda',
-              message: `broadcast routing success - opened GitHub issue ${status[0].url}`
+              message: 'broadcast routing success - opened GitHub issue'
             });
             return callback(null, lambdaSuccess);
           });
