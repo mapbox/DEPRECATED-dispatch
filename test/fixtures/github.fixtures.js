@@ -28,6 +28,30 @@ module.exports.broadcastIssue = {
   body: 'testGithubBody\n\n testSlackID'
 };
 
+module.exports.lowPriorityIssue = {
+  url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7',
+  repository_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo',
+  labels_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/labels{/name}',
+  comments_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/comments',
+  events_url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7/events',
+  html_url: 'https://github.com/testGitHubOwner/testGitHubRepo/issues/7',
+  id: 123,
+  number: 7,
+  title: 'testGitHubTitle',
+  user: {},
+  labels: [],
+  state: 'open',
+  locked: false,
+  assignee: null,
+  assignees: [],
+  milestone: null,
+  comments: 0,
+  created_at: '2017-08-02T23:36:11Z',
+  updated_at: '2017-08-02T23:36:11Z',
+  closed_at: null,
+  body: 'testGithubBody'
+};
+
 module.exports.selfServiceIssue = {
   id: 123,
   url: 'https://api.github.com/repos/testGitHubOwner/testGitHubRepo/issues/7',

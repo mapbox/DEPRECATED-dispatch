@@ -11,6 +11,7 @@ To use Dispatch, have your applications and monitoring systems send [AWS Simple 
 - **Self-service alerts** send interactive Slack messages to users, prompting them to answer yes or no. The user's response is tracked via a GitHub issue for audit purposes. If a user responds yes, it closes the issue. If a user response no, Dispatch escalates the alarm to PagerDuty.
 - **Broadcast alerts** are non-interactive messages delivered via Slack to multiple users. These alerts create a single GitHub issue for audit purposes with a list of users that received the message.
 - **High priority alerts** are sent directly to PagerDuty.
+- **Low priority alerts** are sent directly to a GitHub issue.
 
 ## Architecture
 
@@ -139,7 +140,7 @@ When deploying or updating dispatch-incoming you'll need to provide values for t
 * `PagerDutyServiceId` = The ID of your Dispatch PagerDuty service, obtained from the service URL in PagerDuty
 * `PagerDutyFromAddress` = Email address of a valid PagerDuty user in your team, [required by the PagerDuty API](https://v2.developer.pagerduty.com/docs/incident-creation-api)
 * `PagerDutyApiKey` = [sensitive] PagerDuty API key
-* `SlackChannel` = Fallback Slack channel for when Dispatch direct messages fail
+* `slackDefaultChannel` = Fallback Slack channel for when Dispatch direct messages fail
 * `SlackBotToken` = [sensitive] Bot user OAuth access token from your Dispatch Slack app (begins with `xoxb-`)
 * `KmsKey` = Cloudformation-kms stack name or AWS KMS key ARN to encrypt sensitive parameter values
 
@@ -195,8 +196,17 @@ aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
 High priority Dispatch alerts create PagerDuty incidents without creating a GitHub issue. Replace `$SNS_ARN` and `$PD_SERVICE_ID` with your SNS topic ARN and PagerDuty service ID.
 
 ```
-aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"high\",\"body\":{\"pagerduty\":{\"service\":\"$PD_SERVICE_ID\",\"title\":\"testAlert\",\"body\":\"testAlert\"}}}"
+aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"high-priority\",\"body\":{\"pagerduty\":{\"service\":\"$PD_SERVICE_ID\",\"title\":\"testAlert\",\"body\":\"testAlert\"}}}"
 ```
+
+### Low priority example
+
+Low priority Dispatch alerts create a GitHub issue only. Replace `$SNS_ARN` and `$GITHUB_REPO` with your SNS topic ARN and target GitHub repository.
+
+```
+aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"low-priority\",\"githubRepo\":\"$GITHUB_REPO\",\"body\":{\"github\":{\"title\":\"low-priority title\",\"body\":\"low-priority body\"}}}"
+```
+
 
 ## Development
 
