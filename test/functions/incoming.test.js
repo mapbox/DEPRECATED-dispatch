@@ -38,6 +38,14 @@ test('[incoming] [checkUser] missing Slack username', (assert) => {
   assert.end();
 });
 
+test('[incoming] [checkUser] undefined user passed', (assert) => {
+  let user = incoming.checkUser(undefined, gitHubDefaultUser, slackDefaultChannel, 'testRequestId', 'testMessageBody');
+  assert.equal(user.defaulted, true, '-- undefined user defaulted');
+  assert.equal(user.slackId, slackDefaultChannel, '-- undefined user set to default Slack channel');
+  assert.equal(user.github, gitHubDefaultUser, '-- undefined user set to default GitHub user');
+  assert.end();
+});
+
 test('[incoming] [callGitHub] missing Slack username, default to id', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)

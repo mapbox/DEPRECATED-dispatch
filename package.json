@@ -24,18 +24,18 @@
   "dependencies": {
     "@mapbox/lambda-cfn": "^2.0.0",
     "@mapbox/pagerduty": "^1.0.0",
-    "@slack/client": "^3.10.0",
-    "aws-sdk": "^2.94.0",
+    "@slack/client": "^3.16.0",
+    "aws-sdk": "^2.230.1",
+    "base64url": "0.0.6",
+    "d3-queue": "^3.0.0",
     "decrypt-kms-env": "^3.0.0",
     "github": "^9.2.0",
-    "d3-queue": "^3.0.0",
-    "request": "^2.81.0",
-    "base64url": "0.0.6"
+    "request": "^2.85.0"
   },
   "devDependencies": {
-    "nock": "^9.0.14",
+    "eslint": "^4.19.1",
+    "nock": "^9.2.5",
     "sinon": "^2.1.0",
-    "tape": "^4.8.0",
-    "eslint": "^4.4.1"
+    "tape": "^4.9.0"
   }
 }

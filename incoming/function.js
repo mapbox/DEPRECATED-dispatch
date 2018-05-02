@@ -62,7 +62,7 @@ incoming.fn = function(event, context, callback) {
 
       // SELF-SERVICE
       if (message.type === 'self-service') {
-        let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel);
+        let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel, requestId, message);
 
         incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
           if (err) {
@@ -137,7 +137,7 @@ incoming.fn = function(event, context, callback) {
 
           let q = queue(1);
           message.users.forEach((user) => {
-            user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel);
+            user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel, requestId, message);
             q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
           });
 
@@ -244,7 +244,22 @@ incoming.checkEvent = function(event, callback) {
  * @param {string} gitHubDefaultUser - default GitHub user or team, substitute if user.github missing
  * @param {string} slackDefaultChannel - default Slack channel, substitute if user.slack is missing
  */
-incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel) {
+incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel, requestId, message) {
+  if (!user) {
+    console.log({
+      severity: 'error',
+      requestId: requestId,
+      service: 'checkUser',
+      message: `checkUser called with undefined user, defaulting user array. Message: ${message}`
+    });
+    user = {
+      defaulted: true,
+      slackId: slackDefaultChannel,
+      github: gitHubDefaultUser
+    };
+    return user;
+  }
+
   user.defaulted = false;
   if (!user.slackId) {
     // missing Slack ID, fallback to default channel
