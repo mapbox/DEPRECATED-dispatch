@@ -342,8 +342,8 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     options.body = `${message.body.github.body} \n\n \`\`\`\n${userArray.toString()}\n\`\`\``;
   }
 
-  // SELF-SERVICE
-  if (message.type === 'self-service') {
+  // SELF-SERVICE or LOW-PRIORITY
+  if ((message.type === 'self-service') || (message.type === 'low-priority')) {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
 
