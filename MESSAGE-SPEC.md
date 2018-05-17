@@ -120,11 +120,38 @@ High priority dispatch messages open a PagerDuty incident.
 {
   type: 'high-priority', // required
   requestId: 'STRING_VALUE', // optional, id for logging
+  pagerDutyServiceId: 'STRING_VALUE', // optional, overrides the default PagerDuty service in dispatch-incoming
   body: {
     pagerduty: {
       service: 'STRING_VALUE', // required, PagerDuty service ID to create incident for
       title: 'STRING_VALUE', // required, PagerDuty incident title
       body: 'STRING_VALUE' // optional, PagerDuty incident body
+    }
+  }
+}
+```
+
+## Low priority dispatch
+
+Low priority dispatch messages open a GitHub issue.
+
+### Message specification for `low-priority`
+
+``` javascript
+{
+  type: 'low-priority', // required
+  requestId: 'STRING_VALUE', // optional, ID for logging - if not passed, a 6 character random hex requestId will be generated and used
+  githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
+  retrigger: 'BOOLEAN', // optional, defaults to true if not specified - if false Dispatch will not resend a message for a preexisting issue
+  users: [ // required
+    {
+      github: 'STRING_VALUE' // required, GitHub handle
+    }
+  ],
+  body: { // required
+    github: {
+      title: 'STRING_VALUE' // required, GitHub issue title
+      body: 'STRING_VALUE' // required, GitHub issue body
     }
   }
 }
@@ -141,14 +168,12 @@ users: [
   {
     slackId: 'user1SlackId',
     github: 'user1GitHubHandle',
-    google: 'user1GoogleHandle', // ignored
-    okta: 'user1OktaHandle' // ignored
+    google: 'user1GoogleHandle' // ignored
   },
   {
     slackId: 'user2SlackId',
     github: 'user2GitHubHandle',
-    google: 'user2GoogleHandle', // ignored
-    okta: 'user2OktaHandle' // ignored
+    google: 'user2GoogleHandle' // ignored
   },
   ...
 ]
@@ -156,5 +181,5 @@ users: [
 
 If a Slack Id or GitHub handle is missing from the `users` array, then Dispatch will fallback to either a Slack channel or GitHub user/team for visibility. These values are set via CloudFormation parameters when deploying `dispatch-incoming` and `dispatch-triage` via [lambda-cfn](https://github.com/mapbox/lambda-cfn).
 
-* Slack = `SlackChannel`
+* Slack = `SlackDefaultChannel`
 * GitHub = `GitHubDefaultUser`

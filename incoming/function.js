@@ -164,7 +164,7 @@ incoming.fn = function(event, context, callback) {
       }
 
       // HIGH-PRIORITY
-      else if (message.type === 'high-priority'){
+      else if (message.type === 'high-priority') {
         incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => {
           if (err) {
             console.log({
@@ -180,6 +180,44 @@ incoming.fn = function(event, context, callback) {
             requestId: requestId,
             service: 'lambda',
             message: `high-priority routing success - ${res}`
+          });
+          return callback(null, lambdaSuccess);
+        });
+      }
+
+      // LOW-PRIORITY
+      else if (message.type === 'low-priority') {
+        let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel);
+
+        incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'github',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
+
+          // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
+          let isGithubIssueExists = res && res.status === 'exists';
+
+          if (isGithubIssueExists) {
+            console.log({
+              severity: 'notice',
+              requestId: requestId,
+              service: 'github',
+              message: `issue ${res.issue} already exists`
+            });
+            return callback(null, lambdaSuccess);
+          }
+
+          console.log({
+            severity: 'info',
+            requestId: requestId,
+            service: 'lambda',
+            message: 'low priority routing success - opened GitHub issue'
           });
           return callback(null, lambdaSuccess);
         });
@@ -304,8 +342,8 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     options.body = `${message.body.github.body} \n\n \`\`\`\n${userArray.toString()}\n\`\`\``;
   }
 
-  // SELF-SERVICE
-  if (message.type === 'self-service') {
+  // SELF-SERVICE or LOW-PRIORITY
+  if ((message.type === 'self-service') || (message.type === 'low-priority')) {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
 
