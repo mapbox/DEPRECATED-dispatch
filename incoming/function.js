@@ -350,6 +350,7 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   }
 
   console.log(message);
+  console.log(options);
 
   github.createIssue(options, message.retrigger, gitHubToken)
     .then(res => {
