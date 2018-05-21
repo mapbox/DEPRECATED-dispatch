@@ -189,6 +189,8 @@ incoming.fn = function(event, context, callback) {
       else if (message.type === 'low-priority') {
         let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel);
 
+        console.log(`${gitHubRepo} ${gitHubOwner}`);
+
         incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
           if (err) {
             console.log({
@@ -346,6 +348,9 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   if ((message.type === 'self-service') || (message.type === 'low-priority')) {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
+
+  console.log(message);
+  console.log(options);
 
   github.createIssue(options, message.retrigger, gitHubToken)
     .then(res => {
