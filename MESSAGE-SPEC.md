@@ -157,6 +157,8 @@ Low priority dispatch messages open a GitHub issue.
 }
 ```
 
+Only the first user of users array will be tagged in the github issue created by the low-priority message.
+
 ## Users array specification
 
 Dispatch only processes Slack IDs and GitHub handles in the `users` array. It ignores handles or usernames for other services. This allows you to connect Dispatch to a central API or username mappings file without having to scrub or remove other data.
