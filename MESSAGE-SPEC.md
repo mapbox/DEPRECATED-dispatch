@@ -143,9 +143,9 @@ Low priority dispatch messages open a GitHub issue.
   requestId: 'STRING_VALUE', // optional, ID for logging - if not passed, a 6 character random hex requestId will be generated and used
   githubRepo: 'STRING_VALUE', // optional, specify GitHub repository for Dispatch issue
   retrigger: 'BOOLEAN', // optional, defaults to true if not specified - if false Dispatch will not resend a message for a preexisting issue
-  users: [ // required
+  users: [
     {
-      github: 'STRING_VALUE' // required, GitHub handle
+      github: 'STRING_VALUE' // GitHub handle
     }
   ],
   body: { // required
