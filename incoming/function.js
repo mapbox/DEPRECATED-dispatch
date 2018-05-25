@@ -187,7 +187,13 @@ incoming.fn = function(event, context, callback) {
 
       // LOW-PRIORITY
       else if (message.type === 'low-priority') {
-        let user = incoming.checkUser(message.users[0], gitHubDefaultUser, slackDefaultChannel);
+        let user = undefined;
+
+        if (Array.isArray(message)) {
+          user = message.users[0];
+        }
+
+        user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel);
 
         incoming.callGitHub(user, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
           if (err) {
