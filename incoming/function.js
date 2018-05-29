@@ -323,7 +323,7 @@ incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel, requ
  * Trigger lib/github.js functionality, create GitHub issue for dispatch alert
  *
  * @param {object} user - user object, contains usernames
- * @param {object} message - message object, contains GitHub issue title and body
+ * @param {object} message - message object, contains GitHub issue title, body, and labels
  * @param {string} requestId - unique ID per dispatch alert
  * @param {string} gitHubOwner
  * @param {string} gitHubRepo
@@ -336,6 +336,15 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     repo: gitHubRepo,
     title: message.body.github.title
   };
+
+  // labels can be passed in as an array of strings, and said labels will be applied to
+  // the new issue. any labels that don't already exist in that repo will be created
+  // https://developer.github.com/v3/issues/#create-an-issue
+  if (message.body.github.labels) {
+    options.labels = message.body.github.labels;
+  } else if (message.body.github.label) {
+    options.labels = [message.body.github.label];
+  }
 
   // BROADCAST
   if (message.type === 'broadcast') {

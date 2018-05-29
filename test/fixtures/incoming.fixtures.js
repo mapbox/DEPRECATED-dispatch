@@ -108,6 +108,29 @@ module.exports.lowPriorityEvent = {
   ]
 };
 
+module.exports.labelledEvent = {
+  Records:
+  [
+    { EventSource: 'aws:sns',
+      Sns: {
+        Message: JSON.stringify(
+          {
+            type: 'low-priority',
+            users: [ { github: 'testGitHubUser' }],
+            body: {
+              github: {
+                title: 'testGitHubTitle',
+                body: 'testGitHubBody',
+                labels: ['low_priority']
+              }
+            }
+          }
+        )
+      }
+    }
+  ]
+};
+
 module.exports.lowPriorityEventNoUser = {
   Records:
     [

@@ -24,12 +24,12 @@
   "dependencies": {
     "@mapbox/lambda-cfn": "^2.0.0",
     "@mapbox/pagerduty": "^1.0.0",
+    "@octokit/rest": "^15.8.0",
     "@slack/client": "^3.16.0",
     "aws-sdk": "^2.230.1",
     "base64url": "0.0.6",
     "d3-queue": "^3.0.0",
     "decrypt-kms-env": "^3.0.0",
-    "github": "^9.2.0",
     "request": "^2.85.0"
   },
   "devDependencies": {
