@@ -8,13 +8,17 @@ const githubFixtures = require('../fixtures/github.fixtures.js');
 const token = 'testToken';
 
 test('[github] [authenticate] Receive auth object from request', function(assert) {
-  let auth = {
-    type: 'oauth',
-    token: token
-  };
   let ghAuth = github.authenticate(token);
-  assert.same(ghAuth.auth, auth, '-- function returns expected auth object');
-  assert.end();
+
+  const getUserNock = nock('https://api.github.com')
+    .get('/user')
+    .query({ access_token: token })
+    .reply(200, {});
+
+  ghAuth.users.get().then(() => {
+    assert.ok(getUserNock.isDone());
+    assert.end();
+  });
 });
 
 test('[github] [checkForIssue] Finds requested issue', function(assert) {

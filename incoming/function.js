@@ -147,7 +147,8 @@ incoming.fn = function(event, context, callback) {
                 severity: 'error',
                 requestId: requestId,
                 service: 'slack',
-                message: err
+                message: err,
+                status: status
               });
               return callback(lambdaFailure);
             }
