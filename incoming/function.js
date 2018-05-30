@@ -190,7 +190,7 @@ incoming.fn = function(event, context, callback) {
       else if (message.type === 'low-priority') {
         let user = undefined;
 
-        if (Array.isArray(message)) {
+        if (Array.isArray(message.users)) {
           user = message.users[0];
         }
 
