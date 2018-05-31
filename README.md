@@ -188,7 +188,7 @@ Broadcast alerts send non-interactive Slack messages to multiple users. They cre
 
 ```
 aws sns publish --topic-arn "$SNS_ARN" --subject "test" \
---message "{\"type\":\"broadcast\",\"users\":[{\"slackId\": \"$USER1\"},{\"slackId\": \"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\"},\"slack\":{\"message\":\"testSlackMessage\"}}}"
+--message "{\"type\":\"broadcast\",\"users\":[{\"slackId\": \"$USER1\"},{\"slackId\": \"$USER2\"}],\"body\":{\"github\":{\"title\":\"broadcast title\",\"body\":\"broadcast body\", \"labels\": [\"broadcast\"]},\"slack\":{\"message\":\"testSlackMessage\"}}}"
 ```
 
 ### High priority example
@@ -204,7 +204,7 @@ aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"h
 Low priority Dispatch alerts create a GitHub issue only. Replace `$SNS_ARN` and `$GITHUB_REPO` with your SNS topic ARN and target GitHub repository.
 
 ```
-aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"low-priority\",\"githubRepo\":\"$GITHUB_REPO\",\"body\":{\"github\":{\"title\":\"low-priority title\",\"body\":\"low-priority body\"}}}"
+aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"low-priority\",\"githubRepo\":\"$GITHUB_REPO\",\"body\":{\"github\":{\"title\":\"low-priority title\",\"body\":\"low-priority body\", \"labels\": [\"low_priority\"]}}}"
 ```
 
 

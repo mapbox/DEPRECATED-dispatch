@@ -12,7 +12,7 @@ The Dispatch message specification currently accepts three types of alarm routin
 
 Self-service Dispatch messages do the following for a single user:
 
-1. Create a GitHub issue and tag the user's GitHub handle.
+1. Create a GitHub issue and tag the user's GitHub handle. The issue will be tagged with all provided labels such as `'bug'` or `'question'` .
 2. Send an interactive Slack direct message to the user, which prompts them to respond yes or no.
 
 If a GitHub username is not provided or could not be found, Dispatch will fall back to the `GitHubDefaultUser` parameter.
@@ -38,8 +38,9 @@ The self-service message on Slack includes a link to the associated GitHub issue
   ],
   body: { // required
     github: {
-      title: 'STRING_VALUE' // required, GitHub issue title
-      body: 'STRING_VALUE' // required, GitHub issue body
+      title: 'STRING_VALUE', // required, GitHub issue title
+      body: 'STRING_VALUE', // required, GitHub issue body
+      labels: ['STRING_VALUE', 'STRING_VALUE'] // optional, labels to add to Github Issue
     },
     slack: {
       message: 'STRING_VALUE', // required, Slack message
@@ -100,7 +101,8 @@ Unlike self-service alarms, broadcast Slack DMs do not include a link to their a
   body: {
     github: {
         title: 'STRING_VALUE', // required, GitHub issue title
-        body: 'STRING_VALUE' // required, GitHub issue body
+        body: 'STRING_VALUE', // required, GitHub issue body
+        labels: ['STRING_VALUE', 'STRING_VALUE'] // optional, labels to add to Github Issue
     },
     slack: {
       message: 'STRING_VALUE', // required, Slack message
@@ -150,8 +152,9 @@ Low priority dispatch messages open a GitHub issue.
   ],
   body: { // required
     github: {
-      title: 'STRING_VALUE' // required, GitHub issue title
-      body: 'STRING_VALUE' // required, GitHub issue body
+      title: 'STRING_VALUE', // required, GitHub issue title
+      body: 'STRING_VALUE', // required, GitHub issue body
+      labels: ['STRING_VALUE', 'STRING_VALUE'] // optional, labels to add to Github Issue
     }
   }
 }
