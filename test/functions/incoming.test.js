@@ -195,6 +195,47 @@ test('[incoming] [fn] low-priority event', (assert) => {
   });
 });
 
+
+test.only('[incoming] [fn] low-priority event with user', (assert) => {
+  nock('https://api.github.com')
+    .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ state: 'open', access_token: process.env.GitHubToken })
+    .reply(200, []);
+
+  const githubNock = nock('https://api.github.com')
+    .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`, (req) => {
+      return /@testGitHubUser/g.test(req.body);
+    })
+    .query({ access_token: process.env.GitHubToken })
+    .reply(201, githubFixtures.lowPriorityIssue);
+
+  incoming.fn(incomingFixtures.lowPriorityEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.ok(githubNock.isDone());
+    assert.end();
+  });
+});
+
+test('[incoming] [fn] low-priority event with labels', (assert) => {
+  nock('https://api.github.com')
+    .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
+    .query({ state: 'open', access_token: process.env.GitHubToken })
+    .reply(200, []);
+
+  const createIssue = nock('https://api.github.com')
+    .post(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`, /low_priority/)
+    .query({ access_token: process.env.GitHubToken })
+    .reply(201, githubFixtures.lowPriorityIssue);
+
+  incoming.fn(incomingFixtures.labelledEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.ok(createIssue.isDone(), '-- create issue with label called');
+    assert.end();
+  });
+});
+
 test('[incoming] [fn] low-priority event with no users', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
