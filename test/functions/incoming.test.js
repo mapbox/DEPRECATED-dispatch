@@ -3,10 +3,11 @@
 const test = require('tape');
 const nock = require('nock');
 const sinon = require('sinon');
+
 const github = require('./../../lib/github');
 const slack = require('./../../lib/slack');
-
 const incoming = require('../../incoming/function.js');
+
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
 const githubFixtures = require('../fixtures/github.fixtures.js');
 const pagerDutyFixtures = require('../fixtures/pagerduty.fixtures.js');
@@ -279,8 +280,9 @@ test('[incoming] [fn] unrecognized event fallback', (assert) => {
   });
 });
 
+// TODO: Create a better tests. Checking if github.issues.create is called
 test('[incoming] [fn] nag event', (assert) => {
-  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: 'exists', issue: 4565}));
+  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: null, issue: 4565}));
   let alertToSlackStub = sinon.stub(slack, 'alertToSlack').yields(null, 'wat');
 
   incoming.fn(incomingFixtures.nagEvent, context, (err, res) => {
