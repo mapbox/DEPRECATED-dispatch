@@ -417,6 +417,10 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
     options.body = `${message.body.github.body} \n\n @${user.github}`;
   }
 
+  if (message.type === 'nag') {
+    options.body = message.body.github.body;
+  }
+
   github.createIssue(options, message.retrigger, gitHubToken)
     .then(res => {
       return callback(null, res);
