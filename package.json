@@ -4,12 +4,12 @@
   "description": "Alert routing tool",
   "main": "index.js",
   "engines": {
-    "node": "6.10.3"
+    "node": "^8.10.0"
   },
   "scripts": {
     "lint": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js",
     "unit-test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js",
-    "test": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js && NODE_ENV=test tape test/*.test.js test/**/*.test.js"
+    "test": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js && NODE_ENV=test tape test/*.test.js test/**/*.test.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
-    "@mapbox/lambda-cfn": "^2.0.0",
+    "@mapbox/lambda-cfn": "3.0.1",
     "@mapbox/pagerduty": "^1.0.0",
     "@octokit/rest": "^15.8.0",
     "@slack/client": "^3.16.0",
@@ -36,6 +36,7 @@
     "eslint": "^4.19.1",
     "nock": "^9.2.5",
     "sinon": "^2.1.0",
-    "tape": "^4.9.0"
+    "tape": "^4.9.0",
+    "tap-spec": "^5.0.0"
   }
 }

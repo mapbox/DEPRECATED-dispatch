@@ -196,7 +196,7 @@ test('[incoming] [fn] low-priority event', (assert) => {
 });
 
 
-test.only('[incoming] [fn] low-priority event with user', (assert) => {
+test('[incoming] [fn] low-priority event with user', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
     .query({ state: 'open', access_token: process.env.GitHubToken })

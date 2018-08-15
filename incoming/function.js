@@ -54,7 +54,9 @@ incoming.fn = function(event, context, callback) {
         return callback(lambdaFailure);
       }
 
-      if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
+      if (typeof message.retrigger === 'undefined') {
+        message.retrigger = true;
+      }
 
       const gitHubRepo = message.gitHubRepo ? message.gitHubRepo : process.env.GitHubRepo;
       const pagerDutyServiceId = message.pagerDutyServiceId ? message.pagerDutyServiceId : process.env.PagerDutyServiceId;
