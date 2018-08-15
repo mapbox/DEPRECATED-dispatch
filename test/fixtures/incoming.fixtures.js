@@ -152,6 +152,37 @@ module.exports.lowPriorityEventNoUser = {
     ]
 };
 
+module.exports.nagEvent = {
+  Records:
+    [
+      { EventSource: 'aws:sns',
+        Sns: {
+          Message: JSON.stringify(
+            {
+              type: 'nag',
+              users: [
+                {
+                  github: 'testGitHubUser',
+                  slack: 'testSlackUser',
+                  slackId: 'testSlackId'
+                }
+              ],
+              body: {
+                github: {
+                  title: 'testGitHubTitle',
+                  body: 'testGitHubBody'
+                },
+                slack: {
+                  message: 'testSlackMessage'
+                }
+              }
+            }
+          )
+        }
+      }
+    ]
+};
+
 module.exports.unrecognizedEvent = {
   Records:
   [{ EventSource: 'aws:sns',

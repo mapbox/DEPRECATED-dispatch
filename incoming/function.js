@@ -166,6 +166,58 @@ incoming.fn = function(event, context, callback) {
         });
       }
 
+      else if (message.type === 'nag') {
+        incoming.callGitHub(gitHubDefaultUser, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'github',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
+
+          // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
+          let isGithubIssueExists = res && res.status === 'exists';
+
+          if (isGithubIssueExists) {
+            console.log({
+              severity: 'notice',
+              requestId: requestId,
+              service: 'github',
+              message: `issue ${res.issue} already exists`
+            });
+          }
+
+          let q = queue(1);
+          message.users.forEach((user) => {
+            user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel, requestId, message);
+            q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
+          });
+
+          q.awaitAll(function(err, status) {
+            if (err) {
+              console.log({
+                severity: 'error',
+                requestId: requestId,
+                service: 'slack',
+                message: err,
+                status: status
+              });
+              return callback(lambdaFailure);
+            }
+
+            console.log({
+              severity: 'info',
+              requestId: requestId,
+              service: 'lambda',
+              message: 'nag routing success - opened GitHub issue'
+            });
+            return callback(null, lambdaSuccess);
+          });
+        });
+      }
       // HIGH-PRIORITY
       else if (message.type === 'high-priority') {
         incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => {

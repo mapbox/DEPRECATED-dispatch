@@ -2,6 +2,9 @@
 
 const test = require('tape');
 const nock = require('nock');
+const sinon = require('sinon');
+const github = require('./../../lib/github');
+const slack = require('./../../lib/slack');
 
 const incoming = require('../../incoming/function.js');
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
@@ -272,6 +275,36 @@ test('[incoming] [fn] unrecognized event fallback', (assert) => {
   incoming.fn(incomingFixtures.unrecognizedEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, lambdaSuccess, '-- PagerDuty incident should be triggered');
+    assert.end();
+  });
+});
+
+test('[incoming] [fn] nag event', (assert) => {
+  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: 'exists', issue: 4565}));
+  let alertToSlackStub = sinon.stub(slack, 'alertToSlack').yields(null, 'wat');
+
+  incoming.fn(incomingFixtures.nagEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.equals(github.createIssue.callCount, 1, 'Create Issue should be created only once');
+    assert.equals(slack.alertToSlack.callCount, 1, 'It should only called once');
+    githubStub.restore();
+    alertToSlackStub.restore();
+    assert.end();
+  });
+});
+
+test('[incoming] [fn] [nag event] Send slack message event if the github issue is already created', (assert) => {
+  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: 'exists', issue: 4565}));
+  let alertToSlackStub = sinon.stub(slack, 'alertToSlack').yields(null, 'wat');
+
+  incoming.fn(incomingFixtures.nagEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.equals(github.createIssue.callCount, 1, 'Create Issue should be created only once');
+    assert.equals(slack.alertToSlack.callCount, 1, 'It should only called once');
+    githubStub.restore();
+    alertToSlackStub.restore();
     assert.end();
   });
 });
