@@ -178,7 +178,6 @@ incoming.fn = function(event, context, callback) {
             return callback(lambdaFailure);
           }
 
-          // NOTE: If the GitHub issue already exists and message.retrigger is false, halt alert and return
           let isGithubIssueExists = res && res.status === 'exists';
 
           if (isGithubIssueExists) {
