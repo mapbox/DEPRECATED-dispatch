@@ -90,7 +90,7 @@ test('[slack] [alertToSlack] formatMessage error', (assert) => {
     assert.end();
   });
 
-  slack.formatMessage.restore();
+  formatMessageStub.restore();
 });
 
 test('[slack] [alertToSlack] postAlert error', (assert) => {
@@ -104,8 +104,8 @@ test('[slack] [alertToSlack] postAlert error', (assert) => {
     assert.end();
   });
 
-  slack.formatMessage.restore();
-  slack.postAlert.restore();
+  formatMessageStub.restore();
+  postAlertStub.restore();
 });
 
 test('[slack] [alertToSlack] postAlert message success, no prompt', (assert) => {
@@ -121,8 +121,8 @@ test('[slack] [alertToSlack] postAlert message success, no prompt', (assert) => 
     assert.end();
   });
 
-  slack.formatMessage.restore();
-  slack.postAlert.restore();
+  formatMessageStub.restore();
+  postAlertStub.restore();
 });
 
 test('[slack] [alertToSlack] postAlert message success, prompt error', (assert) => {
@@ -140,8 +140,8 @@ test('[slack] [alertToSlack] postAlert message success, prompt error', (assert) 
     assert.end();
   });
 
-  slack.formatMessage.restore();
-  slack.postAlert.restore();
+  postAlertStub.restore();
+  formatMessageStub.restore();
 });
 
 test('[slack] [alertToSlack] postAlert message success, prompt success', (assert) => {
@@ -161,6 +161,6 @@ test('[slack] [alertToSlack] postAlert message success, prompt success', (assert
     assert.end();
   });
 
-  slack.formatMessage.restore();
-  slack.postAlert.restore();
+  formatMessageStub.restore();
+  postAlertStub.restore();
 });

@@ -133,6 +133,39 @@ High priority dispatch messages open a PagerDuty incident.
 }
 ```
 
+## Nag dispatch
+
+This dispatch message open a github issue and send slack notification everytime dispatch gets an sns message
+
+### Message specification for `nag`
+
+``` javascript
+{
+  type: 'nag', // required
+  retrigger: 'BOOLEAN', // optional, if set to false Dispatch will not send a message if an issue has already been reported
+  users: [
+    {
+      slack: 'STRING_VALUE', // optional, Slack handle
+      slackId: 'STRING_VALUE' // required, Slack ID
+    },
+    {
+      slack: 'STRING_VALUE', // optional, Slack handle
+      slackId: 'STRING_VALUE' // required, Slack ID
+    }
+  ],
+  body: {
+    github: {
+        title: 'STRING_VALUE', // required, GitHub issue title
+        body: 'STRING_VALUE', // required, GitHub issue body
+        labels: ['STRING_VALUE', 'STRING_VALUE'] // optional, labels to add to Github Issue
+    },
+    slack: {
+      message: 'STRING_VALUE', // required, Slack message
+    }
+  }
+}
+```
+
 ## Low priority dispatch
 
 Low priority dispatch messages open a GitHub issue.

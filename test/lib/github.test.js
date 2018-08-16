@@ -112,7 +112,7 @@ test('[github] [createIssue] Does not create issue because one exists. Retrigger
 
   github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
+      assert.deepEqual(res, { status: 'exists', issue: 7, number: 7 }, '-- does not create issue');
       assert.end();
     })
     .catch(err => { console.log(err); });
@@ -135,7 +135,7 @@ test('[github] [createIssue] Does not create issue because one exists. Retrigger
 
   github.createIssue(options, retrigger, token)
     .then(res => {
-      assert.deepEqual(res, { status: 'exists', issue: 7 }, '-- does not create issue');
+      assert.deepEqual(res, { status: 'exists', issue: 7, number: 7}, '-- does not create issue');
       assert.end();
     })
     .catch(err => { console.log(err); });

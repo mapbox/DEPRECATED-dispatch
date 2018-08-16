@@ -207,6 +207,14 @@ Low priority Dispatch alerts create a GitHub issue only. Replace `$SNS_ARN` and 
 aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"low-priority\",\"githubRepo\":\"$GITHUB_REPO\",\"body\":{\"github\":{\"title\":\"low-priority title\",\"body\":\"low-priority body\", \"labels\": [\"low_priority\"]}}}"
 ```
 
+### Nag example
+
+Low priority Dispatch alerts create a GitHub issue only. Replace `$SNS_ARN` and `$GITHUB_REPO` with your SNS topic ARN and target GitHub repository.
+
+```
+aws sns publish --topic-arn "$SNS_ARN" --subject "test" --message "{\"type\":\"nag\",\"githubRepo\":\"$GITHUB_REPO\",\"body\":{\"github\":{\"title\":\"nag title\",\"body\":\"low-priority body\", \"labels\": [\"low_priority\"]}}}"
+```
+
 
 ## Development
 

@@ -2,8 +2,12 @@
 
 const test = require('tape');
 const nock = require('nock');
+const sinon = require('sinon');
 
+const github = require('./../../lib/github');
+const slack = require('./../../lib/slack');
 const incoming = require('../../incoming/function.js');
+
 const incomingFixtures = require('../../test/fixtures/incoming.fixtures.js');
 const githubFixtures = require('../fixtures/github.fixtures.js');
 const pagerDutyFixtures = require('../fixtures/pagerduty.fixtures.js');
@@ -196,7 +200,7 @@ test('[incoming] [fn] low-priority event', (assert) => {
 });
 
 
-test.only('[incoming] [fn] low-priority event with user', (assert) => {
+test('[incoming] [fn] low-priority event with user', (assert) => {
   nock('https://api.github.com')
     .get(`/repos/${process.env.GitHubOwner}/${process.env.GitHubRepo}/issues`)
     .query({ state: 'open', access_token: process.env.GitHubToken })
@@ -272,6 +276,37 @@ test('[incoming] [fn] unrecognized event fallback', (assert) => {
   incoming.fn(incomingFixtures.unrecognizedEvent, context, (err, res) => {
     assert.ifError(err, '-- should not error');
     assert.deepEqual(res, lambdaSuccess, '-- PagerDuty incident should be triggered');
+    assert.end();
+  });
+});
+
+// TODO: Create a better tests. Checking if github.issues.create is called
+test('[incoming] [fn] nag event', (assert) => {
+  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: null, issue: 4565}));
+  let alertToSlackStub = sinon.stub(slack, 'alertToSlack').yields(null, 'wat');
+
+  incoming.fn(incomingFixtures.nagEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.equals(github.createIssue.callCount, 1, 'Create Issue should be created only once');
+    assert.equals(slack.alertToSlack.callCount, 1, 'It should only called once');
+    githubStub.restore();
+    alertToSlackStub.restore();
+    assert.end();
+  });
+});
+
+test('[incoming] [fn] [nag event] Send slack message event if the github issue is already created', (assert) => {
+  let githubStub = sinon.stub(github, 'createIssue').returns(Promise.resolve({status: 'exists', issue: 4565}));
+  let alertToSlackStub = sinon.stub(slack, 'alertToSlack').yields(null, 'wat');
+
+  incoming.fn(incomingFixtures.nagEvent, context, (err, res) => {
+    assert.ifError(err, '-- should not error');
+    assert.deepEqual(res, lambdaSuccess, '-- GitHub issue should be created');
+    assert.equals(github.createIssue.callCount, 1, 'Create Issue should be created only once');
+    assert.equals(slack.alertToSlack.callCount, 1, 'It should only called once');
+    githubStub.restore();
+    alertToSlackStub.restore();
     assert.end();
   });
 });

@@ -6,6 +6,7 @@ module.exports = lambdaCfn.build({
   name: 'incoming',
   memorySize: '1536',
   timeout: '300',
+  runtime: 'nodejs8.10',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',

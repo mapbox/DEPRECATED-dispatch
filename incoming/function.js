@@ -54,7 +54,9 @@ incoming.fn = function(event, context, callback) {
         return callback(lambdaFailure);
       }
 
-      if (typeof message.retrigger === 'undefined') { message.retrigger = true; };
+      if (typeof message.retrigger === 'undefined') {
+        message.retrigger = true;
+      }
 
       const gitHubRepo = message.gitHubRepo ? message.gitHubRepo : process.env.GitHubRepo;
       const pagerDutyServiceId = message.pagerDutyServiceId ? message.pagerDutyServiceId : process.env.PagerDutyServiceId;
@@ -164,6 +166,57 @@ incoming.fn = function(event, context, callback) {
         });
       }
 
+      else if (message.type === 'nag') {
+        incoming.callGitHub(gitHubDefaultUser, message, requestId, gitHubOwner, gitHubRepo, gitHubToken, (err, res) => {
+          if (err) {
+            console.log({
+              severity: 'error',
+              requestId: requestId,
+              service: 'github',
+              message: err
+            });
+            return callback(lambdaFailure);
+          }
+
+          let isGithubIssueExists = res && res.status === 'exists';
+
+          if (isGithubIssueExists) {
+            console.log({
+              severity: 'notice',
+              requestId: requestId,
+              service: 'github',
+              message: `issue ${res.issue} already exists`
+            });
+          }
+
+          let q = queue(1);
+          message.users.forEach((user) => {
+            user = incoming.checkUser(user, gitHubDefaultUser, slackDefaultChannel, requestId, message);
+            q.defer(incoming.callSlack, user, message, requestId, slackDefaultChannel, slackBotToken, res);
+          });
+
+          q.awaitAll(function(err, status) {
+            if (err) {
+              console.log({
+                severity: 'error',
+                requestId: requestId,
+                service: 'slack',
+                message: err,
+                status: status
+              });
+              return callback(lambdaFailure);
+            }
+
+            console.log({
+              severity: 'info',
+              requestId: requestId,
+              service: 'lambda',
+              message: 'nag routing success - opened GitHub issue'
+            });
+            return callback(null, lambdaSuccess);
+          });
+        });
+      }
       // HIGH-PRIORITY
       else if (message.type === 'high-priority') {
         incoming.callPagerDuty(message, requestId, pagerDutyApiKey, pagerDutyServiceId, pagerDutyFromAddress, (err, res) => {
@@ -361,6 +414,10 @@ incoming.callGitHub = function(user, message, requestId, gitHubOwner, gitHubRepo
   // SELF-SERVICE or LOW-PRIORITY
   if ((message.type === 'self-service') || (message.type === 'low-priority')) {
     options.body = `${message.body.github.body} \n\n @${user.github}`;
+  }
+
+  if (message.type === 'nag') {
+    options.body = message.body.github.body;
   }
 
   github.createIssue(options, message.retrigger, gitHubToken)
