@@ -1,8 +1,9 @@
 'use strict';
 
 const lambdaCfn = require('@mapbox/lambda-cfn');
+const cf = require('@mapbox/cloudfriend');
 
-module.exports = lambdaCfn.build({
+const lambdaTemplate = lambdaCfn.build({
   name: 'incoming',
   memorySize: '1536',
   timeout: '300',
@@ -66,3 +67,13 @@ module.exports = lambdaCfn.build({
     sns: {}
   }
 });
+
+delete lambdaTemplate.Parameters.CodeS3Bucket;
+delete lambdaTemplate.Parameters.CodeS3Prefix;
+delete lambdaTemplate.Resources.incoming.Properties.Environment.Variables.CodeS3Bucket;
+delete lambdaTemplate.Resources.incoming.Properties.Environment.Variables.CodeS3Prefix;
+
+lambdaTemplate.Resources.incoming.Properties.Code.S3Bucket = cf.join('-', ['utility', cf.accountId, cf.region]);
+lambdaTemplate.Resources.incoming.Properties.Code.S3Key = cf.join('', ['bundles/dispatch/', cf.ref('GitSha'), '.zip']);
+
+module.exports = lambdaTemplate;
