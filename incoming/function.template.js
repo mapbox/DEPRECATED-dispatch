@@ -68,12 +68,4 @@ const lambdaTemplate = lambdaCfn.build({
   }
 });
 
-delete lambdaTemplate.Parameters.CodeS3Bucket;
-delete lambdaTemplate.Parameters.CodeS3Prefix;
-delete lambdaTemplate.Resources.incoming.Properties.Environment.Variables.CodeS3Bucket;
-delete lambdaTemplate.Resources.incoming.Properties.Environment.Variables.CodeS3Prefix;
-
-lambdaTemplate.Resources.incoming.Properties.Code.S3Bucket = cf.join('-', ['utility', cf.accountId, cf.region]);
-lambdaTemplate.Resources.incoming.Properties.Code.S3Key = cf.join('', ['bundles/dispatch/', cf.ref('GitSha'), '.zip']);
-
 module.exports = lambdaTemplate;
