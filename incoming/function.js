@@ -49,7 +49,7 @@ incoming.fn = function(event, context, callback) {
           severity: 'error',
           requestId: null,
           service: 'lambda',
-          message: 'SNS message missing priority'
+          message: `SNS message missing priority: ${JSON.stringify(message)}`
         });
         return callback(lambdaFailure);
       }
@@ -322,14 +322,14 @@ incoming.fn = function(event, context, callback) {
  * @param {function} callback
  */
 incoming.checkEvent = function(event, callback) {
-  if (event.Records === undefined || !Array.isArray(event.Records)) return callback('SNS message malformed');
-  if (event.Records.length > 1) return callback('SNS message contains more than one record');
+  if (event.Records === undefined || !Array.isArray(event.Records)) return callback(`SNS message malformed: ${JSON.stringify(event)} `);
+  if (event.Records.length > 1) return callback(`SNS message contains more than one record: ${JSON.stringify(event)}`);
   else {
     let message;
     try {
       message = JSON.parse(event.Records[0].Sns.Message);
     } catch (err) {
-      return callback('SNS message contains invalid JSON');
+      return callback(`SNS message contains invalid JSON: ${JSON.stringify(event)}`);
     }
     return callback(null, message);
   }
@@ -348,7 +348,7 @@ incoming.checkUser = function(user, gitHubDefaultUser, slackDefaultChannel, requ
       severity: 'error',
       requestId: requestId,
       service: 'checkUser',
-      message: `checkUser called with undefined user, defaulting user array. Message: ${message}`
+      message: `checkUser called with undefined user, defaulting user array. Message: ${JSON.stringify(message)}`
     });
     user = {
       defaulted: true,
