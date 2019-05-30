@@ -25,12 +25,12 @@
     "@mapbox/lambda-cfn": "3.0.1",
     "@mapbox/pagerduty": "^1.0.0",
     "@octokit/rest": "^15.8.0",
-    "@slack/client": "^3.16.0",
+    "@slack/client": "^5.0.1",
     "aws-sdk": "^2.230.1",
-    "base64url": "0.0.6",
+    "base64url": "^3.0.1",
     "d3-queue": "^3.0.0",
     "decrypt-kms-env": "^3.0.0",
-    "request": "^2.85.0"
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
