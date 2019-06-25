@@ -4,7 +4,7 @@ const lambdaCfn = require('@mapbox/lambda-cfn');
 
 const lambdaTemplate = lambdaCfn.build({
   name: 'triage',
-  handler: 'triage/function.triage',
+  handler: 'triage/function.fn',
   memorySize: '1536',
   parameters: {
     PagerDutyApiKey: {
