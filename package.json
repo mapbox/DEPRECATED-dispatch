@@ -4,12 +4,12 @@
   "description": "Alert routing tool",
   "main": "index.js",
   "engines": {
-    "node": "^8.10.0"
+    "node": "^10.15.3"
   },
   "scripts": {
-    "lint": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js",
+    "lint": "eslint -c .eslintrc.js **/*.js test/**/*.js",
     "unit-test": "NODE_ENV=test tape test/*.test.js test/**/*.test.js",
-    "test": "eslint -c .eslintrc.js *.js **/*.js test/**/*.js && NODE_ENV=test tape test/*.test.js test/**/*.test.js | tap-spec"
+    "test": "eslint -c .eslintrc.js **/*.js test/**/*.js && NODE_ENV=test tape test/*.test.js test/**/*.test.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -22,21 +22,21 @@
   },
   "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
-    "@mapbox/lambda-cfn": "3.0.1",
+    "@mapbox/lambda-cfn": "^3.1.0",
     "@mapbox/pagerduty": "^1.0.0",
     "@octokit/rest": "^15.8.0",
     "@slack/client": "^3.16.0",
-    "aws-sdk": "^2.230.1",
-    "base64url": "0.0.6",
+    "aws-sdk": "^2.481.0",
+    "base64url": "^3.0.1",
     "d3-queue": "^3.0.0",
     "decrypt-kms-env": "^3.0.0",
-    "request": "^2.85.0"
+    "request": "^2.88.0"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "nock": "^9.2.5",
-    "sinon": "^2.4.1",
+    "eslint": "^6.0.1",
+    "nock": "^10.0.6",
+    "sinon": "^7.3.2",
     "tap-spec": "^5.0.0",
-    "tape": "^4.9.0"
+    "tape": "^4.10.2"
   }
 }

@@ -1,43 +1,53 @@
 'use strict';
 
 const lambdaCfn = require('@mapbox/lambda-cfn');
-const cf = require('@mapbox/cloudfriend');
 
 const lambdaTemplate = lambdaCfn.build({
-  name: 'triage',
+  name: 'incoming',
+  handler: 'incoming/function.incoming',
   memorySize: '1536',
+  timeout: '300',
+  runtime: 'nodejs8.10',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',
       Description: '[secure] PagerDuty API key'
     },
-    PagerDutyServiceId: {
-      Type: 'String',
-      Description: 'PagerDuty service ID'
-    },
     PagerDutyFromAddress: {
       Type: 'String',
       Description: 'PagerDuty account email address'
     },
+    PagerDutyServiceId: {
+      Type: 'String',
+      Description: 'PagerDuty service ID'
+    },
+    GitHubDefaultUser: {
+      Type: 'String',
+      Description: 'Default GitHub user or team to be tagged in dispatch issues'
+    },
     GitHubOwner: {
       Type: 'String',
-      Description: 'Owner of Github repo'
+      Description: 'Owner of GitHub repo'
     },
     GitHubRepo: {
       Type: 'String',
-      Description: 'Github repository'
+      Description: 'Default GitHub repo for dispatch issues'
     },
     GitHubToken: {
       Type: 'String',
-      Description: '[secure] GitHub OAuth Token'
-    },
-    SlackVerificationToken: {
-      Type: 'String',
-      Description: '[secure] Slack verification token for Dispatch Slack app'
+      Description: '[secure] GitHub OAuth token'
     },
     KmsKey: {
       Type: 'String',
-      Description: 'Cloudformation-kms stack name or KMS key ARN'
+      Description: 'cloudformation-kms stack name or KMS key ARN'
+    },
+    SlackBotToken: {
+      Type: 'String',
+      Description: '[secure] Slack API bot token'
+    },
+    SlackDefaultChannel: {
+      Type: 'String',
+      Description: 'Default Slack channel for dispatch, MUST INCLUDE #'
     }
   },
   statements: [
@@ -54,16 +64,7 @@ const lambdaTemplate = lambdaCfn.build({
     }
   ],
   eventSources: {
-    webhook: {
-      method: 'POST',
-      apiKey: false,
-      integration: {
-        PassthroughBehavior: 'WHEN_NO_TEMPLATES',
-        RequestTemplates: {
-          'application/x-www-form-urlencoded': '{ "postBody" : $input.json("$")}'
-        }
-      }
-    }
+    sns: {}
   }
 });
 
