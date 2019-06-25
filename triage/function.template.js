@@ -1,10 +1,10 @@
 'use strict';
 
 const lambdaCfn = require('@mapbox/lambda-cfn');
-const cf = require('@mapbox/cloudfriend');
 
 const lambdaTemplate = lambdaCfn.build({
   name: 'triage',
+  handler: 'triage/function.fn',
   memorySize: '1536',
   parameters: {
     PagerDutyApiKey: {

@@ -1,10 +1,10 @@
 'use strict';
 
 const lambdaCfn = require('@mapbox/lambda-cfn');
-const cf = require('@mapbox/cloudfriend');
 
 const lambdaTemplate = lambdaCfn.build({
   name: 'incoming',
+  handler: 'incoming/function.fn',
   memorySize: '1536',
   timeout: '300',
   runtime: 'nodejs8.10',
