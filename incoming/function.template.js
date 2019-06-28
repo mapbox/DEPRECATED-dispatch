@@ -7,7 +7,6 @@ const lambdaTemplate = lambdaCfn.build({
   handler: 'incoming/function.fn',
   memorySize: '1536',
   timeout: '300',
-  runtime: 'nodejs8.10',
   parameters: {
     PagerDutyApiKey: {
       Type: 'String',
