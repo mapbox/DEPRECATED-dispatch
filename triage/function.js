@@ -162,7 +162,7 @@ triage.fn = function(event, context, callback) {
                   severity: 'notice',
                   requestId: res.requestId,
                   service: 'pagerduty',
-                  message: `found existing PagerDuty incident, will not create duplicate`
+                  message: `found existing PagerDuty incident, will not create duplicate: ${JSON.stringify(error)}`
                 });
 
                 responseError = responseText ? responseText : `dispatch ${res.requestId} - found existing PagerDuty incident ${value.incident.incident_key}, will not create duplicate`;
@@ -171,7 +171,7 @@ triage.fn = function(event, context, callback) {
                   severity: 'error',
                   requestId: res.requestId,
                   service: 'pagerduty',
-                  message: 'failed to create PagerDuty incident'
+                  message: 'failed to create PagerDuty incident: ${JSON.stringify(error)}'
                 });
 
                 responseError = `Error: dispatch ${res.requestId} failed to create PagerDuty incident`;
