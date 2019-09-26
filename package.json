@@ -23,20 +23,20 @@
   "homepage": "https://github.com/mapbox/dispatch#readme",
   "dependencies": {
     "@mapbox/lambda-cfn": "^3.1.0",
-    "@mapbox/pagerduty": "^1.0.0",
+    "@mapbox/pagerduty": "^3.0.0",
     "@octokit/rest": "^15.8.0",
     "@slack/client": "^3.16.0",
-    "aws-sdk": "^2.485.0",
+    "aws-sdk": "^2.536.0",
     "base64url": "^3.0.1",
     "d3-queue": "^3.0.0",
     "decrypt-kms-env": "^3.0.0",
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "eslint": "^6.0.1",
+    "eslint": "^6.4.0",
     "nock": "^10.0.6",
-    "sinon": "^7.3.2",
+    "sinon": "^7.5.0",
     "tap-spec": "^5.0.0",
-    "tape": "^4.10.2"
+    "tape": "^4.11.0"
   }
 }
