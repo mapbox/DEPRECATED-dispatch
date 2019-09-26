@@ -171,7 +171,7 @@ triage.fn = function(event, context, callback) {
                   severity: 'error',
                   requestId: res.requestId,
                   service: 'pagerduty',
-                  message: 'failed to create PagerDuty incident: ${JSON.stringify(error)}'
+                  message: `failed to create PagerDuty incident: ${JSON.stringify(error)}`
                 });
 
                 responseError = `Error: dispatch ${res.requestId} failed to create PagerDuty incident`;
