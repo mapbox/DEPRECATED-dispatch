@@ -17,7 +17,7 @@ const lambdaTemplate = lambdaCfn.build({
     },
     PagerDutyFromAddress: {
       Type: 'String',
-      Description: 'PagerDuty account email address'
+      Description: 'Email address of a valid PagerDuty user'
     },
     GitHubOwner: {
       Type: 'String',
