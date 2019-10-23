@@ -1,3 +1,5 @@
+:warning: DEPRECATED :warning:
+
 [![Build Status](https://travis-ci.org/mapbox/dispatch.svg?branch=master)](https://travis-ci.org/mapbox/dispatch)
 
 ![Dispatch logo](https://github.com/mapbox/dispatch/blob/master/assets/dispatch-large.png)
